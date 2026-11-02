@@ -591,13 +591,16 @@ function parseLanguages(lines: string[]): ResumeFormValues['languages'] {
         // Match "<language> <LEVEL>" where the level ends the line. The separator
         // may be a single space, multiple spaces, a tab, or a dash - real PDF text
         // collapses to single spaces, so we cannot rely on a 2+ space gap.
-        const match = line.match(/^(.+?)[\s\-–\t]+(A1|A2|B1|B2|C1|C2|Native|NATIVE)$/i);
+        // Exports print NATIVE as its PDF label ("Native" / "Ojczysty"); older exports print "NATIVE"
+        const match = line.match(/^(.+?)[\s\-–\t]+(A1|A2|B1|B2|C1|C2|Native|Ojczysty)$/i);
         if (match) {
             const language = match[1].replace(/[-–\s]+$/, '').trim();
             if (language) {
                 languages.push({
                     language,
-                    proficiency: match[2].toUpperCase() as LanguageLevelProps,
+                    proficiency: (/^ojczysty$/i.test(match[2])
+                        ? 'NATIVE'
+                        : match[2].toUpperCase()) as LanguageLevelProps,
                 });
             }
         }
