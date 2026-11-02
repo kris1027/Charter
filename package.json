@@ -33,7 +33,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
-        "pre-commit": "prettier --write . && eslint . && vitest run && tsc -b && vite build"
+        "pre-commit": "prettier --write . && eslint . && vitest run && tsc -b && vite build && pnpm perf:size",
+        "perf:size": "node scripts/perf/check-bundle-size.ts"
     },
     "dependencies": {
         "@dnd-kit/core": "^6.3.1",

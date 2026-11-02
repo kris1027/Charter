@@ -38,3 +38,16 @@ jobs:
 
             - name: Build
               run: pnpm build
+
+            # Per route JS budgets from perf/budgets.json; the table also goes to the job summary
+            - name: JS size budgets
+              run: pnpm perf:size
+
+            # dist/.vite (the manifest) is a dot folder, so it's left out; Lighthouse doesn't need it
+            - name: Upload build
+              uses: actions/upload-artifact@v7
+              with:
+                  name: dist
+                  path: dist
+                  retention-days: 1
+
