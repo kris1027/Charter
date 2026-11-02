@@ -270,7 +270,7 @@ describe('parseResumeFromText — native language label', () => {
             'English B2',
         ].join('\n');
 
-    it.each(['Polski Natywny', 'Polish Native', 'Polish NATIVE'])(
+    it.each(['Polski Ojczysty', 'Polish Native', 'Polish NATIVE'])(
         'should read the level as NATIVE when the PDF prints "%s"',
         (line) => {
             const result = parseResumeFromText(textWith(line), 'developer');

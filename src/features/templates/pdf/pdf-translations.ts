@@ -45,7 +45,7 @@ const strings: Record<AppLang, PDFStrings> = {
         interests: 'Zainteresowania',
         specialInterests: 'Zainteresowania',
         present: 'Obecnie',
-        native: 'Natywny',
+        native: 'Ojczysty',
         gdprConsent: (company) =>
             `Wyrażam zgodę na przetwarzanie moich danych osobowych zawartych w moim CV dla potrzeb niezbędnych do realizacji procesu rekrutacji prowadzonego przez ${company} zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 (RODO).`,
         gdprConsentGeneric:
