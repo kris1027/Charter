@@ -258,3 +258,24 @@ describe('parseResumeFromText — real-world PDF reconstruction quirks', () => {
         expect(names).toContain('running');
     });
 });
+
+describe('parseResumeFromText — native language label', () => {
+    const textWith = (languageLine: string) =>
+        [
+            'Jan Kowalski',
+            'Frontend Developer',
+            'jan@example.com',
+            '// LANGUAGES',
+            languageLine,
+            'English B2',
+        ].join('\n');
+
+    it.each(['Polski Natywny', 'Polish Native', 'Polish NATIVE'])(
+        'should read the level as NATIVE when the PDF prints "%s"',
+        (line) => {
+            const result = parseResumeFromText(textWith(line), 'developer');
+            const native = result.languages.find((l) => l.language.startsWith('Pol'));
+            expect(native?.proficiency).toBe('NATIVE');
+        },
+    );
+});

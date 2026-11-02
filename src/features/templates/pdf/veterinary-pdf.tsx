@@ -326,7 +326,9 @@ export function VeterinaryPDF({ data, compactScale = 0, lang = 'en' }: Veterinar
                             {languages.map((l, i) => (
                                 <View key={i} style={styles.langRow}>
                                     <Text style={styles.langName}>{l.language}</Text>
-                                    <Text style={styles.langLevel}>{l.proficiency}</Text>
+                                    <Text style={styles.langLevel}>
+                                        {l.proficiency === 'NATIVE' ? str.native : l.proficiency}
+                                    </Text>
                                 </View>
                             ))}
                         </View>
