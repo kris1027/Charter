@@ -16,13 +16,16 @@ const cssValue = (name: string) => {
 
 describe('motion tokens', () => {
     it.each(Object.entries(duration))(
-        'should match --duration-%s in index.css',
+        'should match --duration-%s in index.css when the token is read',
         (name, seconds) => {
             expect(cssValue(`duration-${name}`)).toBe(`${Math.round(seconds * 1000)}ms`);
         },
     );
 
-    it.each(Object.entries(ease))('should match --ease-%s in index.css', (name, points) => {
-        expect(cssValue(`ease-${name}`)).toBe(`cubic-bezier(${points.join(', ')})`);
-    });
+    it.each(Object.entries(ease))(
+        'should match --ease-%s in index.css when the token is read',
+        (name, points) => {
+            expect(cssValue(`ease-${name}`)).toBe(`cubic-bezier(${points.join(', ')})`);
+        },
+    );
 });

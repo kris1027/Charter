@@ -90,7 +90,7 @@ const cases = (['light', 'dark'] as const).flatMap((theme) =>
 );
 
 describe('design tokens', () => {
-    it('should drop the chart and sidebar tokens and set color-scheme per theme', () => {
+    it('should set color-scheme per theme and define no chart or sidebar tokens when index.css is parsed', () => {
         expect(css).not.toMatch(/--(chart|sidebar)-/);
         expect(css).toMatch(/\n:root \{\n\s+color-scheme: light;/);
         expect(css).toMatch(/\n\.dark \{\n\s+color-scheme: dark;/);
@@ -100,11 +100,16 @@ describe('design tokens', () => {
         expect(contrast('oklch(1 0 0)', 'oklch(0 0 0)')).toBeCloseTo(21, 1);
     });
 
-    it.each(cases)('should meet the contrast ratio for $label', ({ fg, bg, min, theme, label }) => {
-        const tokens = themes[theme];
-        expect(tokens[fg], `--${fg} is missing`).toBeDefined();
-        expect(tokens[bg], `--${bg} is missing`).toBeDefined();
-        const ratio = contrast(tokens[fg], tokens[bg]);
-        expect(ratio, `${label}: ${ratio.toFixed(2)} is under ${min}`).toBeGreaterThanOrEqual(min);
-    });
+    it.each(cases)(
+        'should meet the contrast ratio when $label is checked',
+        ({ fg, bg, min, theme, label }) => {
+            const tokens = themes[theme];
+            expect(tokens[fg], `--${fg} is missing`).toBeDefined();
+            expect(tokens[bg], `--${bg} is missing`).toBeDefined();
+            const ratio = contrast(tokens[fg], tokens[bg]);
+            expect(ratio, `${label}: ${ratio.toFixed(2)} is under ${min}`).toBeGreaterThanOrEqual(
+                min,
+            );
+        },
+    );
 });

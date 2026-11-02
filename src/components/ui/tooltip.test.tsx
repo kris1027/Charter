@@ -28,7 +28,7 @@ describe('Tooltip', () => {
         expect(await screen.findByRole('tooltip')).toHaveTextContent('Download as PDF');
     });
 
-    it('should open on keyboard focus and close on Escape', async () => {
+    it('should open when the trigger gets keyboard focus and close when Escape is pressed', async () => {
         const user = userEvent.setup();
         renderTooltip();
 

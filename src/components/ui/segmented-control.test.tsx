@@ -26,7 +26,7 @@ const ModeSwitch = ({ onChange }: ModeSwitchProps) => {
 };
 
 describe('SegmentedControl', () => {
-    it('should expose a labelled radio group with the chosen item checked', () => {
+    it('should expose a labelled radio group with the chosen item checked when rendered with a value', () => {
         render(<ModeSwitch />);
 
         expect(screen.getByRole('radiogroup', { name: 'Mode' })).toBeInTheDocument();

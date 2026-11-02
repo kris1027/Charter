@@ -37,7 +37,7 @@ describe('PwaReloadPrompt', () => {
         expect(screen.queryByText('New version available')).not.toBeInTheDocument();
     });
 
-    it('should show the offline ready toast with only a close button', async () => {
+    it('should show the offline ready toast with only a close button when the app is offline ready', async () => {
         mockOfflineReady = true;
 
         renderWithToaster(<PwaReloadPrompt />);
@@ -60,7 +60,7 @@ describe('PwaReloadPrompt', () => {
         expect(mockSetOfflineReady).toHaveBeenCalledWith(false);
     });
 
-    it('should show the update toast with Reload and Close', async () => {
+    it('should show the update toast with Reload and Close when a new version is waiting', async () => {
         mockNeedRefresh = true;
 
         renderWithToaster(<PwaReloadPrompt />);
@@ -96,7 +96,7 @@ describe('PwaReloadPrompt', () => {
         );
     });
 
-    it('should auto close the offline ready toast after 5 seconds', async () => {
+    it('should auto close the offline ready toast when 5 seconds pass', async () => {
         vi.useFakeTimers({ shouldAdvanceTime: true });
         mockOfflineReady = true;
 
