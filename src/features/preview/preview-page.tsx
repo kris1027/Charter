@@ -181,7 +181,7 @@ export const PreviewPage = () => {
     if (!resumeData) {
         return (
             <div className='relative min-h-screen overflow-hidden'>
-                <div className='animate-gradient-shift absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-violet-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/80' />
+                <div className='animate-gradient-shift absolute inset-0 bg-linear-to-br from-indigo-50 via-white to-violet-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/80' />
                 <div
                     className='absolute inset-0 opacity-[0.03] dark:opacity-[0.04]'
                     style={{
@@ -190,7 +190,7 @@ export const PreviewPage = () => {
                         backgroundSize: '24px 24px',
                     }}
                 />
-                <div className='relative z-[1] container mx-auto px-4 py-24'>
+                <div className='relative z-1 container mx-auto px-4 py-24'>
                     <div className='animate-fade-in-up mx-auto max-w-md text-center'>
                         <h1 className='font-display mb-4 text-2xl font-bold dark:text-gray-100'>
                             {t('preview.noData')}
@@ -198,7 +198,7 @@ export const PreviewPage = () => {
                         <p className='text-muted-foreground mb-6'>{t('preview.noDataHint')}</p>
                         <Button
                             asChild
-                            className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl'
+                            className='bg-linear-to-r from-indigo-600 to-violet-600 text-white shadow-lg transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl'
                         >
                             <Link to='/templates'>
                                 <ArrowLeft className='mr-2 h-4 w-4' />
@@ -224,13 +224,13 @@ export const PreviewPage = () => {
                                     {t('nav.backToEditor')}
                                 </Link>
                             </Button>
-                            <h1 className='font-display bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400'>
+                            <h1 className='font-display bg-linear-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400'>
                                 {t('preview.title')}
                             </h1>
                         </div>
 
                         <div className='flex items-center gap-3'>
-                            <div className='flex min-h-8 items-center justify-end md:min-w-[190px]'>
+                            <div className='flex min-h-8 items-center justify-end md:min-w-47.5'>
                                 {/* Page layout toggle — visible only when content exceeds one page and can be compacted */}
                                 {showToggle && (
                                     <div className='flex items-center overflow-hidden rounded-md border border-gray-200 dark:border-gray-700'>
@@ -269,6 +269,8 @@ export const PreviewPage = () => {
                                 size='sm'
                                 onClick={handleDownloadPDF}
                                 disabled={isExporting}
+                                // The Lighthouse seed script waits for this (spec 0003)
+                                data-testid='export-pdf'
                                 className='transition-colors hover:border-green-300 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400'
                             >
                                 {isExporting ? (
@@ -281,7 +283,7 @@ export const PreviewPage = () => {
                             <Button
                                 asChild
                                 size='sm'
-                                className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-md'
+                                className='bg-linear-to-r from-indigo-600 to-violet-600 text-white shadow-sm transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-md'
                             >
                                 <Link to='/builder' search={{ templateId, edit: true }}>
                                     <Edit className='mr-2 h-4 w-4' />

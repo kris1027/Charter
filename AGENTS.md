@@ -22,8 +22,10 @@ pnpm dev              # Dev server on http://localhost:5173
 pnpm build            # tsc -b plus vite build (the only typecheck)
 pnpm test             # Vitest once; pnpm test:coverage enforces a 50% floor
 pnpm lint             # ESLint only
-pnpm format           # Prettier; CI runs format:check, lint, test, build
-pnpm pre-commit       # All of the above; run before pushing
+pnpm format           # Prettier; CI runs format:check, lint, test, build, perf:size
+pnpm perf:size        # Per route JS (brotli) against perf/budgets.json; needs a fresh dist
+pnpm perf:lighthouse  # Build, then Lighthouse CI on vite preview (local only, not in pre-commit)
+pnpm pre-commit       # format, lint, test, build, perf:size (not Lighthouse); run before pushing
 ```
 
 ## Specs

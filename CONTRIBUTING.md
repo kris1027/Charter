@@ -26,18 +26,20 @@ The app will be available at `http://localhost:5173/`.
 
 ## Scripts
 
-| Command              | Description                        |
-| -------------------- | ---------------------------------- |
-| `pnpm run dev`       | Start dev server                   |
-| `pnpm run build`     | Production build                   |
-| `pnpm run preview`   | Preview production build           |
-| `pnpm lint`          | ESLint checks                      |
-| `pnpm format`        | Format all files with Prettier     |
-| `pnpm format:check`  | Check formatting (CI uses this)    |
-| `pnpm test`          | Run all tests once                 |
-| `pnpm test:watch`    | Run tests in watch mode            |
-| `pnpm test:coverage` | Run tests with coverage report     |
-| `pnpm pre-commit`    | Format + lint + test + tsc + build |
+| Command                | Description                                                        |
+| ---------------------- | ------------------------------------------------------------------ |
+| `pnpm run dev`         | Start dev server                                                   |
+| `pnpm run build`       | Production build                                                   |
+| `pnpm run preview`     | Preview production build                                           |
+| `pnpm lint`            | ESLint checks                                                      |
+| `pnpm format`          | Format all files with Prettier                                     |
+| `pnpm format:check`    | Check formatting (CI uses this)                                    |
+| `pnpm test`            | Run all tests once                                                 |
+| `pnpm test:watch`      | Run tests in watch mode                                            |
+| `pnpm test:coverage`   | Run tests with coverage report                                     |
+| `pnpm pre-commit`      | Format + lint + test + tsc + build + JS size check                 |
+| `pnpm perf:size`       | Check per page JS size against `perf/budgets.json` (after a build) |
+| `pnpm perf:lighthouse` | Build, then run Lighthouse CI locally (set `CHROME_PATH` first)    |
 
 **Always run `pnpm pre-commit` before pushing.** CI will reject PRs that fail any of these checks.
 
@@ -88,6 +90,21 @@ GitHub Actions runs on push to `main` and on pull requests targeting `main`:
 2. Lint (`pnpm lint`)
 3. Test (`pnpm test`, with the React Compiler on, like the build)
 4. Build (`pnpm run build`, typecheck plus compiled output)
+5. JS size budgets (`pnpm perf:size`)
+6. Lighthouse, in its own job after the build: five pages on mobile settings, reports kept as a workflow artifact for 14 days
+
+## Performance budgets
+
+Each page has a JS budget (brotli KiB of what it loads up front) in `perf/budgets.json`, plus a cap on any single chunk. `pnpm perf:size` fails when a page goes over, when a new route has no budget, or when a budget no longer matches a route. Lighthouse floors per page live at the top of `lighthouserc.cjs`; a median under 0.95 only warns.
+
+To raise a budget, edit `perf/budgets.json` in your PR and write the new `reason` (what grew and why). An empty reason fails the check. Floors change only together with the baseline table in `docs/specs/0003-performance-budgets/rationale.md`.
+
+To run Lighthouse locally, point `CHROME_PATH` at your Chrome, for example on macOS:
+
+```bash
+export CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+pnpm perf:lighthouse
+```
 
 ## Pull Requests
 

@@ -36,5 +36,63 @@ jobs:
             - name: Test
               run: pnpm test
 
+            # src/lib/seo.ts throws on load without VITE_SITE_URL (a blank page, NO_FCP in Lighthouse).
+            # The origin Lighthouse audits, so canonical and og:url stay same origin there.
             - name: Build
               run: pnpm build
+              env:
+                  VITE_SITE_URL: http://localhost:4173
+
+            # Per route JS budgets from perf/budgets.json; the table also goes to the job summary
+            - name: JS size budgets
+              run: pnpm perf:size
+
+            # dist/.vite (the manifest) is a dot folder, so it's left out; Lighthouse doesn't need it
+            - name: Upload build
+              uses: actions/upload-artifact@v7
+              with:
+                  name: dist
+                  path: dist
+                  retention-days: 1
+
+    lighthouse:
+        name: Lighthouse
+        needs: lint-format-test-build
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: pnpm/action-setup@v4
+
+            - uses: actions/setup-node@v6
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            # vite preview loads vite.config.ts and its plugins
+            - run: pnpm install --frozen-lockfile
+
+            - name: Download build
+              uses: actions/download-artifact@v8
+              with:
+                  name: dist
+                  path: dist
+
+            - name: Lighthouse CI
+              run: pnpm perf:lhci
+              env:
+                  CHROME_PATH: /usr/bin/google-chrome
+
+            - name: Lighthouse summary
+              if: always()
+              run: pnpm perf:lhci-summary
+
+            - name: Upload Lighthouse reports
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: lighthouse-reports
+                  path: .lighthouseci
+                  include-hidden-files: true
+                  retention-days: 14

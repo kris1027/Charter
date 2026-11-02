@@ -11,39 +11,39 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 ## At a glance
 
-| #   | Feature                         | Phase      | Status   |
-| --- | ------------------------------- | ---------- | -------- |
-| A   | Landing page                    | Existing   | existing |
-| B   | Template gallery & detail       | Existing   | existing |
-| C   | Builder form                    | Existing   | existing |
-| D   | Resume templates & preview      | Existing   | existing |
-| E   | PDF export                      | Existing   | existing |
-| F   | PDF import                      | Existing   | existing |
-| G   | Local persistence               | Existing   | existing |
-| H   | i18n (EN/PL)                    | Existing   | existing |
-| I   | Theme (light/dark/system)       | Existing   | existing |
-| J   | PWA & offline                   | Existing   | existing |
-| K   | SEO                             | Existing   | existing |
-| 1   | Coding standards & AGENTS.md    | Foundation | done     |
-| 2   | Stack review                    | Foundation | done     |
-| 3   | Upgrades & replacements         | Foundation | done     |
-| 17  | Unified radix-ui package        | Foundation | done     |
-| 18  | Intl dates instead of date-fns  | Foundation | done     |
-| 19  | Single CSP source               | Foundation | done     |
-| 20  | React Compiler                  | Foundation | done     |
-| 4   | Feature based folder structure  | Foundation | done     |
-| 5   | Performance budgets             | Foundation | planned  |
-| 6   | Design system refresh           | Foundation | planned  |
-| 7   | Builder page split              | Slice 1    | planned  |
-| 8   | Shared template model           | Slice 1    | planned  |
-| 9   | PDF import parser restructure   | Slice 1    | planned  |
-| 10  | Lazy load heavy engines         | Slice 2    | planned  |
-| 11  | Builder responsiveness          | Slice 2    | planned  |
-| 12  | Landing page refresh            | Slice 3    | planned  |
-| 13  | Template gallery refresh        | Slice 3    | planned  |
-| 14  | Builder UI refresh              | Slice 3    | planned  |
-| 15  | Preview & export UI refresh     | Slice 3    | planned  |
-| 16  | Accessibility & Lighthouse pass | Slice 3    | planned  |
+| #   | Feature                         | Phase      | Status      |
+| --- | ------------------------------- | ---------- | ----------- |
+| A   | Landing page                    | Existing   | existing    |
+| B   | Template gallery & detail       | Existing   | existing    |
+| C   | Builder form                    | Existing   | existing    |
+| D   | Resume templates & preview      | Existing   | existing    |
+| E   | PDF export                      | Existing   | existing    |
+| F   | PDF import                      | Existing   | existing    |
+| G   | Local persistence               | Existing   | existing    |
+| H   | i18n (EN/PL)                    | Existing   | existing    |
+| I   | Theme (light/dark/system)       | Existing   | existing    |
+| J   | PWA & offline                   | Existing   | existing    |
+| K   | SEO                             | Existing   | existing    |
+| 1   | Coding standards & AGENTS.md    | Foundation | done        |
+| 2   | Stack review                    | Foundation | done        |
+| 3   | Upgrades & replacements         | Foundation | done        |
+| 17  | Unified radix-ui package        | Foundation | done        |
+| 18  | Intl dates instead of date-fns  | Foundation | done        |
+| 19  | Single CSP source               | Foundation | done        |
+| 20  | React Compiler                  | Foundation | done        |
+| 4   | Feature based folder structure  | Foundation | done        |
+| 5   | Performance budgets             | Foundation | in-progress |
+| 6   | Design system refresh           | Foundation | planned     |
+| 7   | Builder page split              | Slice 1    | planned     |
+| 8   | Shared template model           | Slice 1    | planned     |
+| 9   | PDF import parser restructure   | Slice 1    | planned     |
+| 10  | Lazy load heavy engines         | Slice 2    | planned     |
+| 11  | Builder responsiveness          | Slice 2    | planned     |
+| 12  | Landing page refresh            | Slice 3    | planned     |
+| 13  | Template gallery refresh        | Slice 3    | planned     |
+| 14  | Builder UI refresh              | Slice 3    | planned     |
+| 15  | Preview & export UI refresh     | Slice 3    | planned     |
+| 16  | Accessibility & Lighthouse pass | Slice 3    | planned     |
 
 ## Already built
 
@@ -166,12 +166,17 @@ spec [0002](../specs/0002-feature-folder-structure/index.md). code in `src/featu
     - [x] PDF metadata untangled, pdf, templates and resume areas moved, context files updated (AC-1, AC-2, AC-5, AC-9)
     - [x] App shell, theme, dead code removed, README and final checks (AC-1, AC-4, AC-6, AC-7, AC-9)
 
-### 5. Performance budgets · needs a decision
+### 5. Performance budgets · in-progress
 
 Measure today's bundle, Lighthouse scores and builder render cost, then set budgets the build enforces so later work cannot quietly regress.
 **Done when:** a baseline is recorded in the spec, and the build or CI fails when a page's JS budget or Lighthouse threshold is broken.
+spec [0003](../specs/0003-performance-budgets/index.md). code in `scripts/perf/`, `perf/budgets.json`, `lighthouserc.cjs`, `.github/workflows/ci.yml`, `src/test/fixtures/`
 
-- [ ] Design it (spec): `/architect performance budgets`
+- [x] Design it (spec): `/architect performance budgets`
+- [ ] Build it: `/develop performance budgets`
+    - [x] Per page JS size check wired into CI and pre-commit (AC-1, AC-2, AC-3, AC-4, AC-5, AC-8)
+    - [x] Lighthouse CI job with seeded pages, reports and 95 warnings (AC-6, AC-7, AC-8)
+    - [ ] Lighthouse floors locked and the full baseline recorded (AC-6, AC-9)
 
 ### 6. Design system refresh · needs a decision
 

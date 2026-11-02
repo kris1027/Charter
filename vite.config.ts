@@ -92,6 +92,8 @@ export default defineConfig(({ command }) => ({
         },
     },
     build: {
+        // dist/.vite/manifest.json feeds the per route JS budget check (spec 0003)
+        manifest: true,
         rolldownOptions: {
             output: {
                 manualChunks(id) {

@@ -1,0 +1,76 @@
+{
+    "personalInfo": {
+        "firstName": "John",
+        "lastName": "Anderson",
+        "location": "San Francisco, CA",
+        "title": "Senior Full Stack Developer",
+        "phone": "+1 415 555 0123",
+        "email": "john.anderson@email.com",
+        "website": "johnanderson.dev",
+        "linkedin": "john-anderson-dev",
+        "github": "janderson-dev"
+    },
+    "experiences": [
+        {
+            "company": "TechCorp Solutions",
+            "position": "Senior Full Stack Developer",
+            "location": "San Francisco, CA",
+            "startDate": "2022-03",
+            "endDate": "",
+            "current": true,
+            "description": "• Leading development of microservices architecture using Node.js and React\n• Implementing CI/CD pipelines and automated testing strategies\n• Mentoring junior developers and conducting code reviews\n• Optimizing application performance and reducing load times by 40%\n• Collaborating with product team to define technical requirements\n• Managing cloud infrastructure on AWS and implementing scalability solutions"
+        },
+        {
+            "company": "Digital Innovations Inc",
+            "position": "Full Stack Developer",
+            "location": "Austin, TX",
+            "startDate": "2019-06",
+            "endDate": "2022-02",
+            "current": false,
+            "description": "• Developed and maintained RESTful APIs using Express.js and PostgreSQL\n• Built responsive web applications using React and TypeScript\n• Implemented real-time features using WebSocket connections\n• Integrated third-party services and payment gateways\n• Participated in agile development processes and sprint planning\n• Improved code quality through unit testing and documentation"
+        }
+    ],
+    "education": [
+        {
+            "institution": "Stanford University",
+            "degree": "Bachelor of Science",
+            "field": "Computer Science",
+            "startDate": "2015-09",
+            "endDate": "2019-05",
+            "description": ""
+        }
+    ],
+    "skills": [
+        { "name": "JavaScript" },
+        { "name": "TypeScript" },
+        { "name": "React" },
+        { "name": "Node.js" },
+        { "name": "Next.js" },
+        { "name": "Express.js" },
+        { "name": "PostgreSQL" },
+        { "name": "MongoDB" },
+        { "name": "Redis" },
+        { "name": "Docker" },
+        { "name": "Kubernetes" },
+        { "name": "AWS" },
+        { "name": "GraphQL" },
+        { "name": "REST APIs" },
+        { "name": "Git" },
+        { "name": "CI/CD" },
+        { "name": "Tailwind CSS" },
+        { "name": "Jest" }
+    ],
+    "languages": [
+        { "language": "English", "proficiency": "NATIVE" },
+        { "language": "Spanish", "proficiency": "B2" },
+        { "language": "German", "proficiency": "A2" }
+    ],
+    "interests": [
+        { "name": "Open Source" },
+        { "name": "Cloud Computing" },
+        { "name": "Machine Learning" },
+        { "name": "Photography" },
+        { "name": "Hiking" },
+        { "name": "Chess" }
+    ]
+}
