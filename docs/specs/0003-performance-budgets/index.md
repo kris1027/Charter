@@ -134,7 +134,7 @@ Seed script steps, on every call (LHCI calls it before each run): open a new pag
 **Configuration required**:
 
 - `CHROME_PATH`: the Chrome binary for LHCI and puppeteer. CI sets `/usr/bin/google-chrome`; locally you export your own. It isn't a secret.
-- New dev dependencies: `@lhci/cli` and `puppeteer` (LHCI loads it for `puppeteerScript`). Pin both to versions at least two weeks old, as 0001 does. Don't add `puppeteer` to `allowBuilds` in `pnpm-workspace.yaml`. pnpm then skips its postinstall Chrome download, and the system Chrome from `CHROME_PATH` is used everywhere.
+- New dev dependencies: `@lhci/cli` and `puppeteer` (LHCI loads it for `puppeteerScript`). Pin both to versions at least two weeks old, as 0001 does. List `puppeteer: false` under `allowBuilds` in `pnpm-workspace.yaml`: pnpm 12 fails the install (`ERR_PNPM_IGNORED_BUILDS`) on any unreviewed build script, and `false` denies it explicitly. pnpm then skips its postinstall Chrome download, and the system Chrome from `CHROME_PATH` is used everywhere.
 
 **Critical test scenarios**:
 
