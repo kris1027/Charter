@@ -3,14 +3,18 @@
 const PORT = 4173;
 const ORIGIN = `http://localhost:${PORT}`;
 
-// Scores 0 to 1 per page; 0 means report only until build task 4 locks the floors
-const reportOnly = { performance: 0, accessibility: 0, 'best-practices': 0, seo: 0 };
+// Scores 0 to 1 per page, from CI run 41433413867 on main (2026-11-02)
 const floors = {
-    '/': reportOnly,
-    '/templates': reportOnly,
-    '/templates/developer': reportOnly,
-    '/builder': reportOnly,
-    '/preview': reportOnly,
+    '/': { performance: 0.98, accessibility: 0.98, 'best-practices': 0.98, seo: 0.98 },
+    '/templates': { performance: 0.96, accessibility: 0.98, 'best-practices': 0.98, seo: 0.9 },
+    '/templates/developer': {
+        performance: 0.76,
+        accessibility: 0.93,
+        'best-practices': 0.98,
+        seo: 0.9,
+    },
+    '/builder': { performance: 0.97, accessibility: 0.9, 'best-practices': 0.94, seo: 0.9 },
+    '/preview': { performance: 0.7, accessibility: 0.93, 'best-practices': 0.98, seo: 0.9 },
 };
 
 const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

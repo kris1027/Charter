@@ -176,7 +176,7 @@ spec [0003](../specs/0003-performance-budgets/index.md). code in `scripts/perf/`
 - [x] Build it: `/develop performance budgets`
     - [x] Per page JS size check wired into CI and pre-commit (AC-1, AC-2, AC-3, AC-4, AC-5, AC-8)
     - [x] Lighthouse CI job with seeded pages, reports and 95 warnings (AC-6, AC-7, AC-8)
-    - [ ] Lighthouse floors locked and the full baseline recorded (AC-6, AC-9) · skipped 2026-11-03, floors still 0 (report only)
+    - [x] Lighthouse floors locked and the baseline recorded (AC-6, AC-9); the builder Profiler recording (build task 5) was skipped
 
 ### 6. Design system refresh · done
 
