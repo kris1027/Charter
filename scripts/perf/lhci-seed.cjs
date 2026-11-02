@@ -2,7 +2,7 @@
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
-const ORIGIN = 'http://localhost:4173';
+const { ORIGIN } = require('../../lighthouserc.cjs');
 const resumeJson = JSON.stringify(
     JSON.parse(readFileSync(join(__dirname, '../../src/test/fixtures/perf-resume.json'), 'utf8')),
 );
