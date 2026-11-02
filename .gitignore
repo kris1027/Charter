@@ -29,3 +29,6 @@ dist-ssr
 
 .mcp*
 .claude
+
+# Lighthouse CI reports (spec 0003)
+.lighthouseci

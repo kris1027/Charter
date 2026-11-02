@@ -269,6 +269,8 @@ export const PreviewPage = () => {
                                 size='sm'
                                 onClick={handleDownloadPDF}
                                 disabled={isExporting}
+                                // The Lighthouse seed script waits for this (spec 0003)
+                                data-testid='export-pdf'
                                 className='transition-colors hover:border-green-300 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400'
                             >
                                 {isExporting ? (
