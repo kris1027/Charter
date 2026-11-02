@@ -4,16 +4,16 @@ _Steps derived from spec 0004 acceptance criteria. `/check verify` runs these; `
 
 ## Commands
 
-- [ ] `pnpm vitest run src/lib/design-tokens.test.ts` → passes; every pair in _Contrast pairs_ is checked in light and dark → AC-1, AC-2
-- [ ] In a scratch edit, set `.dark --muted-foreground` to slate 500 → the test fails naming `muted-foreground on muted (dark)` and a ratio under 4.5; revert → AC-2
-- [ ] `grep -nE "chart-|sidebar-" src/index.css` → no matches; `:root` has `color-scheme: light`, `.dark` has `color-scheme: dark` → AC-1
-- [ ] `pnpm vitest run src/lib/motion-tokens.test.ts` → passes; change `--duration-base` in CSS only → fails; revert → AC-7
-- [ ] `grep -nE "fade-in-scale|slide-in-(left|right)|grow-width|shimmer|hover-lift" src` → no matches → AC-7
-- [ ] `grep -rnE "shadow-(xs|sm|md|lg|xl|2xl)\b|outline-(none|hidden)" src/components/ui src/lib/button-variants.ts` → no matches; in `dist` CSS, `.shadow-surface` reads `var(--elevation-surface)` → AC-3, AC-8
-- [ ] Add `className='text-slate-500'` to `src/app/root-layout.tsx` → `pnpm lint` fails with the spec 0004 message; the same edit in `src/features/landing/landing-page.tsx` → lint passes; revert both → AC-10
-- [ ] `pnpm vitest run eslint.config.test.ts` → the bad literals error and the token classes pass → AC-10
-- [ ] `pnpm vitest run src/app` → notice tests pass against the real Sonner, including the StrictMode single toast case → AC-6
-- [ ] `pnpm pre-commit` → format, lint, test, build and `perf:size` all pass; any changed `maxKb` in `perf/budgets.json` has a reason naming spec 0004 → AC-11
+- [x] `pnpm vitest run src/lib/design-tokens.test.ts` → passes; every pair in _Contrast pairs_ is checked in light and dark → AC-1, AC-2
+- [x] In a scratch edit, set `.dark --muted-foreground` to slate 500 → the test fails naming `muted-foreground on muted (dark)` and a ratio under 4.5; revert → AC-2
+- [x] `grep -nE "chart-|sidebar-" src/index.css` → no matches; `:root` has `color-scheme: light`, `.dark` has `color-scheme: dark` → AC-1
+- [x] `pnpm vitest run src/lib/motion-tokens.test.ts` → passes; change `--duration-base` in CSS only → fails; revert → AC-7
+- [x] `grep -nE "fade-in-scale|slide-in-(left|right)|grow-width|shimmer|hover-lift" src` → no matches → AC-7
+- [x] `grep -rnE "shadow-(xs|sm|md|lg|xl|2xl)\b|outline-(none|hidden)" src/components/ui src/lib/button-variants.ts` → no matches; in `dist` CSS, `.shadow-surface` reads `var(--elevation-surface)` → AC-3, AC-8
+- [x] Add `className='text-slate-500'` to `src/app/root-layout.tsx` → `pnpm lint` fails with the spec 0004 message; the same edit in `src/features/landing/landing-page.tsx` → lint passes; revert both → AC-10
+- [x] `pnpm vitest run eslint.config.test.ts` → the bad literals error and the token classes pass → AC-10
+- [x] `pnpm vitest run src/app` → notice tests pass against the real Sonner, including the StrictMode single toast case → AC-6
+- [x] `pnpm pre-commit` → format, lint, test, build and `perf:size` all pass; any changed `maxKb` in `perf/budgets.json` has a reason naming spec 0004 → AC-11
 
 ## In the browser (`pnpm dev`, then light and dark, EN and PL)
 
@@ -32,4 +32,4 @@ _Steps derived from spec 0004 acceptance criteria. `/check verify` runs these; `
 
 ## Docs
 
-- [ ] `DESIGN.md` at the repo root lists every token with light and dark values and its tested pairs, each primitive with variants and sizes, the focus, motion, elevation and gradient rules, the toast API, the lint rule, and how to add a token → AC-9
+- [x] `DESIGN.md` at the repo root lists every token with light and dark values and its tested pairs, each primitive with variants and sizes, the focus, motion, elevation and gradient rules, the toast API, the lint rule, and how to add a token → AC-9
