@@ -46,21 +46,17 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
 
     return (
         <div className='flex min-h-[200px] items-center justify-center p-6'>
-            <div className='mx-auto max-w-md rounded-2xl border border-red-200/60 bg-white/80 p-8 text-center shadow-lg backdrop-blur-sm dark:border-red-500/20 dark:bg-slate-900/80'>
-                <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30'>
-                    <AlertTriangle className='h-6 w-6 text-red-600 dark:text-red-400' />
+            <div className='bg-card text-card-foreground border-destructive/30 shadow-surface mx-auto max-w-md rounded-2xl border p-8 text-center'>
+                <div className='bg-destructive/15 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full'>
+                    <AlertTriangle className='text-destructive h-6 w-6' aria-hidden='true' />
                 </div>
-                <h2 className='mb-2 text-lg font-semibold dark:text-gray-100'>
-                    {t('errorBoundary.title')}
-                </h2>
+                <h2 className='mb-2 text-lg font-semibold'>{t('errorBoundary.title')}</h2>
                 <p className='text-muted-foreground mb-4 text-sm'>
                     {t('errorBoundary.description')}
                 </p>
                 <details className='text-muted-foreground mb-4 text-left text-xs'>
                     <summary className='cursor-pointer'>{t('errorBoundary.details')}</summary>
-                    <pre className='mt-2 overflow-auto rounded bg-slate-100 p-2 dark:bg-slate-800'>
-                        {error.message}
-                    </pre>
+                    <pre className='bg-muted mt-2 overflow-auto rounded p-2'>{error.message}</pre>
                 </details>
                 <Button onClick={resetErrorBoundary}>{t('errorBoundary.tryAgain')}</Button>
             </div>

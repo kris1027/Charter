@@ -139,7 +139,7 @@ export function DatePicker({
                     name={name}
                     variant='outline'
                     className={cn(
-                        'w-full justify-start text-left font-normal',
+                        'border-input w-full justify-start text-left font-normal',
                         !dateValue && 'text-muted-foreground',
                     )}
                     onBlur={onBlur}

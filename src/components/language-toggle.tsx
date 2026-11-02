@@ -25,11 +25,7 @@ export const LanguageToggle = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button
-                    variant='outline'
-                    size='icon'
-                    className='hover:bg-accent h-9 w-9 transition-all dark:hover:bg-white/10'
-                >
+                <Button variant='outline' size='icon'>
                     <Languages className='h-4 w-4' />
                     <span className='sr-only'>{t('accessibility.toggleLanguage')}</span>
                 </Button>

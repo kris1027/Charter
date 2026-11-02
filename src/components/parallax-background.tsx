@@ -14,7 +14,7 @@ export const ParallaxBackground = () => {
             <motion.div
                 ref={gradientRef}
                 style={{ y: gradientY }}
-                className='animate-gradient-shift pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-violet-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/80'
+                className='animate-gradient-shift from-accent via-background to-brand-via/5 dark:from-background dark:via-card dark:to-brand-from/10 pointer-events-none absolute inset-0 bg-gradient-to-br'
                 aria-hidden='true'
             />
 

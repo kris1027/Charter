@@ -23,7 +23,7 @@ export const FieldError = ({ errors, isTouched }: FieldErrorProps) => {
         .join(', ');
 
     return (
-        <p role='alert' className='flex items-center gap-1 text-sm text-red-500'>
+        <p role='alert' className='text-destructive flex items-center gap-1 text-sm'>
             <AlertCircle className='h-3 w-3' />
             {message}
         </p>
