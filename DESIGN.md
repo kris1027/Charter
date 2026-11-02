@@ -144,7 +144,7 @@ Sonner renders the stack, positioning, swipe and the live region; every toast's 
     - `dismissible`: default `true`; a dismissible toast gets a close button labelled `toast.close`, so it never depends on swipe alone
     - `onAutoClose`, `onDismiss`: callbacks for timing out and for any other close (close button, swipe, action or `dismiss(id)`); each fires once
 - **`dismiss(id)`** removes a toast.
-- **Rules for a notice**: render `null`, call `notify` from an effect when its condition turns true, and `dismiss` when it turns false. Never dismiss in an effect cleanup (StrictMode would show, dismiss and show the same id). Text comes from translation keys only.
+- **Rules for a notice**: render `null` and call `useNotice(id, notice)` (`src/hooks/use-notice.ts`) with the toast options while its condition is true and `null` when it turns false; the hook notifies and dismisses from one effect and never dismisses in a cleanup (StrictMode would show, dismiss and show the same id). Text comes from translation keys only.
 - **Testing**: render with `renderWithToaster` from `@/test/test-utils` and assert with `findBy*` queries (Sonner renders on a timer). `src/test/setup.ts` clears every toast after each test.
 
 The four shell notices (`src/app/`) are toasts: privacy (Accept only, no close, no timeout), offline (warning while offline), update (Reload and Close, plus a 5 second offline ready toast) and install (Install and Close).

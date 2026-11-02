@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WifiOff } from 'lucide-react';
-import { dismiss, notify } from '@/components/ui/toast';
-
-const TOAST_ID = 'offline';
+import { useNotice } from '@/hooks/use-notice';
 
 export const OfflineIndicator = () => {
     const { t } = useTranslation();
@@ -22,21 +20,18 @@ export const OfflineIndicator = () => {
         };
     }, []);
 
-    // Dismissed only when the condition turns false, never in a cleanup (StrictMode safe)
-    useEffect(() => {
-        if (!isOffline) {
-            dismiss(TOAST_ID);
-            return;
-        }
-        notify({
-            id: TOAST_ID,
-            variant: 'warning',
-            icon: WifiOff,
-            title: t('pwa.offline'),
-            duration: Infinity,
-            dismissible: false,
-        });
-    }, [isOffline, t]);
+    useNotice(
+        'offline',
+        isOffline
+            ? {
+                  variant: 'warning',
+                  icon: WifiOff,
+                  title: t('pwa.offline'),
+                  duration: Infinity,
+                  dismissible: false,
+              }
+            : null,
+    );
 
     return null;
 };

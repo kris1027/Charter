@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
-import { dismiss, notify } from '@/components/ui/toast';
+import { useNotice } from '@/hooks/use-notice';
 import { safeStorage } from '@/lib/storage';
 
 const STORAGE_KEY = 'pwaInstallDismissed';
-const TOAST_ID = 'pwa-install';
 
 type BeforeInstallPromptEvent = Event & {
     prompt: () => Promise<void>;
@@ -33,38 +32,36 @@ export const PwaInstallPrompt = () => {
         };
     }, []);
 
-    // Dismissed only when the condition turns false, never in a cleanup (StrictMode safe)
-    useEffect(() => {
-        if (!promptEvent) {
-            dismiss(TOAST_ID);
-            return;
-        }
-        // Closes whatever the user picks in the browser prompt, without saving the flag
-        const handleInstall = async () => {
-            try {
-                await promptEvent.prompt();
-            } finally {
-                setPromptEvent(null);
-            }
-        };
-        const handleClose = () => {
-            safeStorage.setItem(STORAGE_KEY, 'true');
+    // Closes whatever the user picks in the browser prompt, without saving the flag
+    const handleInstall = async () => {
+        try {
+            await promptEvent?.prompt();
+        } finally {
             setPromptEvent(null);
-        };
-        notify({
-            id: TOAST_ID,
-            variant: 'info',
-            icon: Download,
-            title: t('pwa.install'),
-            description: t('pwa.installDescription'),
-            duration: Infinity,
-            dismissible: false,
-            actions: [
-                { label: t('pwa.installButton'), kind: 'primary', onClick: handleInstall },
-                { label: t('pwa.close'), kind: 'secondary', onClick: handleClose },
-            ],
-        });
-    }, [promptEvent, t]);
+        }
+    };
+    const handleClose = () => {
+        safeStorage.setItem(STORAGE_KEY, 'true');
+        setPromptEvent(null);
+    };
+
+    useNotice(
+        'pwa-install',
+        promptEvent
+            ? {
+                  variant: 'info',
+                  icon: Download,
+                  title: t('pwa.install'),
+                  description: t('pwa.installDescription'),
+                  duration: Infinity,
+                  dismissible: false,
+                  actions: [
+                      { label: t('pwa.installButton'), kind: 'primary', onClick: handleInstall },
+                      { label: t('pwa.close'), kind: 'secondary', onClick: handleClose },
+                  ],
+              }
+            : null,
+    );
 
     return null;
 };
