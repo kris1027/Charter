@@ -33,7 +33,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 20  | React Compiler                  | Foundation | done        |
 | 4   | Feature based folder structure  | Foundation | done        |
 | 5   | Performance budgets             | Foundation | in-progress |
-| 6   | Design system refresh           | Foundation | planned     |
+| 6   | Design system refresh           | Foundation | done        |
 | 7   | Builder page split              | Slice 1    | planned     |
 | 8   | Shared template model           | Slice 1    | planned     |
 | 9   | PDF import parser restructure   | Slice 1    | planned     |
@@ -178,12 +178,18 @@ spec [0003](../specs/0003-performance-budgets/index.md). code in `scripts/perf/`
     - [x] Lighthouse CI job with seeded pages, reports and 95 warnings (AC-6, AC-7, AC-8)
     - [ ] Lighthouse floors locked and the full baseline recorded (AC-6, AC-9)
 
-### 6. Design system refresh · needs a decision
+### 6. Design system refresh · done
 
 New visual language for the app shell (type, color, spacing, motion, components) in light and dark, meeting WCAG 2.2 AA. Templates are out of scope.
 **Done when:** tokens and base components are defined and documented, contrast and focus states pass AA in both themes, and motion respects reduced motion.
+spec [0004](../specs/0004-design-system-refresh/index.md) · code in `src/index.css`, `src/components/ui/`, `src/app/`, `src/lib/motion-tokens.ts`, `DESIGN.md`
 
-- [ ] Design it (spec): `/architect design system refresh`
+- [x] Design it (spec): `/architect design system refresh`
+- [x] Build it: `/develop design system refresh`
+    - [x] Tokens, contrast test, focus rule and refreshed primitives (AC-1, AC-2, AC-3, AC-4, AC-8, AC-9)
+    - [x] Sonner toasts replace the four shell banners (AC-6, AC-11)
+    - [x] Lint guard plus badge, tooltip and segmented control (AC-3, AC-5, AC-10)
+    - [x] Motion tokens, global reduced motion rule, DESIGN.md finished and final checks (AC-7, AC-9, AC-11)
 
 ## Slice 1: Refactor the core
 
