@@ -139,10 +139,10 @@ Sonner renders the stack, positioning, swipe and the live region; every toast's 
     - `variant`: `info`, `success`, `warning` or `destructive` (sets the icon chip color and default icon)
     - `title`, and optional `description`
     - `icon`: a lucide icon component, optional
-    - `actions`: up to two `{ label, onClick, kind: 'primary' | 'secondary' }`; an action closes the toast after its `onClick`
+    - `actions`: up to two `{ label, onClick, kind: 'primary' | 'secondary' }`; an action closes the toast once its `onClick` settles, whatever the outcome
     - `duration`: ms, default 5000, `Infinity` to persist
     - `dismissible`: default `true`; a dismissible toast gets a close button labelled `toast.close`, so it never depends on swipe alone
-    - `onAutoClose`, `onDismiss`: callbacks for timing out and for being closed by the user
+    - `onAutoClose`, `onDismiss`: callbacks for timing out and for any other close (close button, swipe, action or `dismiss(id)`); each fires once
 - **`dismiss(id)`** removes a toast.
 - **Rules for a notice**: render `null`, call `notify` from an effect when its condition turns true, and `dismiss` when it turns false. Never dismiss in an effect cleanup (StrictMode would show, dismiss and show the same id). Text comes from translation keys only.
 - **Testing**: render with `renderWithToaster` from `@/test/test-utils` and assert with `findBy*` queries (Sonner renders on a timer). `src/test/setup.ts` clears every toast after each test.

@@ -56,10 +56,10 @@ describe('PwaReloadPrompt', () => {
         renderWithToaster(<PwaReloadPrompt />);
         await user.click(await screen.findByRole('button', { name: 'Close notification' }));
 
-        expect(mockSetOfflineReady).toHaveBeenCalledWith(false);
         await waitFor(() =>
             expect(screen.queryByText('App ready to work offline')).not.toBeInTheDocument(),
         );
+        expect(mockSetOfflineReady).toHaveBeenCalledWith(false);
     });
 
     it('should show the update toast with Reload and Close', async () => {

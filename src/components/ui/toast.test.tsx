@@ -70,9 +70,33 @@ describe('Toast', () => {
 
         await user.click(closeButtons[0]);
 
-        expect(handleDismiss).toHaveBeenCalledOnce();
         await waitFor(() => expect(screen.queryByText('Loose')).not.toBeInTheDocument());
+        expect(handleDismiss).toHaveBeenCalledOnce();
         expect(screen.getByText('Fixed')).toBeInTheDocument();
+    });
+
+    it('should keep the toast open until an async action settles when an action is clicked', async () => {
+        let settle = () => {};
+        const handleClick = () =>
+            new Promise<void>((resolve) => {
+                settle = resolve;
+            });
+        const user = userEvent.setup();
+        renderWithToaster(<div />);
+
+        show({
+            id: 'slow',
+            variant: 'info',
+            title: 'Slow',
+            duration: Infinity,
+            dismissible: false,
+            actions: [{ label: 'Wait', kind: 'primary', onClick: handleClick }],
+        });
+        await user.click(await screen.findByRole('button', { name: 'Wait' }));
+
+        expect(screen.getByText('Slow')).toBeInTheDocument();
+        await act(async () => settle());
+        await waitFor(() => expect(screen.queryByText('Slow')).not.toBeInTheDocument());
     });
 
     it('should remove the toast when dismiss is called with its id', async () => {

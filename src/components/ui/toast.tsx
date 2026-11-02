@@ -45,7 +45,12 @@ const dismiss = (id: string) => {
     toast.dismiss(id);
 };
 
-type ToastCardProps = Omit<NotifyOptions, 'duration' | 'onAutoClose'>;
+type ToastCardProps = Omit<
+    NotifyOptions,
+    'duration' | 'dismissible' | 'onAutoClose' | 'onDismiss'
+> & {
+    dismissible: boolean;
+};
 
 const ToastCard = ({
     id,
@@ -54,19 +59,22 @@ const ToastCard = ({
     description,
     icon,
     actions = [],
-    dismissible = true,
-    onDismiss,
+    dismissible,
 }: ToastCardProps) => {
     const { t } = useTranslation();
     const Icon = icon ?? VARIANT_ICON[variant];
 
-    const handleAction = (action: ToastAction) => {
-        void action.onClick();
-        dismiss(id);
+    // Closes once onClick settles, whatever the outcome
+    const handleAction = async (action: ToastAction) => {
+        try {
+            await action.onClick();
+        } finally {
+            dismiss(id);
+        }
     };
 
+    // Sonner fires onDismiss for every dismiss, so the card never calls it itself
     const handleClose = () => {
-        onDismiss?.();
         dismiss(id);
     };
 
@@ -99,7 +107,7 @@ const ToastCard = ({
                             key={action.label}
                             size='sm'
                             variant={action.kind === 'primary' ? 'default' : 'outline'}
-                            onClick={() => handleAction(action)}
+                            onClick={() => void handleAction(action)}
                         >
                             {action.label}
                         </Button>
@@ -122,13 +130,19 @@ const ToastCard = ({
 };
 
 // Headless: Sonner keeps positioning, stacking, swipe and the live region; the look is ours
-const notify = ({ duration = 5000, onAutoClose, ...card }: NotifyOptions) =>
-    toast.custom(() => <ToastCard {...card} />, {
+const notify = ({
+    duration = 5000,
+    dismissible = true,
+    onAutoClose,
+    onDismiss,
+    ...card
+}: NotifyOptions) =>
+    toast.custom(() => <ToastCard {...card} dismissible={dismissible} />, {
         id: card.id,
         duration,
-        dismissible: card.dismissible ?? true,
+        dismissible,
         onAutoClose,
-        onDismiss: card.onDismiss,
+        onDismiss,
     });
 
 // Mount once, before anything that calls notify, so its subscription exists first
