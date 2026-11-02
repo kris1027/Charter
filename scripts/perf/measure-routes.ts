@@ -11,7 +11,7 @@ export type Manifest = Record<string, ManifestChunk>;
 
 export type MeasuredRoute = { path: string; files: string[]; bytes: number };
 export type MeasuredChunk = { file: string; bytes: number };
-export type Measured = { routes: MeasuredRoute[]; chunks: MeasuredChunk[] };
+export type BuildSizes = { routes: MeasuredRoute[]; chunks: MeasuredChunk[] };
 
 export type Budget = { maxKb: number; reason?: string };
 export type Budgets = {
@@ -20,7 +20,7 @@ export type Budgets = {
     chunkCap: Budget;
 };
 
-export type BudgetRow = { label: string; kb: number; maxKb: number | null; ok: boolean };
+export type BudgetRow = { label: string; bytes: number; maxKb: number | null; ok: boolean };
 export type BudgetResult = { ok: boolean; rows: BudgetRow[]; problems: string[] };
 
 const ROUTE_PREFIX = 'src/routes/';
@@ -28,7 +28,7 @@ const ROUTE_SUFFIX = '?tsr-split=component';
 // A plain segment, optionally a $param, optionally with the trailing _ that un-nests a route
 const SEGMENT = /^\$?[A-Za-z0-9][A-Za-z0-9-]*_?$/;
 
-export const toKb = (bytes: number) => bytes / 1024;
+const toKb = (bytes: number) => bytes / 1024;
 export const formatKb = (bytes: number) => toKb(bytes).toFixed(1);
 
 /**
@@ -71,7 +71,7 @@ const staticClosure = (manifest: Manifest, startKeys: string[]) => {
  * A route's initial JS is the entry chunk plus its `?tsr-split=component` chunk plus every
  * chunk reachable from those two through static imports, each counted once.
  */
-export const measureRoutes = (manifest: Manifest, sizeOf: (file: string) => number): Measured => {
+export const measureRoutes = (manifest: Manifest, sizeOf: (file: string) => number): BuildSizes => {
     const entries = Object.keys(manifest).filter((key) => manifest[key].isEntry);
     if (entries.length !== 1) {
         throw new Error(
@@ -110,64 +110,80 @@ const hasReason = (budget: Budget) =>
     typeof budget.reason === 'string' && budget.reason.trim() !== '';
 const validMax = (budget: Budget) => typeof budget.maxKb === 'number' && budget.maxKb > 0;
 
-export const checkBudgets = (measured: Measured, budgets: Budgets): BudgetResult => {
+type Check = { rows: BudgetRow[]; problems: string[] };
+
+const checkRoutes = (routes: MeasuredRoute[], budgets: Budgets['routes']): Check => {
     const problems: string[] = [];
     const rows: BudgetRow[] = [];
 
-    if (budgets.compression !== 'brotli') {
-        problems.push(`compression must be "brotli", got "${budgets.compression}"`);
-    }
-
-    for (const route of measured.routes) {
-        const budget = budgets.routes[route.path];
-        const kb = toKb(route.bytes);
+    for (const route of routes) {
+        const budget = budgets[route.path];
         if (!budget) {
             problems.push(
                 `${route.path}: no budget in perf/budgets.json (measured ${formatKb(route.bytes)} KiB)`,
             );
-            rows.push({ label: route.path, kb, maxKb: null, ok: false });
+            rows.push({ label: route.path, bytes: route.bytes, maxKb: null, ok: false });
             continue;
         }
-        const ok = validMax(budget) && kb <= budget.maxKb;
+        const ok = validMax(budget) && toKb(route.bytes) <= budget.maxKb;
         if (!validMax(budget)) problems.push(`${route.path}: maxKb must be a positive number`);
         else if (!ok) {
             problems.push(
                 `${route.path}: ${formatKb(route.bytes)} KiB is over its ${budget.maxKb} KiB budget`,
             );
         }
-        rows.push({ label: route.path, kb, maxKb: budget.maxKb, ok });
+        rows.push({ label: route.path, bytes: route.bytes, maxKb: budget.maxKb, ok });
     }
 
-    const measuredPaths = new Set(measured.routes.map((route) => route.path));
-    for (const [path, budget] of Object.entries(budgets.routes)) {
+    const measuredPaths = new Set(routes.map((route) => route.path));
+    for (const [path, budget] of Object.entries(budgets)) {
         if (!measuredPaths.has(path)) {
             problems.push(`${path}: budget matches no route chunk (stale budget)`);
         }
         if (!hasReason(budget)) problems.push(`${path}: budget has no reason`);
     }
 
-    const cap = budgets.chunkCap;
+    return { rows, problems };
+};
+
+const checkChunkCap = (chunks: MeasuredChunk[], cap: Budget): Check => {
+    const problems: string[] = [];
     if (!validMax(cap)) problems.push('chunkCap: maxKb must be a positive number');
     if (!hasReason(cap)) problems.push('chunkCap: budget has no reason');
 
-    const largest = measured.chunks.reduce<MeasuredChunk | null>(
-        (max, chunk) => (max && max.bytes >= chunk.bytes ? max : chunk),
-        null,
-    );
-    const overCap = measured.chunks.filter((chunk) => toKb(chunk.bytes) > cap.maxKb);
+    const overCap = chunks.filter((chunk) => toKb(chunk.bytes) > cap.maxKb);
     for (const chunk of overCap) {
         problems.push(
             `chunk ${chunk.file}: ${formatKb(chunk.bytes)} KiB is over the ${cap.maxKb} KiB chunk cap`,
         );
     }
-    if (largest) {
-        rows.push({
-            label: `largest chunk (${largest.file})`,
-            kb: toKb(largest.bytes),
-            maxKb: cap.maxKb,
-            ok: overCap.length === 0 && validMax(cap),
-        });
-    }
 
-    return { ok: problems.length === 0, rows, problems };
+    const largest = chunks.reduce<MeasuredChunk | null>(
+        (max, chunk) => (max && max.bytes >= chunk.bytes ? max : chunk),
+        null,
+    );
+    const rows: BudgetRow[] = largest
+        ? [
+              {
+                  label: `largest chunk (${largest.file})`,
+                  bytes: largest.bytes,
+                  maxKb: cap.maxKb,
+                  ok: overCap.length === 0 && validMax(cap),
+              },
+          ]
+        : [];
+
+    return { rows, problems };
+};
+
+export const checkBudgets = (buildSizes: BuildSizes, budgets: Budgets): BudgetResult => {
+    const compressionProblems =
+        budgets.compression === 'brotli'
+            ? []
+            : [`compression must be "brotli", got "${budgets.compression}"`];
+    const routes = checkRoutes(buildSizes.routes, budgets.routes);
+    const chunkCap = checkChunkCap(buildSizes.chunks, budgets.chunkCap);
+
+    const problems = [...compressionProblems, ...routes.problems, ...chunkCap.problems];
+    return { ok: problems.length === 0, rows: [...routes.rows, ...chunkCap.rows], problems };
 };

@@ -37,11 +37,11 @@ const budgets = (overrides: Partial<Budgets> = {}): Budgets => ({
 });
 
 describe('routePathFromFile', () => {
-    it('should map index.tsx to /', () => {
+    it('should return / when the file is index.tsx', () => {
         expect(routePathFromFile('index.tsx')).toBe('/');
     });
 
-    it('should map a plain route file to its path', () => {
+    it('should return its path when the route file is a plain segment', () => {
         expect(routePathFromFile('builder.tsx')).toBe('/builder');
     });
 
@@ -101,10 +101,10 @@ describe('measureRoutes', () => {
 });
 
 describe('checkBudgets', () => {
-    const measured = measureRoutes(manifest, sizeOf);
+    const buildSizes = measureRoutes(manifest, sizeOf);
 
     it('should pass with a row per route plus the largest chunk when all is within budget', () => {
-        const result = checkBudgets(measured, budgets());
+        const result = checkBudgets(buildSizes, budgets());
 
         expect(result.ok).toBe(true);
         expect(result.problems).toEqual([]);
@@ -116,7 +116,7 @@ describe('checkBudgets', () => {
 
     it('should name the route with its size and budget when it is over budget', () => {
         const result = checkBudgets(
-            measured,
+            buildSizes,
             budgets({ routes: { '/builder': { maxKb: 30, reason: 'test' } } }),
         );
 
@@ -126,7 +126,7 @@ describe('checkBudgets', () => {
 
     it('should name the chunk when a single chunk is over the cap', () => {
         const result = checkBudgets(
-            measured,
+            buildSizes,
             budgets({ chunkCap: { maxKb: 100, reason: 'test' } }),
         );
 
@@ -137,7 +137,7 @@ describe('checkBudgets', () => {
     });
 
     it('should fail with the path and size when a route has no budget', () => {
-        const result = checkBudgets(measured, budgets({ routes: {} }));
+        const result = checkBudgets(buildSizes, budgets({ routes: {} }));
 
         expect(result.ok).toBe(false);
         expect(result.problems).toEqual([
@@ -147,7 +147,7 @@ describe('checkBudgets', () => {
 
     it('should fail when a budget matches no route chunk', () => {
         const result = checkBudgets(
-            measured,
+            buildSizes,
             budgets({
                 routes: {
                     '/builder': { maxKb: 40, reason: 'test' },
@@ -161,7 +161,7 @@ describe('checkBudgets', () => {
 
     it('should fail when a budget reason is missing or empty', () => {
         const result = checkBudgets(
-            measured,
+            buildSizes,
             budgets({
                 routes: { '/builder': { maxKb: 40, reason: ' ' } },
                 chunkCap: { maxKb: 400 },
@@ -175,7 +175,7 @@ describe('checkBudgets', () => {
     });
 
     it('should fail when compression is not brotli', () => {
-        const result = checkBudgets(measured, budgets({ compression: 'gzip' }));
+        const result = checkBudgets(buildSizes, budgets({ compression: 'gzip' }));
 
         expect(result.problems).toEqual(['compression must be "brotli", got "gzip"']);
     });

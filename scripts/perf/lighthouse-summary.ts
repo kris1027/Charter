@@ -1,11 +1,12 @@
 // pnpm perf:lhci-summary: Lighthouse medians next to their floors, plus a warning per score
 // below 0.95 (spec 0003). Always exits 0; failing on a floor is LHCI's job.
-import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
+import { markdownTable, writeJobSummary } from './job-summary.ts';
 
-export const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'] as const;
-export const WARN_BELOW = 0.95;
+const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'] as const;
+const WARN_BELOW = 0.95;
 
 type Category = (typeof CATEGORIES)[number];
 export type Floors = Record<string, Record<Category, number>>;
@@ -33,15 +34,19 @@ export const summarize = (entries: ReportEntry[], floors: Floors) => {
                 }
                 return `${score(value)} (floor ${score(floors[path]?.[category])})`;
             });
-            return `| \`${path}\` | ${cells.join(' | ')} |`;
+            return [`\`${path}\``, ...cells];
         });
 
     const markdown = [
         '### Lighthouse medians',
         '',
-        `| Page | ${CATEGORIES.join(' | ')} |`,
-        `| --- |${' ---: |'.repeat(CATEGORIES.length)}`,
-        ...rows,
+        markdownTable(
+            [
+                { label: 'Page' },
+                ...CATEGORIES.map((category) => ({ label: category, align: 'right' as const })),
+            ],
+            rows,
+        ),
         '',
     ].join('\n');
 
@@ -49,8 +54,7 @@ export const summarize = (entries: ReportEntry[], floors: Floors) => {
 };
 
 const writeSummary = (text: string) => {
-    const summaryPath = process.env.GITHUB_STEP_SUMMARY;
-    if (summaryPath) appendFileSync(summaryPath, text);
+    writeJobSummary(text);
     console.log(text);
 };
 
