@@ -360,5 +360,10 @@
     "toast": {
         "region": "Notifications",
         "close": "Close notification"
+    },
+    "theme": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
     }
 }

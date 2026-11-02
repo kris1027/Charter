@@ -360,5 +360,10 @@
     "toast": {
         "region": "Powiadomienia",
         "close": "Zamknij powiadomienie"
+    },
+    "theme": {
+        "light": "Jasny",
+        "dark": "Ciemny",
+        "system": "Systemowy"
     }
 }
