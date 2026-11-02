@@ -1,12 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act } from '@testing-library/react';
-import { renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
+import { flushToasts, renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
 import { PwaInstallPrompt } from './pwa-install-prompt';
 import { safeStorage } from '@/lib/storage';
 
 const TITLE = 'Install app';
-
-const flushToasts = () => act(() => new Promise((resolve) => setTimeout(resolve, 50)));
 
 const fireBeforeInstallPrompt = (outcome: 'accepted' | 'dismissed' = 'accepted') => {
     const promptEvent = new Event('beforeinstallprompt') as Event & {

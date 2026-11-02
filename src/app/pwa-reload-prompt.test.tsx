@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act } from '@testing-library/react';
-import { renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
+import { flushToasts, renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
 import { PwaReloadPrompt } from './pwa-reload-prompt';
 
 const mockSetOfflineReady = vi.fn();
@@ -17,8 +17,6 @@ vi.mock('@/test/pwa-register-mock', () => ({
         updateServiceWorker: mockUpdateServiceWorker,
     }),
 }));
-
-const flushToasts = () => act(() => new Promise((resolve) => setTimeout(resolve, 50)));
 
 describe('PwaReloadPrompt', () => {
     beforeEach(() => {

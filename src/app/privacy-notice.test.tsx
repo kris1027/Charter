@@ -1,13 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { act } from '@testing-library/react';
-import { renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
+import { flushToasts, renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
 import { PrivacyNotice } from './privacy-notice';
 import { safeStorage } from '@/lib/storage';
 
 const TITLE = 'Your data stays private';
-
-// Lets Sonner's timers run so a toast that should not appear has had its chance
-const flushToasts = () => act(() => new Promise((resolve) => setTimeout(resolve, 50)));
 
 describe('PrivacyNotice', () => {
     beforeEach(() => {

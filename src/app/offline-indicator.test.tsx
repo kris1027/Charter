@@ -1,11 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { act } from '@testing-library/react';
-import { renderWithToaster, screen, waitFor } from '@/test/test-utils';
+import { flushToasts, renderWithToaster, screen, waitFor } from '@/test/test-utils';
 import { OfflineIndicator } from './offline-indicator';
 
 const MESSAGE = "You're offline — all features still work";
-
-const flushToasts = () => act(() => new Promise((resolve) => setTimeout(resolve, 50)));
 
 const setOnLine = (value: boolean) => {
     Object.defineProperty(navigator, 'onLine', { value, writable: true, configurable: true });
