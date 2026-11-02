@@ -45,8 +45,7 @@ module.exports = {
             // With a puppeteerScript, LHCI ignores settings.chromeFlags and always runs headless
             puppeteerLaunchOptions: {
                 executablePath: process.env.CHROME_PATH,
-                // /dev/shm on CI runners is small; without this Chrome may never paint (NO_FCP)
-                args: ['--no-sandbox', '--disable-dev-shm-usage'],
+                args: ['--no-sandbox'],
             },
             settings: {
                 // Otherwise Lighthouse wipes the storage the seed script wrote

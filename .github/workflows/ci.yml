@@ -36,8 +36,12 @@ jobs:
             - name: Test
               run: pnpm test
 
+            # src/lib/seo.ts throws on load without VITE_SITE_URL (a blank page, NO_FCP in Lighthouse).
+            # The origin Lighthouse audits, so canonical and og:url stay same origin there.
             - name: Build
               run: pnpm build
+              env:
+                  VITE_SITE_URL: http://localhost:4173
 
             # Per route JS budgets from perf/budgets.json; the table also goes to the job summary
             - name: JS size budgets
