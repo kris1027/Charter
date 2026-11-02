@@ -30,7 +30,7 @@ const entryBan = ban(
 const restrictBelowShell = (files, bans) => restrict(files, [...bans, entryBan]);
 
 export default defineConfig([
-    globalIgnores(['dist', '.agents']),
+    globalIgnores(['dist', '.agents', '.lighthouseci']),
     {
         files: ['**/*.{ts,tsx}'],
         extends: [
@@ -49,6 +49,21 @@ export default defineConfig([
         rules: {
             'react-refresh/only-export-components': 'off',
         },
+    },
+    // Node scripts for the perf checks (spec 0003); the @/ alias and ../ ban apply only to src/
+    {
+        files: ['scripts/**/*.ts'],
+        languageOptions: { globals: globals.node },
+    },
+    {
+        files: ['scripts/**/*.cjs', 'lighthouserc.cjs'],
+        extends: [js.configs.recommended],
+        languageOptions: { sourceType: 'commonjs', globals: globals.node },
+    },
+    // The seed script also passes functions into the page, which run in the browser
+    {
+        files: ['scripts/perf/lhci-seed.cjs'],
+        languageOptions: { globals: { ...globals.node, ...globals.browser } },
     },
     { ...restrict(['src/**/*.{ts,tsx}'], []), ignores: ['src/routeTree.gen.ts'] },
     restrictBelowShell(

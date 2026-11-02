@@ -23,5 +23,5 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true
     },
-    "include": ["vite.config.ts", "react-plugins.ts", "vercel.json"]
+    "include": ["vite.config.ts", "react-plugins.ts", "vercel.json", "scripts/**/*.ts"]
 }
