@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WifiOff } from 'lucide-react';
+import { useNotice } from '@/hooks/use-notice';
 
 export const OfflineIndicator = () => {
     const { t } = useTranslation();
@@ -19,14 +20,18 @@ export const OfflineIndicator = () => {
         };
     }, []);
 
-    if (!isOffline) return null;
-
-    return (
-        <div className='fixed top-0 right-0 left-0 z-50 bg-amber-500 text-white'>
-            <div className='container mx-auto flex items-center justify-center gap-2 px-4 py-2'>
-                <WifiOff className='h-4 w-4' />
-                <p className='text-sm font-medium'>{t('pwa.offline')}</p>
-            </div>
-        </div>
+    useNotice(
+        'offline',
+        isOffline
+            ? {
+                  variant: 'warning',
+                  icon: WifiOff,
+                  title: t('pwa.offline'),
+                  duration: Infinity,
+                  dismissible: false,
+              }
+            : null,
     );
+
+    return null;
 };

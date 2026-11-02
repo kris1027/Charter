@@ -29,6 +29,33 @@ const entryBan = ban(
 // Features and shared code sit below the app shell, so they always carry entryBan.
 const restrictBelowShell = (files, bans) => restrict(files, [...bans, entryBan]);
 
+// Token only colors in the shell (spec 0004). String.raw keeps every \b in one place.
+const RAW_COLOR_PATTERNS = [
+    String.raw`\b(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|[1-9]00|950)\b`,
+    String.raw`\b(bg|text|border|ring|ring-offset|outline|fill|stroke|from|via|to|shadow|divide|placeholder|caret|accent|decoration)-(white|black)\b`,
+    String.raw`-\[(#|oklch\(|rgb|hsl)`,
+];
+const RAW_COLOR_MESSAGE = 'Use a design token, not a raw palette color (spec 0004, see DESIGN.md).';
+// Each Slice 3 page refresh adds its folder here
+const TOKEN_ONLY_FILES = [
+    'src/components/**/*.{ts,tsx}',
+    'src/app/**/*.{ts,tsx}',
+    'src/lib/button-variants.ts',
+];
+const tokenOnly = {
+    files: TOKEN_ONLY_FILES,
+    ignores: ['**/*.test.{ts,tsx}'],
+    rules: {
+        'no-restricted-syntax': [
+            'error',
+            ...RAW_COLOR_PATTERNS.flatMap((pattern) => [
+                { selector: `Literal[value=/${pattern}/]`, message: RAW_COLOR_MESSAGE },
+                { selector: `TemplateElement[value.raw=/${pattern}/]`, message: RAW_COLOR_MESSAGE },
+            ]),
+        ],
+    },
+};
+
 export default defineConfig([
     globalIgnores(['dist', '.agents', '.lighthouseci']),
     {
@@ -97,5 +124,6 @@ export default defineConfig([
         ['src/app/**/*.{ts,tsx}'],
         [ban(['@/routes/**'], 'The app shell never imports routes')],
     ),
+    tokenOnly,
     eslintConfigPrettier,
 ]);

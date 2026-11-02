@@ -1,17 +1,19 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, userEvent } from '@/test/test-utils';
+import { flushToasts, renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
 import { PrivacyNotice } from './privacy-notice';
 import { safeStorage } from '@/lib/storage';
+
+const TITLE = 'Your data stays private';
 
 describe('PrivacyNotice', () => {
     beforeEach(() => {
         localStorage.clear();
     });
 
-    it('should show the privacy notice when not previously accepted', () => {
-        render(<PrivacyNotice />);
+    it('should show the privacy toast when not previously accepted', async () => {
+        renderWithToaster(<PrivacyNotice />);
 
-        expect(screen.getByText('Your data stays private')).toBeInTheDocument();
+        expect(await screen.findByText(TITLE)).toBeInTheDocument();
         expect(
             screen.getByText(
                 'All your resume data is stored locally in your browser. Nothing is sent to any server.',
@@ -20,21 +22,41 @@ describe('PrivacyNotice', () => {
         expect(screen.getByRole('button', { name: 'Got it' })).toBeInTheDocument();
     });
 
-    it('should not show the privacy notice when previously accepted', () => {
+    it('should offer no close button when shown, so Accept is the only way out', async () => {
+        renderWithToaster(<PrivacyNotice />);
+
+        await screen.findByText(TITLE);
+
+        expect(
+            screen.queryByRole('button', { name: 'Close notification' }),
+        ).not.toBeInTheDocument();
+    });
+
+    it('should not show the privacy toast when previously accepted', async () => {
         safeStorage.setItem('privacyNoticeAccepted', 'true');
 
-        render(<PrivacyNotice />);
+        renderWithToaster(<PrivacyNotice />);
+        await flushToasts();
 
-        expect(screen.queryByText('Your data stays private')).not.toBeInTheDocument();
+        expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
     });
 
     it('should dismiss and persist acceptance when "Got it" is clicked', async () => {
-        render(<PrivacyNotice />);
+        renderWithToaster(<PrivacyNotice />);
 
         const user = userEvent.setup();
-        await user.click(screen.getByRole('button', { name: 'Got it' }));
+        await user.click(await screen.findByRole('button', { name: 'Got it' }));
 
-        expect(screen.queryByText('Your data stays private')).not.toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByText(TITLE)).not.toBeInTheDocument());
         expect(safeStorage.getItem('privacyNoticeAccepted')).toBe('true');
+    });
+
+    it('should show exactly one toast when rendered in StrictMode', async () => {
+        renderWithToaster(<PrivacyNotice />, { reactStrictMode: true });
+
+        await screen.findByText(TITLE);
+        await flushToasts();
+
+        expect(screen.getAllByText(TITLE)).toHaveLength(1);
     });
 });

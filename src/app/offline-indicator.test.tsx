@@ -1,72 +1,63 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { act } from '@testing-library/react';
-import { render, screen } from '@/test/test-utils';
+import { flushToasts, renderWithToaster, screen, waitFor } from '@/test/test-utils';
 import { OfflineIndicator } from './offline-indicator';
+
+const MESSAGE = "You're offline — all features still work";
+
+const setOnLine = (value: boolean) => {
+    Object.defineProperty(navigator, 'onLine', { value, writable: true, configurable: true });
+};
 
 describe('OfflineIndicator', () => {
     const originalOnLine = navigator.onLine;
 
     beforeEach(() => {
-        Object.defineProperty(navigator, 'onLine', {
-            value: true,
-            writable: true,
-            configurable: true,
-        });
+        setOnLine(true);
     });
 
     afterEach(() => {
-        Object.defineProperty(navigator, 'onLine', {
-            value: originalOnLine,
-            writable: true,
-            configurable: true,
-        });
+        setOnLine(originalOnLine);
     });
 
-    it('should not render when online', () => {
-        render(<OfflineIndicator />);
+    it('should not show a toast when online', async () => {
+        renderWithToaster(<OfflineIndicator />);
+        await flushToasts();
 
-        expect(
-            screen.queryByText("You're offline — all features still work"),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
     });
 
-    it('should render when initially offline', () => {
-        Object.defineProperty(navigator, 'onLine', { value: false });
+    it('should show the warning toast when the page loads offline', async () => {
+        setOnLine(false);
 
-        render(<OfflineIndicator />);
+        renderWithToaster(<OfflineIndicator />);
 
-        expect(screen.getByText("You're offline — all features still work")).toBeInTheDocument();
+        expect(await screen.findByText(MESSAGE)).toBeInTheDocument();
     });
 
-    it('should show banner when going offline', () => {
-        render(<OfflineIndicator />);
-
-        expect(
-            screen.queryByText("You're offline — all features still work"),
-        ).not.toBeInTheDocument();
+    it('should show the warning toast when going offline', async () => {
+        renderWithToaster(<OfflineIndicator />);
 
         act(() => {
-            Object.defineProperty(navigator, 'onLine', { value: false });
+            setOnLine(false);
             window.dispatchEvent(new Event('offline'));
         });
 
-        expect(screen.getByText("You're offline — all features still work")).toBeInTheDocument();
+        expect(await screen.findByText(MESSAGE)).toBeInTheDocument();
     });
 
-    it('should hide banner when coming back online', () => {
-        Object.defineProperty(navigator, 'onLine', { value: false });
-
-        render(<OfflineIndicator />);
-
-        expect(screen.getByText("You're offline — all features still work")).toBeInTheDocument();
+    it('should remove the toast and show no other when coming back online', async () => {
+        setOnLine(false);
+        renderWithToaster(<OfflineIndicator />);
+        await screen.findByText(MESSAGE);
 
         act(() => {
-            Object.defineProperty(navigator, 'onLine', { value: true });
+            setOnLine(true);
             window.dispatchEvent(new Event('online'));
         });
 
-        expect(
-            screen.queryByText("You're offline — all features still work"),
-        ).not.toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument());
+        await flushToasts();
+        expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
     });
 });

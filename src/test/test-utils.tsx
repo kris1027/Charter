@@ -1,9 +1,11 @@
-import { cleanup, render, type RenderOptions } from '@testing-library/react';
+import { act, cleanup, render, type RenderOptions } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactElement, ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { afterEach } from 'vitest';
 
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/toast';
 import i18n from './i18n-test';
 
 afterEach(() => {
@@ -17,5 +19,18 @@ const AllProviders = ({ children }: { children: ReactNode }) => (
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
     render(ui, { wrapper: AllProviders, ...options });
 
-export { customRender as render, userEvent };
-export { screen, within } from '@testing-library/react';
+// Sonner renders on a timer, so assert toasts with findBy* queries
+const renderWithToaster = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
+    customRender(
+        <ThemeProvider>
+            <Toaster />
+            {ui}
+        </ThemeProvider>,
+        options,
+    );
+
+// Lets Sonner's timers run so a toast that should not appear has had its chance
+const flushToasts = () => act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+
+export { customRender as render, flushToasts, renderWithToaster, userEvent };
+export { screen, waitFor, within } from '@testing-library/react';

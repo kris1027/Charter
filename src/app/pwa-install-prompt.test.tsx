@@ -1,14 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act } from '@testing-library/react';
-import { render, screen, userEvent } from '@/test/test-utils';
+import { flushToasts, renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
 import { PwaInstallPrompt } from './pwa-install-prompt';
 import { safeStorage } from '@/lib/storage';
 
-const fireBeforeInstallPrompt = () => {
+const TITLE = 'Install app';
+
+const fireBeforeInstallPrompt = (outcome: 'accepted' | 'dismissed' = 'accepted') => {
     const promptEvent = new Event('beforeinstallprompt') as Event & {
         prompt: () => Promise<void>;
+        userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
     };
     promptEvent.prompt = vi.fn().mockResolvedValue(undefined);
+    promptEvent.userChoice = Promise.resolve({ outcome });
     act(() => {
         window.dispatchEvent(promptEvent);
     });
@@ -20,57 +24,68 @@ describe('PwaInstallPrompt', () => {
         localStorage.clear();
     });
 
-    it('should not render when no beforeinstallprompt event has fired', () => {
-        render(<PwaInstallPrompt />);
+    it('should not show a toast when no beforeinstallprompt event has fired', async () => {
+        renderWithToaster(<PwaInstallPrompt />);
+        await flushToasts();
 
-        expect(screen.queryByRole('button', { name: 'Install app' })).not.toBeInTheDocument();
+        expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
     });
 
-    it('should render when beforeinstallprompt event fires', () => {
-        render(<PwaInstallPrompt />);
+    it('should show the install toast when beforeinstallprompt fires', async () => {
+        renderWithToaster(<PwaInstallPrompt />);
 
         fireBeforeInstallPrompt();
 
-        expect(screen.getByRole('button', { name: 'Install app' })).toBeInTheDocument();
+        expect(await screen.findByText(TITLE)).toBeInTheDocument();
         expect(
             screen.getByText('Install Resume Builder for quick access and offline use'),
         ).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Install' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
     });
 
-    it('should not render when previously dismissed', () => {
+    it('should not show a toast when previously dismissed', async () => {
         safeStorage.setItem('pwaInstallDismissed', 'true');
 
-        render(<PwaInstallPrompt />);
-
+        renderWithToaster(<PwaInstallPrompt />);
         fireBeforeInstallPrompt();
+        await flushToasts();
 
-        expect(screen.queryByRole('button', { name: 'Install app' })).not.toBeInTheDocument();
+        expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
     });
 
-    it('should call prompt and hide when install is clicked', async () => {
+    it('should open the prompt and close without saving the flag when Install is picked', async () => {
         const user = userEvent.setup();
+        renderWithToaster(<PwaInstallPrompt />);
+        const promptEvent = fireBeforeInstallPrompt('dismissed');
 
-        render(<PwaInstallPrompt />);
-
-        const promptEvent = fireBeforeInstallPrompt();
-
-        const installButtons = screen.getAllByRole('button', { name: 'Install app' });
-        await user.click(installButtons[0]);
+        await user.click(await screen.findByRole('button', { name: 'Install' }));
 
         expect(promptEvent.prompt).toHaveBeenCalled();
-        expect(screen.queryByRole('button', { name: 'Install app' })).not.toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByText(TITLE)).not.toBeInTheDocument());
+        expect(safeStorage.getItem('pwaInstallDismissed')).toBeNull();
     });
 
-    it('should persist dismissal and hide when close is clicked', async () => {
+    it('should persist dismissal and close when Close is clicked', async () => {
         const user = userEvent.setup();
-
-        render(<PwaInstallPrompt />);
-
+        renderWithToaster(<PwaInstallPrompt />);
         fireBeforeInstallPrompt();
 
-        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await user.click(await screen.findByRole('button', { name: 'Close' }));
 
-        expect(screen.queryByRole('button', { name: 'Install app' })).not.toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByText(TITLE)).not.toBeInTheDocument());
         expect(safeStorage.getItem('pwaInstallDismissed')).toBe('true');
+    });
+
+    it('should close the toast when the app gets installed', async () => {
+        renderWithToaster(<PwaInstallPrompt />);
+        fireBeforeInstallPrompt();
+        await screen.findByText(TITLE);
+
+        act(() => {
+            window.dispatchEvent(new Event('appinstalled'));
+        });
+
+        await waitFor(() => expect(screen.queryByText(TITLE)).not.toBeInTheDocument());
     });
 });

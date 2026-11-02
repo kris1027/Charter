@@ -17,7 +17,7 @@ export default defineConfig({
         globals: true,
         environment: 'jsdom',
         setupFiles: ['./src/test/setup.ts'],
-        include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
+        include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts', 'eslint.config.test.ts'],
         coverage: {
             provider: 'v8',
             include: ['src/**/*.{ts,tsx}'],

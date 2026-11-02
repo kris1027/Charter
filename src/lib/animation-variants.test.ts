@@ -9,7 +9,7 @@ describe('fadeInUp', () => {
             initial: { opacity: 0, y: 24 },
             whileInView: { opacity: 1, y: 0 },
             viewport: { once: true },
-            transition: { duration: 0.5, delay: 0.2, ease: 'easeOut' },
+            transition: { duration: 0.4, delay: 0.2, ease: [0.2, 0, 0, 1] },
         });
     });
 
@@ -31,7 +31,7 @@ describe('fadeInScale', () => {
             initial: { opacity: 0, scale: 0.95 },
             whileInView: { opacity: 1, scale: 1 },
             viewport: { once: true },
-            transition: { duration: 0.5, delay: 0.3, ease: 'easeOut' },
+            transition: { duration: 0.4, delay: 0.3, ease: [0.2, 0, 0, 1] },
         });
     });
 

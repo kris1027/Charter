@@ -1,6 +1,7 @@
 import { HeadContent, Outlet } from '@tanstack/react-router';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { Toaster } from '@/components/ui/toast';
 import { PrivacyNotice } from '@/app/privacy-notice';
 import { PwaReloadPrompt } from '@/app/pwa-reload-prompt';
 import { PwaInstallPrompt } from '@/app/pwa-install-prompt';
@@ -16,7 +17,7 @@ export const RootLayout = () => {
             <ThemeProvider defaultTheme='system'>
                 <a
                     href='#main-content'
-                    className='focus:bg-background focus:text-foreground focus:ring-ring sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:px-4 focus:py-2 focus:shadow-lg focus:ring-2'
+                    className='focus:bg-background focus:text-foreground focus:shadow-overlay sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:px-4 focus:py-2'
                 >
                     {t('accessibility.skipToContent')}
                 </a>
@@ -27,6 +28,8 @@ export const RootLayout = () => {
                         </ErrorBoundary>
                     </main>
                 </div>
+                {/* Before the notices: sibling effects run in tree order, so Sonner subscribes first */}
+                <Toaster />
                 <OfflineIndicator />
                 <PrivacyNotice />
                 <PwaInstallPrompt />
