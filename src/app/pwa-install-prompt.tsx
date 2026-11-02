@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { dismiss, notify } from '@/components/ui/toast';
 import { safeStorage } from '@/lib/storage';
 
 const STORAGE_KEY = 'pwaInstallDismissed';
+const TOAST_ID = 'pwa-install';
 
 type BeforeInstallPromptEvent = Event & {
     prompt: () => Promise<void>;
@@ -22,43 +23,48 @@ export const PwaInstallPrompt = () => {
             e.preventDefault();
             setPromptEvent(e as BeforeInstallPromptEvent);
         };
+        const handleAppInstalled = () => setPromptEvent(null);
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener('appinstalled', handleAppInstalled);
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
     }, []);
 
-    const handleInstall = async () => {
-        if (!promptEvent) return;
-        await promptEvent.prompt();
-        setPromptEvent(null);
-    };
+    // Dismissed only when the condition turns false, never in a cleanup (StrictMode safe)
+    useEffect(() => {
+        if (!promptEvent) {
+            dismiss(TOAST_ID);
+            return;
+        }
+        // Closes whatever the user picks in the browser prompt, without saving the flag
+        const handleInstall = async () => {
+            try {
+                await promptEvent.prompt();
+            } finally {
+                setPromptEvent(null);
+            }
+        };
+        const handleClose = () => {
+            safeStorage.setItem(STORAGE_KEY, 'true');
+            setPromptEvent(null);
+        };
+        notify({
+            id: TOAST_ID,
+            variant: 'info',
+            icon: Download,
+            title: t('pwa.install'),
+            description: t('pwa.installDescription'),
+            duration: Infinity,
+            dismissible: false,
+            actions: [
+                { label: t('pwa.installButton'), kind: 'primary', onClick: handleInstall },
+                { label: t('pwa.close'), kind: 'secondary', onClick: handleClose },
+            ],
+        });
+    }, [promptEvent, t]);
 
-    const handleDismiss = () => {
-        safeStorage.setItem(STORAGE_KEY, 'true');
-        setPromptEvent(null);
-    };
-
-    if (!promptEvent) return null;
-
-    return (
-        <div className='fixed right-0 bottom-0 left-0 z-50 border-t border-white/20 bg-white/95 shadow-lg backdrop-blur-sm dark:border-white/10 dark:bg-slate-900/95'>
-            <div className='container mx-auto flex items-center gap-4 px-4 py-3'>
-                <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30'>
-                    <Download className='h-4 w-4 text-blue-600 dark:text-blue-400' />
-                </div>
-                <div className='min-w-0 flex-1'>
-                    <p className='text-sm font-medium dark:text-gray-100'>{t('pwa.install')}</p>
-                    <p className='text-muted-foreground text-xs'>{t('pwa.installDescription')}</p>
-                </div>
-                <div className='flex gap-2'>
-                    <Button size='sm' onClick={handleInstall}>
-                        {t('pwa.install')}
-                    </Button>
-                    <Button size='sm' variant='outline' onClick={handleDismiss}>
-                        {t('pwa.close')}
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
+    return null;
 };

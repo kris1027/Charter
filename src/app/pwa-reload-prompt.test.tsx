@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, userEvent } from '@/test/test-utils';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act } from '@testing-library/react';
+import { renderWithToaster, screen, userEvent, waitFor } from '@/test/test-utils';
 import { PwaReloadPrompt } from './pwa-reload-prompt';
 
 const mockSetOfflineReady = vi.fn();
@@ -17,6 +18,8 @@ vi.mock('@/test/pwa-register-mock', () => ({
     }),
 }));
 
+const flushToasts = () => act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+
 describe('PwaReloadPrompt', () => {
     beforeEach(() => {
         mockOfflineReady = false;
@@ -24,66 +27,88 @@ describe('PwaReloadPrompt', () => {
         vi.clearAllMocks();
     });
 
-    it('should not render when neither offline ready nor needs refresh', () => {
-        render(<PwaReloadPrompt />);
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it('should not show a toast when neither offline ready nor needs refresh', async () => {
+        renderWithToaster(<PwaReloadPrompt />);
+        await flushToasts();
 
         expect(screen.queryByText('App ready to work offline')).not.toBeInTheDocument();
         expect(screen.queryByText('New version available')).not.toBeInTheDocument();
     });
 
-    it('should show offline ready message', () => {
+    it('should show the offline ready toast with only a close button', async () => {
         mockOfflineReady = true;
 
-        render(<PwaReloadPrompt />);
+        renderWithToaster(<PwaReloadPrompt />);
 
-        expect(screen.getByText('App ready to work offline')).toBeInTheDocument();
+        expect(await screen.findByText('App ready to work offline')).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Reload' })).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close notification' })).toBeInTheDocument();
     });
 
-    it('should show new version message with reload button', () => {
+    it('should reset offline ready when its toast is closed', async () => {
+        mockOfflineReady = true;
+        const user = userEvent.setup();
+
+        renderWithToaster(<PwaReloadPrompt />);
+        await user.click(await screen.findByRole('button', { name: 'Close notification' }));
+
+        expect(mockSetOfflineReady).toHaveBeenCalledWith(false);
+        await waitFor(() =>
+            expect(screen.queryByText('App ready to work offline')).not.toBeInTheDocument(),
+        );
+    });
+
+    it('should show the update toast with Reload and Close', async () => {
         mockNeedRefresh = true;
 
-        render(<PwaReloadPrompt />);
+        renderWithToaster(<PwaReloadPrompt />);
 
-        expect(screen.getByText('New version available')).toBeInTheDocument();
+        expect(await screen.findByText('New version available')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Reload' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+        expect(
+            screen.queryByRole('button', { name: 'Close notification' }),
+        ).not.toBeInTheDocument();
     });
 
-    it('should call updateServiceWorker when reload is clicked', async () => {
+    it('should call updateServiceWorker when Reload is clicked', async () => {
         mockNeedRefresh = true;
         const user = userEvent.setup();
 
-        render(<PwaReloadPrompt />);
-
-        await user.click(screen.getByRole('button', { name: 'Reload' }));
+        renderWithToaster(<PwaReloadPrompt />);
+        await user.click(await screen.findByRole('button', { name: 'Reload' }));
 
         expect(mockUpdateServiceWorker).toHaveBeenCalledWith(true);
     });
 
-    it('should dismiss when close is clicked', async () => {
+    it('should hide the update toast for this visit when Close is clicked', async () => {
         mockNeedRefresh = true;
         const user = userEvent.setup();
 
-        render(<PwaReloadPrompt />);
+        renderWithToaster(<PwaReloadPrompt />);
+        await user.click(await screen.findByRole('button', { name: 'Close' }));
 
-        await user.click(screen.getByRole('button', { name: 'Close' }));
-
-        expect(mockSetOfflineReady).toHaveBeenCalledWith(false);
         expect(mockSetNeedRefresh).toHaveBeenCalledWith(false);
+        await waitFor(() =>
+            expect(screen.queryByText('New version available')).not.toBeInTheDocument(),
+        );
     });
 
-    it('should auto-dismiss offline ready after 5 seconds', () => {
-        vi.useFakeTimers();
+    it('should auto close the offline ready toast after 5 seconds', async () => {
+        vi.useFakeTimers({ shouldAdvanceTime: true });
         mockOfflineReady = true;
 
-        render(<PwaReloadPrompt />);
+        renderWithToaster(<PwaReloadPrompt />);
+        await screen.findByText('App ready to work offline');
 
-        expect(screen.getByText('App ready to work offline')).toBeInTheDocument();
+        act(() => {
+            vi.advanceTimersByTime(5000);
+        });
 
-        vi.advanceTimersByTime(5000);
-
-        expect(mockSetOfflineReady).toHaveBeenCalledWith(false);
-
-        vi.useRealTimers();
+        await waitFor(() => expect(mockSetOfflineReady).toHaveBeenCalledWith(false));
     });
 });

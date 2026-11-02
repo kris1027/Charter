@@ -353,7 +353,12 @@
         "reload": "Reload",
         "close": "Close",
         "install": "Install app",
+        "installButton": "Install",
         "installDescription": "Install Resume Builder for quick access and offline use",
         "offline": "You're offline — all features still work"
+    },
+    "toast": {
+        "region": "Notifications",
+        "close": "Close notification"
     }
 }
