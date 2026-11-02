@@ -37,14 +37,16 @@ module.exports = {
             url: Object.keys(floors).flatMap((path) => Array(RUNS).fill(ORIGIN + path)),
             numberOfRuns: 1,
             startServerCommand: `pnpm exec vite preview --port ${PORT} --strictPort`,
-            startServerReadyPattern: 'Local:',
+            // Not 'Local:': on CI Vite colors its output and the color reset sits before the colon
+            startServerReadyPattern: 'Local',
             startServerReadyTimeout: 30000,
             puppeteerScript: './scripts/perf/lhci-seed.cjs',
             chromePath: process.env.CHROME_PATH,
             // With a puppeteerScript, LHCI ignores settings.chromeFlags and always runs headless
             puppeteerLaunchOptions: {
                 executablePath: process.env.CHROME_PATH,
-                args: ['--no-sandbox'],
+                // /dev/shm on CI runners is small; without this Chrome may never paint (NO_FCP)
+                args: ['--no-sandbox', '--disable-dev-shm-usage'],
             },
             settings: {
                 // Otherwise Lighthouse wipes the storage the seed script wrote
