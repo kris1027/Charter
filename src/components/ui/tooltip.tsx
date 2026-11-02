@@ -3,9 +3,7 @@ import { Tooltip as TooltipPrimitive } from 'radix-ui';
 
 import { cn } from '@/lib/utils';
 
-type TooltipProps = React.ComponentProps<typeof TooltipPrimitive.Root> & {
-    delayDuration?: number;
-};
+type TooltipProps = React.ComponentProps<typeof TooltipPrimitive.Root>;
 
 // Each tooltip carries its own provider, so routes without one load nothing extra
 const Tooltip = ({ delayDuration = 300, ...props }: TooltipProps) => (
