@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { ResumeFormValues } from '@/features/resume/form-types';
 import { clearResume, saveResume } from '@/features/resume/stored-resume';
 
@@ -16,32 +16,28 @@ export const useResumeAutosave = (form: ResumeForm) => {
     // Starts empty, so the first tick after mount writes once even with no edit
     const lastSavedJsonRef = useRef('');
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const values = form.state.values;
-            if (JSON.stringify(values) === lastSavedJsonRef.current) return;
-
-            const { ok, json, savedAt } = saveResume(values);
-            lastSavedJsonRef.current = json;
-            setSaveError(!ok);
-            setIsAutoSaved(true);
-            setLastSaved(savedAt);
-        }, AUTOSAVE_INTERVAL_MS);
-
-        return () => clearInterval(interval);
-    }, [form]);
-
     // The manual save is the one that writes a backup, and it shows Saving… for a moment
-    const save = ({ backup = false } = {}) => {
+    const save = ({ backup = false, autosaved = false } = {}) => {
         if (backup) setIsSaving(true);
         const { ok, json, savedAt } = saveResume(form.state.values, { backup });
         lastSavedJsonRef.current = json;
         setSaveError(!ok);
-        setIsAutoSaved(false);
+        setIsAutoSaved(autosaved);
         setLastSaved(savedAt);
         if (backup) setTimeout(() => setIsSaving(false), SAVING_HOLD_MS);
         return ok;
     };
+
+    // An effect event, so the interval always sees the latest save without restarting
+    const autosaveTick = useEffectEvent(() => {
+        if (JSON.stringify(form.state.values) === lastSavedJsonRef.current) return;
+        save({ autosaved: true });
+    });
+
+    useEffect(() => {
+        const interval = setInterval(autosaveTick, AUTOSAVE_INTERVAL_MS);
+        return () => clearInterval(interval);
+    }, []);
 
     // Keeps the backup; the last saved JSON, error and autosaved flag stay as they were
     const clear = () => {
