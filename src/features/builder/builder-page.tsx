@@ -10,7 +10,6 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import type {
     EducationProps,
-    ExperienceProps,
     InterestProps,
     LanguageLevelProps,
     LanguageProps,
@@ -210,36 +209,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                 fileInputRef.current.value = '';
             }
         }
-    };
-
-    const addExperience = () => {
-        form.setFieldValue('experiences', [
-            {
-                company: '',
-                position: '',
-                location: '',
-                startDate: '',
-                endDate: '',
-                current: false,
-                description: '',
-            },
-            ...(form.getFieldValue('experiences') as ExperienceProps[]),
-        ]);
-    };
-
-    const removeExperience = (index: number) => {
-        const experiences = form.getFieldValue('experiences') as ExperienceProps[];
-        form.setFieldValue(
-            'experiences',
-            experiences.filter((_, i) => i !== index),
-        );
-    };
-
-    const reorderExperiences = (oldIndex: number, newIndex: number) => {
-        const experiences = [...(form.getFieldValue('experiences') as ExperienceProps[])];
-        const [removed] = experiences.splice(oldIndex, 1);
-        experiences.splice(newIndex, 0, removed);
-        form.setFieldValue('experiences', experiences);
     };
 
     const addEducation = () => {
@@ -567,12 +536,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
                         {/* Work Experience Section */}
                         <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <ExperienceSection
-                                form={sectionForm}
-                                addExperience={addExperience}
-                                removeExperience={removeExperience}
-                                reorderExperiences={reorderExperiences}
-                            />
+                            <ExperienceSection form={form} />
                         </motion.div>
 
                         {/* Education Section */}
