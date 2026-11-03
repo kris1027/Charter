@@ -8,12 +8,7 @@ import { InterestsSection } from '@/features/builder/form-sections/interests-sec
 import { GdprConsentSection } from '@/features/builder/form-sections/gdpr-consent-section';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
-import type {
-    InterestProps,
-    LanguageLevelProps,
-    LanguageProps,
-    SkillProps,
-} from '@/features/resume/form-types';
+import type { InterestProps, SkillProps } from '@/features/resume/form-types';
 import { resumeFormOptions, useAppForm } from '@/features/builder/resume-form';
 import {
     ArrowLeft,
@@ -230,28 +225,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
         const [removed] = skills.splice(oldIndex, 1);
         skills.splice(newIndex, 0, removed);
         form.setFieldValue('skills', skills);
-    };
-
-    const addLanguage = () => {
-        form.setFieldValue('languages', [
-            ...(form.getFieldValue('languages') as LanguageProps[]),
-            { language: '', proficiency: 'A1' as LanguageLevelProps },
-        ]);
-    };
-
-    const removeLanguage = (index: number) => {
-        const languages = form.getFieldValue('languages') as LanguageProps[];
-        form.setFieldValue(
-            'languages',
-            languages.filter((_, i) => i !== index),
-        );
-    };
-
-    const reorderLanguages = (oldIndex: number, newIndex: number) => {
-        const languages = [...(form.getFieldValue('languages') as LanguageProps[])];
-        const [removed] = languages.splice(oldIndex, 1);
-        languages.splice(newIndex, 0, removed);
-        form.setFieldValue('languages', languages);
     };
 
     const addInterest = () => {
@@ -526,12 +499,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
                         {/* Languages Section */}
                         <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <LanguagesSection
-                                form={sectionForm}
-                                addLanguage={addLanguage}
-                                removeLanguage={removeLanguage}
-                                reorderLanguages={reorderLanguages}
-                            />
+                            <LanguagesSection form={form} />
                         </motion.div>
 
                         {/* Interests Section */}
