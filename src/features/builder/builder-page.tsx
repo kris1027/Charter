@@ -47,8 +47,13 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ParallaxBackground } from '@/components/parallax-background';
 import { fadeInUp } from '@/lib/animation-variants';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { safeStorage } from '@/lib/storage';
-import { loadStoredResume, normalizeResume } from '@/features/resume/stored-resume';
+import {
+    clearResume,
+    loadStoredResume,
+    normalizeResume,
+    saveResume,
+    writeResume,
+} from '@/features/resume/stored-resume';
 import type { FormApi } from '@/features/builder/form-component-types';
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
@@ -109,17 +114,12 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
             onChange: resumeFormSchema,
         },
         onSubmit: async ({ value }) => {
-            setIsSaving(true);
             // Store data in localStorage for persistence
-            const json = JSON.stringify(value);
-            const ok = safeStorage.setItem('resumeData', json);
-            const now = new Date();
-            safeStorage.setItem('resumeData_lastSaved', now.toISOString());
+            const { ok, json, savedAt } = saveResume(value as ResumeFormValues);
             lastSavedJsonRef.current = json;
             setSaveError(!ok);
             setIsAutoSaved(false);
-            setLastSaved(now);
-            setIsSaving(false);
+            setLastSaved(savedAt);
 
             // Navigate to preview page with templateId
             navigate({ to: '/preview', search: { templateId: value.templateId } });
@@ -143,16 +143,13 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     useEffect(() => {
         const interval = setInterval(() => {
             const formData = form.state.values as ResumeFormValues;
-            const json = JSON.stringify(formData);
-            if (json === lastSavedJsonRef.current) return;
+            if (JSON.stringify(formData) === lastSavedJsonRef.current) return;
 
-            const ok = safeStorage.setItem('resumeData', json);
-            const now = new Date();
-            safeStorage.setItem('resumeData_lastSaved', now.toISOString());
+            const { ok, json, savedAt } = saveResume(formData);
             lastSavedJsonRef.current = json;
             setSaveError(!ok);
             setIsAutoSaved(true);
-            setLastSaved(now);
+            setLastSaved(savedAt);
         }, 30_000);
 
         return () => clearInterval(interval);
@@ -162,22 +159,17 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     const handleManualSave = () => {
         setIsSaving(true);
         const formData = form.state.values as ResumeFormValues;
-        const json = JSON.stringify(formData);
-        const ok = safeStorage.setItem('resumeData', json);
-        safeStorage.setItem('resumeData_backup', json);
-        const now = new Date();
-        safeStorage.setItem('resumeData_lastSaved', now.toISOString());
+        const { ok, json, savedAt } = saveResume(formData, { backup: true });
         lastSavedJsonRef.current = json;
         setSaveError(!ok);
         setIsAutoSaved(false);
-        setLastSaved(now);
+        setLastSaved(savedAt);
         setTimeout(() => setIsSaving(false), 500);
     };
 
     // Reset form function — keeps backup intact for recovery
     const handleReset = () => {
-        safeStorage.removeItem('resumeData');
-        safeStorage.removeItem('resumeData_lastSaved');
+        clearResume();
         setLastSaved(null);
         form.reset(getEmptyValues());
     };
@@ -209,7 +201,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
             // Persist first so getInitialValues() returns matching data on
             // re-render, preventing useForm's update() from overwriting the reset
-            safeStorage.setItem('resumeData', JSON.stringify(newValues));
+            writeResume(newValues);
 
             // Reset the form with all values at once — no intermediate
             // validation states and no stale errors
