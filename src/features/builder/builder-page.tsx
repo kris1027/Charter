@@ -562,7 +562,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                     >
                         {/* Personal Information Section */}
                         <motion.div {...fadeInUp(0, shouldReduceMotion)}>
-                            <PersonalInfoSection form={sectionForm} />
+                            <PersonalInfoSection form={form} />
                         </motion.div>
 
                         {/* Work Experience Section */}
