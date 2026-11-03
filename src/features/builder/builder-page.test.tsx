@@ -47,8 +47,7 @@ const lastNameInput = () => screen.getByLabelText(/^Last Name/);
 const emailInput = () => screen.getByLabelText(/^Email/);
 const previewButton = () => screen.getByRole('button', { name: /Preview CV/ });
 
-const fileInput = (container: HTMLElement) =>
-    container.querySelector<HTMLInputElement>('input[type="file"]')!;
+const fileInput = () => screen.getByLabelText<HTMLInputElement>('Load PDF');
 
 const pdfFile = (size?: number) => {
     const file = new File(['%PDF'], 'resume.pdf', { type: 'application/pdf' });
@@ -239,9 +238,9 @@ describe('BuilderPage', () => {
 
     it('should show the too large error when the PDF is over 10MB', async () => {
         const user = userEvent.setup();
-        const { container } = await renderWithRouter(BuilderPage);
+        await renderWithRouter(BuilderPage);
 
-        await user.upload(fileInput(container), pdfFile(10 * 1024 * 1024 + 1));
+        await user.upload(fileInput(), pdfFile(10 * 1024 * 1024 + 1));
 
         expect(await screen.findByText('Unable to Load PDF')).toBeInTheDocument();
         expect(
@@ -259,14 +258,14 @@ describe('BuilderPage', () => {
                 skills: [{ name: 'Go' }],
             }),
         );
-        const { container } = await renderWithRouter(BuilderPage);
+        await renderWithRouter(BuilderPage);
 
-        await user.upload(fileInput(container), pdfFile());
+        await user.upload(fileInput(), pdfFile());
 
         await waitFor(() => expect(firstNameInput()).toHaveValue('Imported'));
         expect(storedResume().personalInfo.firstName).toBe('Imported');
         expect(storedResume().templateId).toBe('default');
-        expect(fileInput(container).value).toBe('');
+        expect(fileInput().value).toBe('');
 
         // A further rerender must keep the imported values
         await user.type(lastNameInput(), 'X');
@@ -282,11 +281,11 @@ describe('BuilderPage', () => {
             ...resume(),
             ...JSON.parse('{"templateId":"retired"}'),
         });
-        const { container } = await renderWithRouter(BuilderPage, {
+        await renderWithRouter(BuilderPage, {
             initialEntry: '/builder?templateId=veterinary',
         });
 
-        await user.upload(fileInput(container), pdfFile());
+        await user.upload(fileInput(), pdfFile());
 
         await waitFor(() => expect(storedResume().templateId).toBe('veterinary'));
     });
@@ -295,9 +294,9 @@ describe('BuilderPage', () => {
         const user = userEvent.setup();
         vi.mocked(loadResumeFromPDF).mockRejectedValue(new Error('Not a resume PDF'));
         vi.spyOn(console, 'error').mockImplementation(() => {});
-        const { container } = await renderWithRouter(BuilderPage);
+        await renderWithRouter(BuilderPage);
 
-        await user.upload(fileInput(container), pdfFile());
+        await user.upload(fileInput(), pdfFile());
 
         expect(await screen.findByText('Not a resume PDF')).toBeInTheDocument();
         expect(screen.getByText('Unable to Load PDF')).toBeInTheDocument();

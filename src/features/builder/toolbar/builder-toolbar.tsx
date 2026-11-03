@@ -52,6 +52,7 @@ export const BuilderToolbar = ({
                             onChange={handleFileChange}
                             accept='.pdf'
                             className='hidden'
+                            aria-label={t('builder.loadPdf')}
                         />
                         <Button
                             type='button'
