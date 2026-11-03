@@ -135,6 +135,12 @@ export default defineConfig([
         ['src/app/**/*.{ts,tsx}'],
         [ban(['@/routes/**'], 'The app shell never imports routes')],
     ),
+    // Builder files stay small (spec 0005); a different rule, so it overrides nothing above
+    {
+        files: ['src/features/builder/**/*.{ts,tsx}'],
+        ignores: ['**/*.test.{ts,tsx}'],
+        rules: { 'max-lines': ['error', { max: 250, skipBlankLines: true, skipComments: true }] },
+    },
     tokenOnly,
     eslintConfigPrettier,
 ]);

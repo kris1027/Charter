@@ -51,3 +51,25 @@ describe('raw color lint rule', () => {
         expect(errors).toHaveLength(0);
     });
 });
+
+// Line limit for builder files from spec 0005
+const maxLinesErrors = async (lines: number, filePath: string) => {
+    const code = Array.from({ length: lines }, (_, i) => `export const a${i} = ${i};`).join('\n');
+    const [result] = await eslint.lintText(`${code}\n`, { filePath });
+    return result.messages.filter((message) => message.ruleId === 'max-lines');
+};
+
+describe('builder max-lines lint rule', () => {
+    it('should error when a builder file has 251 code lines', async () => {
+        expect(await maxLinesErrors(251, 'src/features/builder/fixture.ts')).toHaveLength(1);
+    });
+
+    it('should pass when a builder file has 250 code lines', async () => {
+        expect(await maxLinesErrors(250, 'src/features/builder/fixture.ts')).toHaveLength(0);
+    });
+
+    it('should ignore the limit when the file is a test or outside the builder', async () => {
+        expect(await maxLinesErrors(251, 'src/features/builder/fixture.test.ts')).toHaveLength(0);
+        expect(await maxLinesErrors(251, 'src/features/landing/fixture.ts')).toHaveLength(0);
+    });
+});
