@@ -70,6 +70,17 @@ export default defineConfig([
             ecmaVersion: 2020,
             globals: globals.browser,
         },
+        rules: {
+            // The vite preset's options, plus withForm sections count as components (spec 0005)
+            'react-refresh/only-export-components': [
+                'error',
+                {
+                    allowConstantExport: true,
+                    allowCompoundComponents: true,
+                    extraHOCs: ['withForm'],
+                },
+            ],
+        },
     },
     {
         files: ['src/test/**/*.{ts,tsx}', '**/*.test.{ts,tsx}'],

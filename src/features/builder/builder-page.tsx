@@ -8,7 +8,7 @@ import { InterestsSection } from '@/features/builder/form-sections/interests-sec
 import { GdprConsentSection } from '@/features/builder/form-sections/gdpr-consent-section';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
-import type { InterestProps, SkillProps } from '@/features/resume/form-types';
+import type { InterestProps } from '@/features/resume/form-types';
 import { resumeFormOptions, useAppForm } from '@/features/builder/resume-form';
 import {
     ArrowLeft,
@@ -203,28 +203,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                 fileInputRef.current.value = '';
             }
         }
-    };
-
-    const addSkill = () => {
-        form.setFieldValue('skills', [
-            ...(form.getFieldValue('skills') as SkillProps[]),
-            { name: '' },
-        ]);
-    };
-
-    const removeSkill = (index: number) => {
-        const skills = form.getFieldValue('skills') as SkillProps[];
-        form.setFieldValue(
-            'skills',
-            skills.filter((_, i) => i !== index),
-        );
-    };
-
-    const reorderSkills = (oldIndex: number, newIndex: number) => {
-        const skills = [...(form.getFieldValue('skills') as SkillProps[])];
-        const [removed] = skills.splice(oldIndex, 1);
-        skills.splice(newIndex, 0, removed);
-        form.setFieldValue('skills', skills);
     };
 
     const addInterest = () => {
@@ -489,12 +467,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
                         {/* Skills Section */}
                         <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <SkillsSection
-                                form={sectionForm}
-                                addSkill={addSkill}
-                                removeSkill={removeSkill}
-                                reorderSkills={reorderSkills}
-                            />
+                            <SkillsSection form={form} />
                         </motion.div>
 
                         {/* Languages Section */}
