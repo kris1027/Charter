@@ -54,4 +54,10 @@ Decisions settled while writing (pick, why, runner up):
 - **`DragHandle` sizes `sm` and `md`**: chips use a 12px grip and cards a 20px one today. Runner up: one size (a visible change).
 - **`useSearch({ from: '/builder' })`, not `Route.useSearch()`**: spec 0002's lint bans `@/routes/**` imports from features, and the route file imports the page. Runner up: `getRouteApi('/builder')` (same typing, one more line).
 - **Autosave, reset and submit keep today's quirks** (first tick writes once, reset keeps `saveError`, submit navigates after a failed write): this is a refactor; changing them would need their own decision.
-- **Invalid `templateId` dropped with `.catch(undefined)`**: an old or typed URL still opens the builder. Runner up: redirect to `/templates` (a new flow nobody asked for).
+- **Invalid `templateId` dropped**: an old or typed URL still opens the builder. Runner up: redirect to `/templates` (a new flow nobody asked for).
+
+Changes found during the build (2026-11-03):
+
+- **Plain code search check, not zod.** The spec first asked for `z.enum(TEMPLATE_IDS).optional().catch(undefined)`. Route search validation is part of the route tree, which every page loads, so zod landed in the main bundle and `/` and `/templates` went over their `perf:size` budgets. `builder-search.ts` does the same check with `isTemplateId`. Runner up: raise the two budgets (pays bundle size on every page for one optional param).
+- **List sections also subscribe to their whole array.** An array mode `form.Field` rerenders only when its own helpers (`pushValue`, `removeValue`, `moveValue`) run, so `form.reset` from reset and import left stale items on screen. The characterization suite (AC-1 rerender cases) caught it. Runner up: remount the sections with a `key` bumped on reset (more state to carry, and it drops focus).
+- **`writeResume` as a third storage writer.** PDF import has always written `resumeData` alone. Routing it through `saveResume` would also write `resumeData_lastSaved`, which the gallery shows as a saved time, so it would be a visible change. Runner up: a `{ stampSavedAt: false }` option on `saveResume` (one function, but a flag that changes what it means to save).

@@ -33,3 +33,7 @@ _Steps derived from spec 0005 acceptance criteria. `/check verify` runs these; `
 - [ ] Add a skill, then Reset → the chip is gone right away, not only after the next keystroke; import a PDF with skills → the chips show right away (list sections subscribe to their array, since array mode fields skip `form.reset`) → AC-4, AC-7, AC-8
 - [ ] Type the email first, then first and last name → the percent reads 10, 20, 30 as you type and Preview unlocks without the email being last → AC-9
 - [ ] Open the gallery template page and the templates list, click Use template → `/builder?templateId=<id>` opens with that badge; from `/preview`, Back to editor no longer adds `edit=true` to the URL → AC-10
+
+## Correction by /develop · 2026-11-03
+
+- [ ] Type into a required field, clear it, then tab out → its error shows; a field you only focus and leave, without typing, shows none (validation runs on change, on `main` too, so the "tab out of an empty required field" step above never shows an error) → AC-6
