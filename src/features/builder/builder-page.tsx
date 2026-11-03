@@ -9,7 +9,6 @@ import { GdprConsentSection } from '@/features/builder/form-sections/gdpr-consen
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import type {
-    ResumeFormValues,
     EducationProps,
     ExperienceProps,
     InterestProps,
@@ -17,8 +16,7 @@ import type {
     LanguageProps,
     SkillProps,
 } from '@/features/resume/form-types';
-import { useForm } from '@tanstack/react-form';
-import { resumeFormSchema } from '@/features/resume/resume-schema';
+import { resumeFormOptions, useAppForm } from '@/features/builder/resume-form';
 import {
     ArrowLeft,
     CheckCircle,
@@ -49,17 +47,19 @@ import { fadeInUp } from '@/lib/animation-variants';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import {
     clearResume,
+    EMPTY_RESUME,
     loadStoredResume,
     normalizeResume,
     saveResume,
     writeResume,
 } from '@/features/resume/stored-resume';
 import type { FormApi } from '@/features/builder/form-component-types';
+import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
 
 type BuilderPageProps = {
-    templateId?: string;
+    templateId?: TemplateId;
 };
 
 const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
@@ -77,8 +77,9 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const lastSavedJsonRef = useRef<string>('');
 
-    // Use search param if available, otherwise fall back to prop
-    const activeTemplateId = search.templateId || templateId;
+    // Use search param if it names a template, otherwise fall back to prop
+    const searchTemplateId = isTemplateId(search.templateId) ? search.templateId : undefined;
+    const activeTemplateId = searchTemplateId ?? templateId;
 
     // Convert template ID to display name
     const getTemplateName = (id: string) => {
@@ -94,28 +95,20 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
         }
     };
 
-    // Default values for a new CV
-    const getEmptyValues = () => ({ ...normalizeResume({}), templateId: activeTemplateId });
-
-    // Get initial values - load from localStorage if available, otherwise defaults
-    const getInitialValues = () => {
+    // Read once per mount: stored resume if any, the URL template winning over the stored one
+    const [initialValues] = useState(() => {
         const stored = loadStoredResume();
-        if (!stored) return getEmptyValues();
-        return {
-            ...stored,
-            // Always use URL templateId when explicitly provided, otherwise fall back to stored value
-            templateId: search.templateId || stored.templateId || activeTemplateId,
-        };
-    };
+        if (!stored) return { ...EMPTY_RESUME, templateId: activeTemplateId };
+        const storedTemplateId = isTemplateId(stored.templateId) ? stored.templateId : undefined;
+        return { ...stored, templateId: searchTemplateId ?? storedTemplateId ?? activeTemplateId };
+    });
 
-    const form = useForm({
-        defaultValues: getInitialValues(),
-        validators: {
-            onChange: resumeFormSchema,
-        },
+    const form = useAppForm({
+        ...resumeFormOptions,
+        defaultValues: initialValues,
         onSubmit: async ({ value }) => {
             // Store data in localStorage for persistence
-            const { ok, json, savedAt } = saveResume(value as ResumeFormValues);
+            const { ok, json, savedAt } = saveResume(value);
             lastSavedJsonRef.current = json;
             setSaveError(!ok);
             setIsAutoSaved(false);
@@ -131,18 +124,15 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
     // Sync form templateId when URL parameter changes
     useEffect(() => {
-        if (
-            search.templateId &&
-            (form.getFieldValue('templateId') as string) !== search.templateId
-        ) {
-            form.setFieldValue('templateId', search.templateId);
+        if (searchTemplateId && form.getFieldValue('templateId') !== searchTemplateId) {
+            form.setFieldValue('templateId', searchTemplateId);
         }
-    }, [search.templateId, form]);
+    }, [searchTemplateId, form]);
 
     // Auto-save every 30 seconds
     useEffect(() => {
         const interval = setInterval(() => {
-            const formData = form.state.values as ResumeFormValues;
+            const formData = form.state.values;
             if (JSON.stringify(formData) === lastSavedJsonRef.current) return;
 
             const { ok, json, savedAt } = saveResume(formData);
@@ -158,8 +148,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     // Manual save function
     const handleManualSave = () => {
         setIsSaving(true);
-        const formData = form.state.values as ResumeFormValues;
-        const { ok, json, savedAt } = saveResume(formData, { backup: true });
+        const { ok, json, savedAt } = saveResume(form.state.values, { backup: true });
         lastSavedJsonRef.current = json;
         setSaveError(!ok);
         setIsAutoSaved(false);
@@ -171,7 +160,9 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     const handleReset = () => {
         clearResume();
         setLastSaved(null);
-        form.reset(getEmptyValues());
+        // keepDefaultValues: useAppForm re-applies its options each render, and new defaults
+        // would make it put the initial resume back
+        form.reset({ ...EMPTY_RESUME, templateId: activeTemplateId }, { keepDefaultValues: true });
     };
 
     const handleLoadPDF = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,13 +190,12 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                 templateId: resumeData.templateId || activeTemplateId,
             };
 
-            // Persist first so getInitialValues() returns matching data on
-            // re-render, preventing useForm's update() from overwriting the reset
+            // Persist so a reload shows the import
             writeResume(newValues);
 
             // Reset the form with all values at once — no intermediate
             // validation states and no stale errors
-            form.reset(newValues);
+            form.reset(newValues, { keepDefaultValues: true });
 
             // PDF loaded - user can manually save when ready
         } catch (error) {
@@ -349,7 +339,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
     // Calculate form progress
     const calculateProgress = () => {
-        const values = form.state.values as ResumeFormValues;
+        const values = form.state.values;
         let progress = 0;
 
         // Personal info (30%)
