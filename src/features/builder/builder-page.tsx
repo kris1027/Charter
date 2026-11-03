@@ -9,7 +9,6 @@ import { GdprConsentSection } from '@/features/builder/form-sections/gdpr-consen
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import type {
-    EducationProps,
     InterestProps,
     LanguageLevelProps,
     LanguageProps,
@@ -209,35 +208,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                 fileInputRef.current.value = '';
             }
         }
-    };
-
-    const addEducation = () => {
-        form.setFieldValue('education', [
-            ...(form.getFieldValue('education') as EducationProps[]),
-            {
-                institution: '',
-                degree: '',
-                field: '',
-                startDate: '',
-                endDate: '',
-                description: '',
-            },
-        ]);
-    };
-
-    const removeEducation = (index: number) => {
-        const education = form.getFieldValue('education') as EducationProps[];
-        form.setFieldValue(
-            'education',
-            education.filter((_, i) => i !== index),
-        );
-    };
-
-    const reorderEducation = (oldIndex: number, newIndex: number) => {
-        const education = [...(form.getFieldValue('education') as EducationProps[])];
-        const [removed] = education.splice(oldIndex, 1);
-        education.splice(newIndex, 0, removed);
-        form.setFieldValue('education', education);
     };
 
     const addSkill = () => {
@@ -541,12 +511,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
                         {/* Education Section */}
                         <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <EducationSection
-                                form={sectionForm}
-                                addEducation={addEducation}
-                                removeEducation={removeEducation}
-                                reorderEducation={reorderEducation}
-                            />
+                            <EducationSection form={form} />
                         </motion.div>
 
                         {/* Skills Section */}
