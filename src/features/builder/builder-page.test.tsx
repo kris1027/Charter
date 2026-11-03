@@ -327,4 +327,20 @@ describe('BuilderPage', () => {
 
         expect(screen.getByText('Save failed — storage may be full')).toBeInTheDocument();
     });
+
+    // Spec 0005, AC-9: progress follows typing (the old page only updated it on other rerenders)
+    it('should move the progress with each required field when the user types', async () => {
+        const user = userEvent.setup();
+        await renderWithRouter(BuilderPage);
+        expect(screen.getByText('0%')).toBeInTheDocument();
+
+        await user.type(emailInput(), 'ada@example.com');
+        expect(await screen.findByText('10%')).toBeInTheDocument();
+        await user.type(firstNameInput(), 'Ada');
+        expect(await screen.findByText('20%')).toBeInTheDocument();
+        await user.type(lastNameInput(), 'Lovelace');
+        expect(await screen.findByText('30%')).toBeInTheDocument();
+
+        await waitFor(() => expect(previewButton()).toBeEnabled());
+    });
 });

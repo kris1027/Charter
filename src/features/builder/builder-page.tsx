@@ -32,6 +32,8 @@ import { EMPTY_RESUME, loadStoredResume } from '@/features/resume/stored-resume'
 import { usePdfImport } from '@/features/builder/use-pdf-import';
 import { PdfErrorDialog } from '@/features/builder/toolbar/pdf-error-dialog';
 import { useResumeAutosave } from '@/features/builder/use-resume-autosave';
+import { calculateProgress } from '@/features/builder/calculate-progress';
+import { FormProgress } from '@/features/builder/form-progress';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
 type BuilderPageProps = {
@@ -109,34 +111,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
         // keepDefaultValues: useAppForm re-applies its options each render, and new defaults
         // would make it put the initial resume back
         form.reset({ ...EMPTY_RESUME, templateId: activeTemplateId }, { keepDefaultValues: true });
-    };
-
-    // Calculate form progress
-    const calculateProgress = () => {
-        const values = form.state.values;
-        let progress = 0;
-
-        // Personal info (30%)
-        if (values.personalInfo.firstName) progress += 10;
-        if (values.personalInfo.lastName) progress += 10;
-        if (values.personalInfo.email) progress += 10;
-
-        // Experience (25%)
-        if (values.experiences.length > 0) progress += 25;
-
-        // Education (20%)
-        if (values.education.length > 0) progress += 20;
-
-        // Skills (15%)
-        if (values.skills.length > 0) progress += 15;
-
-        // Languages (5%)
-        if (values.languages.length > 0) progress += 5;
-
-        // Interests (5%)
-        if (values.interests.length > 0) progress += 5;
-
-        return Math.min(progress, 100);
     };
 
     return (
@@ -267,38 +241,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
             <div className='relative z-[1] container mx-auto max-w-5xl px-4 py-8'>
                 {/* Progress Indicator */}
-                <motion.div
-                    className='mb-8 rounded-2xl border border-white/20 bg-white/60 p-5 backdrop-blur-sm dark:border-white/5 dark:bg-white/[0.03]'
-                    {...fadeInUp(0, shouldReduceMotion)}
-                >
-                    <div className='mb-3 flex items-center justify-between'>
-                        <div className='flex items-center gap-3'>
-                            <div
-                                className='inline-flex rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 p-2 text-white shadow-lg'
-                                aria-hidden='true'
-                            >
-                                <CheckCircle className='h-4 w-4' />
-                            </div>
-                            <span className='font-display text-sm font-semibold dark:text-slate-200'>
-                                {t('builder.progress.title')}
-                            </span>
-                        </div>
-                        <span className='rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-0.5 text-xs font-bold text-white shadow-sm'>
-                            {calculateProgress()}%
-                        </span>
-                    </div>
-                    <div className='h-3 w-full overflow-hidden rounded-full bg-slate-200/80 dark:bg-white/10'>
-                        <div
-                            className='h-full rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 shadow-sm shadow-indigo-500/25 transition-all duration-500 ease-out'
-                            style={{ width: `${calculateProgress()}%` }}
-                        />
-                    </div>
-                    <div className='text-muted-foreground mt-2 text-xs'>
-                        {calculateProgress() === 100
-                            ? t('builder.progress.complete')
-                            : t('builder.progress.incomplete')}
-                    </div>
-                </motion.div>
+                <FormProgress form={form} />
 
                 <ErrorBoundary>
                     <form
@@ -350,12 +293,15 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                             {...fadeInUp(0.05, shouldReduceMotion)}
                         >
                             <form.Subscribe
-                                selector={(state) => [
-                                    state.canSubmit,
-                                    state.isSubmitting,
-                                    state.isValid,
-                                ]}
-                                children={([canSubmit, isSubmitting, isValid]) => (
+                                selector={(state) =>
+                                    [
+                                        state.canSubmit,
+                                        state.isSubmitting,
+                                        state.isValid,
+                                        calculateProgress(state.values),
+                                    ] as const
+                                }
+                                children={([canSubmit, isSubmitting, isValid, progress]) => (
                                     <>
                                         <div className='text-sm'>
                                             {!isValid && (
@@ -366,7 +312,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                                         </div>
                                         <Button
                                             type='submit'
-                                            disabled={!canSubmit || calculateProgress() < 30}
+                                            disabled={!canSubmit || progress < 30}
                                             size='lg'
                                             className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl'
                                         >
