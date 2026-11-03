@@ -34,7 +34,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 4   | Feature based folder structure  | Foundation | done        |
 | 5   | Performance budgets             | Foundation | in-progress |
 | 6   | Design system refresh           | Foundation | done        |
-| 7   | Builder page split              | Slice 1    | planned     |
+| 7   | Builder page split              | Slice 1    | in-progress |
 | 8   | Shared template model           | Slice 1    | planned     |
 | 9   | PDF import parser restructure   | Slice 1    | planned     |
 | 10  | Lazy load heavy engines         | Slice 2    | planned     |
@@ -193,12 +193,19 @@ spec [0004](../specs/0004-design-system-refresh/index.md) · code in `src/index.
 
 ## Slice 1: Refactor the core
 
-### 7. Builder page split · needs a decision
+### 7. Builder page split · in-progress
 
 Break the 788 line builder page into focused pieces with clear form state boundaries (form, section list, toolbar, import/save dialogs).
 **Done when:** no builder file is over roughly 250 lines, each section owns its own state slice, and builder behavior is unchanged under the existing tests.
+spec [0005](../specs/0005-builder-page-split/index.md)
 
-- [ ] Design it (spec): `/architect builder page split`
+- [x] Design it (spec): `/architect builder page split`
+- [ ] Build it: `/develop builder page split`
+    - [ ] Characterization tests for today's page, plus the save and clear writers (AC-1, AC-7)
+    - [ ] Typed form with field components and the shared sortable list (AC-3, AC-5, AC-6)
+    - [ ] Every section on withForm and array helpers, page callbacks gone (AC-3, AC-4, AC-5, AC-6)
+    - [ ] Autosave, PDF import, live progress and toolbar extracted, templateId validated (AC-7, AC-8, AC-9, AC-10)
+    - [ ] max-lines lint rule and final pre-commit and browser pass (AC-2, AC-11)
 
 ### 8. Shared template model · needs a decision
 
