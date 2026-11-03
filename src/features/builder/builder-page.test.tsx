@@ -275,6 +275,22 @@ describe('BuilderPage', () => {
         expect(screen.getByText('Go')).toBeInTheDocument();
     });
 
+    it('should fall back to the active template when the imported PDF names an unknown one', async () => {
+        const user = userEvent.setup();
+        // Embedded JSON is untyped at runtime, so a PDF can carry a template that no longer exists
+        vi.mocked(loadResumeFromPDF).mockResolvedValue({
+            ...resume(),
+            ...JSON.parse('{"templateId":"retired"}'),
+        });
+        const { container } = await renderWithRouter(BuilderPage, {
+            initialEntry: '/builder?templateId=veterinary',
+        });
+
+        await user.upload(fileInput(container), pdfFile());
+
+        await waitFor(() => expect(storedResume().templateId).toBe('veterinary'));
+    });
+
     it('should show the error message when the PDF import fails', async () => {
         const user = userEvent.setup();
         vi.mocked(loadResumeFromPDF).mockRejectedValue(new Error('Not a resume PDF'));

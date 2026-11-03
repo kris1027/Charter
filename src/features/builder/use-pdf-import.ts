@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { loadResumeFromPDF } from '@/features/pdf/pdf-parser';
 import type { ResumeFormValues } from '@/features/resume/form-types';
 import { normalizeResume, writeResume } from '@/features/resume/stored-resume';
-import type { TemplateId } from '@/lib/template-ids';
+import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -42,10 +42,13 @@ export const usePdfImport = ({ form, activeTemplateId }: UsePdfImportOptions) =>
         try {
             const resumeData = await loadResumeFromPDF(file);
 
-            // Backfill missing keys; fall back to the active template so the schema stays valid
+            // Backfill missing keys; embedded JSON can name any template, so fall back to the
+            // active one unless it is a real template
             const newValues = {
                 ...normalizeResume(resumeData),
-                templateId: resumeData.templateId || activeTemplateId,
+                templateId: isTemplateId(resumeData.templateId)
+                    ? resumeData.templateId
+                    : activeTemplateId,
             };
 
             // Persist so a reload shows the import
