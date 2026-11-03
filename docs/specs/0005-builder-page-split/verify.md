@@ -25,3 +25,11 @@ _Steps derived from spec 0005 acceptance criteria. `/check verify` runs these; `
 - [ ] Import a PDF exported from each of the three templates, then the same file again, then an 11MB file → the form fills twice, the big file shows the size error → AC-8
 - [ ] Open `/builder?templateId=veterinary` and `/builder?templateId=nope` → the first shows the veterinary badge, the second the developer badge with the stored resume loaded (an intended change: `main` shows `nope`) → AC-10
 - [ ] Compare the builder side by side with `main` at desktop and phone width, with reduced motion on and off → no visual difference → AC-11
+
+## Added by /develop · 2026-11-03
+
+- [ ] `grep -rn "from 'zod'" src/features/builder/builder-search.ts src/routes/builder.tsx` → no matches; `pnpm build && pnpm perf:size` keeps `/` and `/templates` within budget (zod in route search validation pushed both over) → AC-10, AC-11
+- [ ] Open `/builder?templateId=nope` with a stored `default` resume → the URL becomes `/builder`, the badge shows the developer name, and Save stores `templateId: 'default'` → AC-10
+- [ ] Add a skill, then Reset → the chip is gone right away, not only after the next keystroke; import a PDF with skills → the chips show right away (list sections subscribe to their array, since array mode fields skip `form.reset`) → AC-4, AC-7, AC-8
+- [ ] Type the email first, then first and last name → the percent reads 10, 20, 30 as you type and Preview unlocks without the email being last → AC-9
+- [ ] Open the gallery template page and the templates list, click Use template → `/builder?templateId=<id>` opens with that badge; from `/preview`, Back to editor no longer adds `edit=true` to the URL → AC-10
