@@ -87,38 +87,45 @@ export const InterestsSection = withForm({
                                     </Button>
                                 </div>
 
-                                <div>
-                                    {field.state.value.length === 0 ? (
-                                        <div className='py-8 text-center'>
-                                            <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 p-2.5 text-white/60 shadow-inner'>
-                                                <Heart className='h-6 w-6' />
-                                            </div>
-                                            <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
-                                                {t('sections.interests.empty')}
-                                            </p>
-                                            <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
-                                                {t('sections.interests.emptyHint')}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <SortableList
-                                            items={field.state.value}
-                                            idPrefix='interest'
-                                            strategy='horizontal'
-                                            onMove={field.moveValue}
-                                            className='flex flex-wrap gap-2'
-                                        >
-                                            {(item, index, id) => (
-                                                <InterestChip
-                                                    key={id}
-                                                    id={id}
-                                                    name={item.name}
-                                                    onRemove={() => field.removeValue(index)}
-                                                />
+                                {/* Array mode rerenders only on its helpers; this also catches form.reset */}
+                                <form.Subscribe selector={(state) => state.values.interests}>
+                                    {(items) => (
+                                        <div>
+                                            {items.length === 0 ? (
+                                                <div className='py-8 text-center'>
+                                                    <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 p-2.5 text-white/60 shadow-inner'>
+                                                        <Heart className='h-6 w-6' />
+                                                    </div>
+                                                    <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
+                                                        {t('sections.interests.empty')}
+                                                    </p>
+                                                    <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
+                                                        {t('sections.interests.emptyHint')}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <SortableList
+                                                    items={items}
+                                                    idPrefix='interest'
+                                                    strategy='horizontal'
+                                                    onMove={field.moveValue}
+                                                    className='flex flex-wrap gap-2'
+                                                >
+                                                    {(item, index, id) => (
+                                                        <InterestChip
+                                                            key={id}
+                                                            id={id}
+                                                            name={item.name}
+                                                            onRemove={() =>
+                                                                field.removeValue(index)
+                                                            }
+                                                        />
+                                                    )}
+                                                </SortableList>
                                             )}
-                                        </SortableList>
+                                        </div>
                                     )}
-                                </div>
+                                </form.Subscribe>
                             </div>
                         );
                     }}

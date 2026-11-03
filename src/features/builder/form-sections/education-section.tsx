@@ -126,40 +126,45 @@ export const EducationSection = withForm({
                             </Button>
                         }
                     >
-                        <div className='space-y-6'>
-                            {field.state.value.length === 0 && (
-                                <div className='py-8 text-center'>
-                                    <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 p-2.5 text-white/60 shadow-inner'>
-                                        <GraduationCap className='h-6 w-6' />
-                                    </div>
-                                    <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
-                                        {t('sections.education.empty')}
-                                    </p>
-                                    <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
-                                        {t('sections.education.emptyHint')}
-                                    </p>
+                        {/* Array mode rerenders only on its helpers; this also catches form.reset */}
+                        <form.Subscribe selector={(state) => state.values.education}>
+                            {(items) => (
+                                <div className='space-y-6'>
+                                    {items.length === 0 && (
+                                        <div className='py-8 text-center'>
+                                            <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 p-2.5 text-white/60 shadow-inner'>
+                                                <GraduationCap className='h-6 w-6' />
+                                            </div>
+                                            <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
+                                                {t('sections.education.empty')}
+                                            </p>
+                                            <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
+                                                {t('sections.education.emptyHint')}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {items.length > 0 && (
+                                        <SortableList
+                                            items={items}
+                                            idPrefix='education'
+                                            strategy='vertical'
+                                            onMove={field.moveValue}
+                                            className='space-y-6'
+                                        >
+                                            {(_, index, id) => (
+                                                <EducationItem
+                                                    key={id}
+                                                    form={form}
+                                                    id={id}
+                                                    index={index}
+                                                    onRemove={() => field.removeValue(index)}
+                                                />
+                                            )}
+                                        </SortableList>
+                                    )}
                                 </div>
                             )}
-                            {field.state.value.length > 0 && (
-                                <SortableList
-                                    items={field.state.value}
-                                    idPrefix='education'
-                                    strategy='vertical'
-                                    onMove={field.moveValue}
-                                    className='space-y-6'
-                                >
-                                    {(_, index, id) => (
-                                        <EducationItem
-                                            key={id}
-                                            form={form}
-                                            id={id}
-                                            index={index}
-                                            onRemove={() => field.removeValue(index)}
-                                        />
-                                    )}
-                                </SortableList>
-                            )}
-                        </div>
+                        </form.Subscribe>
                     </FormSectionCard>
                 )}
             </form.Field>

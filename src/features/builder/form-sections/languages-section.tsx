@@ -89,40 +89,45 @@ export const LanguagesSection = withForm({
                             </Button>
                         }
                     >
-                        <div className='space-y-4'>
-                            {field.state.value.length === 0 && (
-                                <div className='py-8 text-center'>
-                                    <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 p-2.5 text-white/60 shadow-inner'>
-                                        <Globe className='h-6 w-6' />
-                                    </div>
-                                    <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
-                                        {t('sections.languages.empty')}
-                                    </p>
-                                    <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
-                                        {t('sections.languages.emptyHint')}
-                                    </p>
+                        {/* Array mode rerenders only on its helpers; this also catches form.reset */}
+                        <form.Subscribe selector={(state) => state.values.languages}>
+                            {(items) => (
+                                <div className='space-y-4'>
+                                    {items.length === 0 && (
+                                        <div className='py-8 text-center'>
+                                            <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 p-2.5 text-white/60 shadow-inner'>
+                                                <Globe className='h-6 w-6' />
+                                            </div>
+                                            <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
+                                                {t('sections.languages.empty')}
+                                            </p>
+                                            <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
+                                                {t('sections.languages.emptyHint')}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {items.length > 0 && (
+                                        <SortableList
+                                            items={items}
+                                            idPrefix='language'
+                                            strategy='vertical'
+                                            onMove={field.moveValue}
+                                            className='space-y-4'
+                                        >
+                                            {(_, index, id) => (
+                                                <LanguageItem
+                                                    key={id}
+                                                    form={form}
+                                                    id={id}
+                                                    index={index}
+                                                    onRemove={() => field.removeValue(index)}
+                                                />
+                                            )}
+                                        </SortableList>
+                                    )}
                                 </div>
                             )}
-                            {field.state.value.length > 0 && (
-                                <SortableList
-                                    items={field.state.value}
-                                    idPrefix='language'
-                                    strategy='vertical'
-                                    onMove={field.moveValue}
-                                    className='space-y-4'
-                                >
-                                    {(_, index, id) => (
-                                        <LanguageItem
-                                            key={id}
-                                            form={form}
-                                            id={id}
-                                            index={index}
-                                            onRemove={() => field.removeValue(index)}
-                                        />
-                                    )}
-                                </SortableList>
-                            )}
-                        </div>
+                        </form.Subscribe>
                     </FormSectionCard>
                 )}
             </form.Field>

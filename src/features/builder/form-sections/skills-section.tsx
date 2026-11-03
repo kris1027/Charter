@@ -87,38 +87,45 @@ export const SkillsSection = withForm({
                                     </Button>
                                 </div>
 
-                                <div>
-                                    {field.state.value.length === 0 ? (
-                                        <div className='py-8 text-center'>
-                                            <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 p-2.5 text-white/60 shadow-inner'>
-                                                <Code className='h-6 w-6' />
-                                            </div>
-                                            <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
-                                                {t('sections.skills.empty')}
-                                            </p>
-                                            <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
-                                                {t('sections.skills.emptyHint')}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <SortableList
-                                            items={field.state.value}
-                                            idPrefix='skill'
-                                            strategy='horizontal'
-                                            onMove={field.moveValue}
-                                            className='flex flex-wrap gap-2'
-                                        >
-                                            {(item, index, id) => (
-                                                <SkillChip
-                                                    key={id}
-                                                    id={id}
-                                                    name={item.name}
-                                                    onRemove={() => field.removeValue(index)}
-                                                />
+                                {/* Array mode rerenders only on its helpers; this also catches form.reset */}
+                                <form.Subscribe selector={(state) => state.values.skills}>
+                                    {(items) => (
+                                        <div>
+                                            {items.length === 0 ? (
+                                                <div className='py-8 text-center'>
+                                                    <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 p-2.5 text-white/60 shadow-inner'>
+                                                        <Code className='h-6 w-6' />
+                                                    </div>
+                                                    <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
+                                                        {t('sections.skills.empty')}
+                                                    </p>
+                                                    <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
+                                                        {t('sections.skills.emptyHint')}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <SortableList
+                                                    items={items}
+                                                    idPrefix='skill'
+                                                    strategy='horizontal'
+                                                    onMove={field.moveValue}
+                                                    className='flex flex-wrap gap-2'
+                                                >
+                                                    {(item, index, id) => (
+                                                        <SkillChip
+                                                            key={id}
+                                                            id={id}
+                                                            name={item.name}
+                                                            onRemove={() =>
+                                                                field.removeValue(index)
+                                                            }
+                                                        />
+                                                    )}
+                                                </SortableList>
                                             )}
-                                        </SortableList>
+                                        </div>
                                     )}
-                                </div>
+                                </form.Subscribe>
                             </div>
                         );
                     }}
