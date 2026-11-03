@@ -61,3 +61,13 @@ Changes found during the build (2026-11-03):
 - **Plain code search check, not zod.** The spec first asked for `z.enum(TEMPLATE_IDS).optional().catch(undefined)`. Route search validation is part of the route tree, which every page loads, so zod landed in the main bundle and `/` and `/templates` went over their `perf:size` budgets. `builder-search.ts` does the same check with `isTemplateId`. Runner up: raise the two budgets (pays bundle size on every page for one optional param).
 - **List sections also subscribe to their whole array.** An array mode `form.Field` rerenders only when its own helpers (`pushValue`, `removeValue`, `moveValue`) run, so `form.reset` from reset and import left stale items on screen. The characterization suite (AC-1 rerender cases) caught it. Runner up: remount the sections with a `key` bumped on reset (more state to carry, and it drops focus).
 - **`writeResume` as a third storage writer.** PDF import has always written `resumeData` alone. Routing it through `saveResume` would also write `resumeData_lastSaved`, which the gallery shows as a saved time, so it would be a visible change. Runner up: a `{ stampSavedAt: false }` option on `saveResume` (one function, but a flag that changes what it means to save).
+- **Preview links drop `edit: true`.** The typed `/builder` search has only `templateId`, so the old `edit` flag no longer typechecks; the builder never read it.
+- **`react-refresh/only-export-components` knows `withForm`.** `extraHOCs: ['withForm']` in `eslint.config.js`, so section files that export `withForm` components keep fast refresh without a lint error.
+- **The test route tree uses `validateBuilderSearch`.** The inline `/builder` route in `src/test/test-utils.tsx` validates search like the real one, so the unknown `templateId` case tests real behavior.
+
+Changes from the code review (2026-11-03):
+
+- **Shared `SortableCard`, `SortableChip` and `ListEmptyState`.** Five sections repeated the same card header, chip and empty state markup; they now live once, with the same classes.
+- **Imported template id is checked.** A PDF's embedded JSON can name any template, so `usePdfImport` keeps it only when `isTemplateId`, else the active template (before, `||` let an unknown id reach the form).
+- **Autosave tick calls `save`.** The interval runs through `useEffectEvent` and calls `save({ autosaved: true })` instead of repeating the save steps.
+- **The hidden PDF input has `aria-label` (`builder.loadPdf`).** Tests find it by label; no new translation key.
