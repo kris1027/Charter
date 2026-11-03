@@ -1,43 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormSectionCard } from '@/features/builder/form-sections/form-section-card';
-import { DragHandle } from '@/features/builder/form-sections/sortable-item';
+import { ListEmptyState } from '@/features/builder/form-sections/list-empty-state';
+import { SortableChip } from '@/features/builder/form-sections/sortable-item';
 import { SortableList } from '@/features/builder/form-sections/sortable-list';
-import { useSortableItem } from '@/features/builder/form-sections/use-sortable-item';
 import { resumeFormOptions, withForm } from '@/features/builder/resume-form';
-import { Plus, Heart, X } from 'lucide-react';
+import { Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-type InterestChipProps = {
-    id: string;
-    name: string;
-    onRemove: () => void;
-};
-
-const InterestChip = ({ id, name, onRemove }: InterestChipProps) => {
-    const { t } = useTranslation();
-    const { setNodeRef, style, isDragging, handleProps } = useSortableItem(id);
-
-    return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className={`group flex items-center gap-1 rounded-full border border-slate-200/60 bg-white/60 px-3 py-1.5 backdrop-blur-sm transition-all hover:shadow-md dark:border-white/10 dark:bg-white/[0.05] dark:hover:shadow-indigo-500/5 ${isDragging ? 'shadow-lg ring-2 ring-indigo-500/20' : ''}`}
-        >
-            <DragHandle handleProps={handleProps} size='sm' />
-            <span className='text-sm font-medium text-slate-700 dark:text-slate-300'>{name}</span>
-            <button
-                type='button'
-                onClick={onRemove}
-                className='opacity-0 transition-opacity group-hover:opacity-100'
-                aria-label={t('accessibility.removeInterest')}
-            >
-                <X className='h-3 w-3 text-slate-400 hover:text-red-500' />
-            </button>
-        </div>
-    );
-};
 
 export const InterestsSection = withForm({
     ...resumeFormOptions,
@@ -92,17 +62,12 @@ export const InterestsSection = withForm({
                                     {(items) => (
                                         <div>
                                             {items.length === 0 ? (
-                                                <div className='py-8 text-center'>
-                                                    <div className='mx-auto mb-3 inline-flex rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 p-2.5 text-white/60 shadow-inner'>
-                                                        <Heart className='h-6 w-6' />
-                                                    </div>
-                                                    <p className='font-display font-medium text-slate-500 dark:text-slate-400'>
-                                                        {t('sections.interests.empty')}
-                                                    </p>
-                                                    <p className='mt-1 text-sm text-slate-400 dark:text-slate-500'>
-                                                        {t('sections.interests.emptyHint')}
-                                                    </p>
-                                                </div>
+                                                <ListEmptyState
+                                                    icon={Heart}
+                                                    iconGradient='from-rose-500 to-pink-600'
+                                                    title={t('sections.interests.empty')}
+                                                    hint={t('sections.interests.emptyHint')}
+                                                />
                                             ) : (
                                                 <SortableList
                                                     items={items}
@@ -112,10 +77,13 @@ export const InterestsSection = withForm({
                                                     className='flex flex-wrap gap-2'
                                                 >
                                                     {(item, index, id) => (
-                                                        <InterestChip
+                                                        <SortableChip
                                                             key={id}
                                                             id={id}
                                                             name={item.name}
+                                                            removeLabel={t(
+                                                                'accessibility.removeInterest',
+                                                            )}
                                                             onRemove={() =>
                                                                 field.removeValue(index)
                                                             }
