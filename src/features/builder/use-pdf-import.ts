@@ -7,12 +7,13 @@ import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
 
-type ResumeForm = {
+// The import only needs reset from the form
+type ResettableForm = {
     reset: (values: ResumeFormValues, opts?: { keepDefaultValues?: boolean }) => void;
 };
 
 type UsePdfImportOptions = {
-    form: ResumeForm;
+    form: ResettableForm;
     activeTemplateId: TemplateId;
 };
 

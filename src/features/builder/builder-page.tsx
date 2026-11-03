@@ -22,6 +22,8 @@ import { FormProgress } from '@/features/builder/form-progress';
 import { BuilderToolbar } from '@/features/builder/toolbar/builder-toolbar';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
+const emptyResumeFor = (templateId: TemplateId) => ({ ...EMPTY_RESUME, templateId });
+
 const BuilderPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -34,7 +36,7 @@ const BuilderPage = () => {
     // Read once per mount: stored resume if any, the URL template winning over the stored one
     const [initialValues] = useState(() => {
         const stored = loadStoredResume();
-        if (!stored) return { ...EMPTY_RESUME, templateId: activeTemplateId };
+        if (!stored) return emptyResumeFor(activeTemplateId);
         const storedTemplateId = isTemplateId(stored.templateId) ? stored.templateId : undefined;
         return { ...stored, templateId: search.templateId ?? storedTemplateId ?? activeTemplateId };
     });
@@ -43,7 +45,8 @@ const BuilderPage = () => {
         ...resumeFormOptions,
         defaultValues: initialValues,
         onSubmit: async ({ value }) => {
-            // Store data in localStorage for persistence, then preview whether or not it worked
+            // Store data in localStorage for persistence, then preview whether or not it worked.
+            // autosave is declared below because it needs form; submit only runs after render.
             autosave.save();
 
             // Navigate to preview page with templateId
@@ -69,7 +72,7 @@ const BuilderPage = () => {
         autosave.clear();
         // keepDefaultValues: useAppForm re-applies its options each render, and new defaults
         // would make it put the initial resume back
-        form.reset({ ...EMPTY_RESUME, templateId: activeTemplateId }, { keepDefaultValues: true });
+        form.reset(emptyResumeFor(activeTemplateId), { keepDefaultValues: true });
     };
 
     return (

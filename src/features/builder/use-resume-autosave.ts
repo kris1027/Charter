@@ -5,10 +5,10 @@ import { clearResume, saveResume } from '@/features/resume/stored-resume';
 const AUTOSAVE_INTERVAL_MS = 30_000;
 const SAVING_HOLD_MS = 500;
 
-type ResumeForm = { state: { values: ResumeFormValues } };
+type FormWithValues = { state: { values: ResumeFormValues } };
 
 // Save state for the builder: the 30 second autosave, manual save, submit save and reset
-export const useResumeAutosave = (form: ResumeForm) => {
+export const useResumeAutosave = (form: FormWithValues) => {
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [isAutoSaved, setIsAutoSaved] = useState(false);
     const [saveError, setSaveError] = useState(false);
