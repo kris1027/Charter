@@ -16,6 +16,20 @@ if (typeof window !== 'undefined') {
     Element.prototype.releasePointerCapture ??= () => {};
     Element.prototype.hasPointerCapture ??= () => false;
 
+    // jsdom has no IntersectionObserver; motion's whileInView calls it
+    window.IntersectionObserver ??= class IntersectionObserver {
+        readonly root = null;
+        readonly rootMargin = '';
+        readonly scrollMargin = '';
+        readonly thresholds = [];
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+        takeRecords() {
+            return [];
+        }
+    };
+
     // jsdom has no matchMedia; ThemeProvider and Sonner both call it
     window.matchMedia ??= (query: string) =>
         ({
