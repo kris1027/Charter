@@ -9,15 +9,7 @@ import { GdprConsentSection } from '@/features/builder/form-sections/gdpr-consen
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import { resumeFormOptions, useAppForm } from '@/features/builder/resume-form';
-import {
-    ArrowLeft,
-    CheckCircle,
-    Save,
-    RotateCcw,
-    AlertTriangle,
-    Upload,
-    FileWarning,
-} from 'lucide-react';
+import { ArrowLeft, CheckCircle, Save, RotateCcw, AlertTriangle, Upload } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -29,24 +21,18 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useState, useRef, useEffect } from 'react';
-import { loadResumeFromPDF } from '@/features/pdf/pdf-parser';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'motion/react';
 import { ParallaxBackground } from '@/components/parallax-background';
 import { fadeInUp } from '@/lib/animation-variants';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
-import {
-    EMPTY_RESUME,
-    loadStoredResume,
-    normalizeResume,
-    writeResume,
-} from '@/features/resume/stored-resume';
+import { EMPTY_RESUME, loadStoredResume } from '@/features/resume/stored-resume';
+import { usePdfImport } from '@/features/builder/use-pdf-import';
+import { PdfErrorDialog } from '@/features/builder/toolbar/pdf-error-dialog';
 import { useResumeAutosave } from '@/features/builder/use-resume-autosave';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
-
-const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
 
 type BuilderPageProps = {
     templateId?: TemplateId;
@@ -57,10 +43,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     const navigate = useNavigate();
     const search = useSearch({ from: '/builder' }) as { templateId?: string };
     const shouldReduceMotion = useReducedMotion();
-
-    const [isLoadingPDF, setIsLoadingPDF] = useState(false);
-    const [pdfLoadError, setPdfLoadError] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Use search param if it names a template, otherwise fall back to prop
     const searchTemplateId = isTemplateId(search.templateId) ? search.templateId : undefined;
@@ -110,6 +92,14 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     const autosave = useResumeAutosave(form);
     const { lastSaved, isAutoSaved, saveError, isSaving } = autosave;
 
+    const {
+        fileInputRef,
+        isLoading: isLoadingPDF,
+        error: pdfLoadError,
+        clearError: clearPdfLoadError,
+        handleFileChange: handleLoadPDF,
+    } = usePdfImport({ form, activeTemplateId });
+
     // Manual save function
     const handleManualSave = () => autosave.save({ backup: true });
 
@@ -119,53 +109,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
         // keepDefaultValues: useAppForm re-applies its options each render, and new defaults
         // would make it put the initial resume back
         form.reset({ ...EMPTY_RESUME, templateId: activeTemplateId }, { keepDefaultValues: true });
-    };
-
-    const handleLoadPDF = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        if (file.size > MAX_PDF_SIZE) {
-            setPdfLoadError(t('builder.pdfTooLarge'));
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
-            return;
-        }
-
-        setIsLoadingPDF(true);
-        try {
-            const resumeData = await loadResumeFromPDF(file);
-
-            // Normalize PDF data by merging with defaults to backfill missing keys.
-            // PDF metadata (ResumeData) doesn't include templateId — fall back to
-            // the currently active template so form.reset() gets a valid string
-            // and the Zod schema doesn't trigger a "fix errors" validation message.
-            const newValues = {
-                ...normalizeResume(resumeData),
-                templateId: resumeData.templateId || activeTemplateId,
-            };
-
-            // Persist so a reload shows the import
-            writeResume(newValues);
-
-            // Reset the form with all values at once — no intermediate
-            // validation states and no stale errors
-            form.reset(newValues, { keepDefaultValues: true });
-
-            // PDF loaded - user can manually save when ready
-        } catch (error) {
-            if (import.meta.env.DEV) console.error('Error loading PDF:', error);
-            const errorMessage =
-                error instanceof Error ? error.message : t('dialogs.pdfError.unexpected');
-            setPdfLoadError(errorMessage);
-        } finally {
-            setIsLoadingPDF(false);
-            // Reset file input so the same file can be selected again
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
-        }
     };
 
     // Calculate form progress
@@ -286,32 +229,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            {/* PDF Load Error Dialog */}
-                            <AlertDialog
-                                open={!!pdfLoadError}
-                                onOpenChange={(open) => !open && setPdfLoadError(null)}
-                            >
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <div className='flex items-center gap-3'>
-                                            <div className='flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30'>
-                                                <FileWarning className='h-5 w-5 text-orange-600 dark:text-orange-400' />
-                                            </div>
-                                            <AlertDialogTitle>
-                                                {t('dialogs.pdfError.title')}
-                                            </AlertDialogTitle>
-                                        </div>
-                                        <AlertDialogDescription className='pt-2'>
-                                            {pdfLoadError}
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogAction onClick={() => setPdfLoadError(null)}>
-                                            {t('dialogs.pdfError.ok')}
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                            <PdfErrorDialog error={pdfLoadError} onClose={clearPdfLoadError} />
 
                             {saveError && (
                                 <div
