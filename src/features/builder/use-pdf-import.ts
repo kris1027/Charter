@@ -65,3 +65,5 @@ export const usePdfImport = ({ form, activeTemplateId }: UsePdfImportOptions) =>
 
     return { fileInputRef, isLoading, error, clearError: () => setError(null), handleFileChange };
 };
+
+export type PdfImport = ReturnType<typeof usePdfImport>;

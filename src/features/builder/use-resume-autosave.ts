@@ -51,3 +51,5 @@ export const useResumeAutosave = (form: ResumeForm) => {
 
     return { lastSaved, isAutoSaved, saveError, isSaving, save, clear };
 };
+
+export type ResumeAutosave = ReturnType<typeof useResumeAutosave>;
