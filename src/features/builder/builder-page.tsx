@@ -617,7 +617,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
                         {/* GDPR Consent Section */}
                         <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <GdprConsentSection form={sectionForm} />
+                            <GdprConsentSection form={form} />
                         </motion.div>
 
                         {/* Submit Button */}
