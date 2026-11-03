@@ -14,6 +14,7 @@ import { I18nextProvider } from 'react-i18next';
 import { afterEach } from 'vitest';
 
 import { ThemeProvider } from '@/components/theme-provider';
+import { builderSearchSchema } from '@/features/builder/builder-search';
 import { Toaster } from '@/components/ui/toast';
 import i18n from './i18n-test';
 
@@ -48,6 +49,7 @@ const renderWithRouter = async (page: RouteComponent, { initialEntry = '/builder
     const builderRoute = createRoute({
         getParentRoute: () => rootRoute,
         path: '/builder',
+        validateSearch: builderSearchSchema,
         component: page,
     });
     const previewRoute = createRoute({

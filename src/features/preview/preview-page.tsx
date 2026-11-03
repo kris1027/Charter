@@ -219,7 +219,7 @@ export const PreviewPage = () => {
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-4'>
                             <Button asChild variant='outline' size='sm'>
-                                <Link to='/builder' search={{ templateId, edit: true }}>
+                                <Link to='/builder' search={{ templateId }}>
                                     <ArrowLeft className='mr-2 h-4 w-4' />
                                     {t('nav.backToEditor')}
                                 </Link>
@@ -285,7 +285,7 @@ export const PreviewPage = () => {
                                 size='sm'
                                 className='bg-linear-to-r from-indigo-600 to-violet-600 text-white shadow-sm transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-md'
                             >
-                                <Link to='/builder' search={{ templateId, edit: true }}>
+                                <Link to='/builder' search={{ templateId }}>
                                     <Edit className='mr-2 h-4 w-4' />
                                     {t('preview.editCv')}
                                 </Link>

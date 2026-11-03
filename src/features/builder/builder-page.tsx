@@ -22,26 +22,21 @@ import { FormProgress } from '@/features/builder/form-progress';
 import { BuilderToolbar } from '@/features/builder/toolbar/builder-toolbar';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
-type BuilderPageProps = {
-    templateId?: TemplateId;
-};
-
-const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
+const BuilderPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const search = useSearch({ from: '/builder' }) as { templateId?: string };
+    const search = useSearch({ from: '/builder' });
     const shouldReduceMotion = useReducedMotion();
 
-    // Use search param if it names a template, otherwise fall back to prop
-    const searchTemplateId = isTemplateId(search.templateId) ? search.templateId : undefined;
-    const activeTemplateId = searchTemplateId ?? templateId;
+    // The route drops an unknown templateId, so this is always a real template
+    const activeTemplateId: TemplateId = search.templateId ?? 'developer';
 
     // Read once per mount: stored resume if any, the URL template winning over the stored one
     const [initialValues] = useState(() => {
         const stored = loadStoredResume();
         if (!stored) return { ...EMPTY_RESUME, templateId: activeTemplateId };
         const storedTemplateId = isTemplateId(stored.templateId) ? stored.templateId : undefined;
-        return { ...stored, templateId: searchTemplateId ?? storedTemplateId ?? activeTemplateId };
+        return { ...stored, templateId: search.templateId ?? storedTemplateId ?? activeTemplateId };
     });
 
     const form = useAppForm({
@@ -58,10 +53,10 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
     // Sync form templateId when URL parameter changes
     useEffect(() => {
-        if (searchTemplateId && form.getFieldValue('templateId') !== searchTemplateId) {
-            form.setFieldValue('templateId', searchTemplateId);
+        if (search.templateId && form.getFieldValue('templateId') !== search.templateId) {
+            form.setFieldValue('templateId', search.templateId);
         }
-    }, [searchTemplateId, form]);
+    }, [search.templateId, form]);
 
     const autosave = useResumeAutosave(form);
     const pdfImport = usePdfImport({ form, activeTemplateId });

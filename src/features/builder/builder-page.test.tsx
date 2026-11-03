@@ -343,4 +343,19 @@ describe('BuilderPage', () => {
 
         await waitFor(() => expect(previewButton()).toBeEnabled());
     });
+
+    // Spec 0005, AC-10: an unknown templateId is dropped (the old page showed it raw)
+    it('should fall back to the stored template when the URL templateId is unknown', async () => {
+        const user = userEvent.setup();
+        storeResume(resume({ templateId: 'default' }));
+
+        const { router } = await renderWithRouter(BuilderPage, {
+            initialEntry: '/builder?templateId=nope',
+        });
+
+        expect(screen.getByText('Developer Template')).toBeInTheDocument();
+        expect(router.state.location.search).toEqual({});
+        await user.click(screen.getByRole('button', { name: 'Save' }));
+        expect(storedResume().templateId).toBe('default');
+    });
 });

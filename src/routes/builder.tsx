@@ -1,8 +1,10 @@
 import BuilderPage from '@/features/builder/builder-page';
+import { builderSearchSchema } from '@/features/builder/builder-search';
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_URL, SEO_DEFAULTS } from '@/lib/seo';
 
 export const Route = createFileRoute('/builder')({
+    validateSearch: builderSearchSchema,
     head: () => ({
         meta: [
             { title: `Build Your CV | ${SEO_DEFAULTS.siteName}` },
