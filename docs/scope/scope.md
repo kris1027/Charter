@@ -201,10 +201,10 @@ spec [0005](../specs/0005-builder-page-split/index.md)
 
 - [x] Design it (spec): `/architect builder page split`
 - [ ] Build it: `/develop builder page split`
-    - [ ] Characterization tests for today's page, plus the save and clear writers (AC-1, AC-7)
-    - [ ] Typed form with field components and the shared sortable list (AC-3, AC-5, AC-6)
-    - [ ] Every section on withForm and array helpers, page callbacks gone (AC-3, AC-4, AC-5, AC-6)
-    - [ ] Autosave, PDF import, live progress and toolbar extracted, templateId validated (AC-7, AC-8, AC-9, AC-10)
+    - [x] Characterization tests for today's page, plus the save and clear writers (AC-1, AC-7)
+    - [x] Typed form with field components and the shared sortable list (AC-3, AC-5, AC-6)
+    - [x] Every section on withForm and array helpers, page callbacks gone (AC-3, AC-4, AC-5, AC-6)
+    - [x] Autosave, PDF import, live progress and toolbar extracted, templateId validated (AC-7, AC-8, AC-9, AC-10)
     - [ ] max-lines lint rule and final pre-commit and browser pass (AC-2, AC-11)
 
 ### 8. Shared template model · needs a decision
