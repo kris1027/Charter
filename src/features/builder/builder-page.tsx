@@ -38,13 +38,12 @@ import { ParallaxBackground } from '@/components/parallax-background';
 import { fadeInUp } from '@/lib/animation-variants';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import {
-    clearResume,
     EMPTY_RESUME,
     loadStoredResume,
     normalizeResume,
-    saveResume,
     writeResume,
 } from '@/features/resume/stored-resume';
+import { useResumeAutosave } from '@/features/builder/use-resume-autosave';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
@@ -59,14 +58,9 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
     const search = useSearch({ from: '/builder' }) as { templateId?: string };
     const shouldReduceMotion = useReducedMotion();
 
-    const [isSaving, setIsSaving] = useState(false);
-    const [lastSaved, setLastSaved] = useState<Date | null>(null);
-    const [isAutoSaved, setIsAutoSaved] = useState(false);
-    const [saveError, setSaveError] = useState(false);
     const [isLoadingPDF, setIsLoadingPDF] = useState(false);
     const [pdfLoadError, setPdfLoadError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const lastSavedJsonRef = useRef<string>('');
 
     // Use search param if it names a template, otherwise fall back to prop
     const searchTemplateId = isTemplateId(search.templateId) ? search.templateId : undefined;
@@ -98,12 +92,8 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
         ...resumeFormOptions,
         defaultValues: initialValues,
         onSubmit: async ({ value }) => {
-            // Store data in localStorage for persistence
-            const { ok, json, savedAt } = saveResume(value);
-            lastSavedJsonRef.current = json;
-            setSaveError(!ok);
-            setIsAutoSaved(false);
-            setLastSaved(savedAt);
+            // Store data in localStorage for persistence, then preview whether or not it worked
+            autosave.save();
 
             // Navigate to preview page with templateId
             navigate({ to: '/preview', search: { templateId: value.templateId } });
@@ -117,37 +107,15 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
         }
     }, [searchTemplateId, form]);
 
-    // Auto-save every 30 seconds
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const formData = form.state.values;
-            if (JSON.stringify(formData) === lastSavedJsonRef.current) return;
-
-            const { ok, json, savedAt } = saveResume(formData);
-            lastSavedJsonRef.current = json;
-            setSaveError(!ok);
-            setIsAutoSaved(true);
-            setLastSaved(savedAt);
-        }, 30_000);
-
-        return () => clearInterval(interval);
-    }, [form]);
+    const autosave = useResumeAutosave(form);
+    const { lastSaved, isAutoSaved, saveError, isSaving } = autosave;
 
     // Manual save function
-    const handleManualSave = () => {
-        setIsSaving(true);
-        const { ok, json, savedAt } = saveResume(form.state.values, { backup: true });
-        lastSavedJsonRef.current = json;
-        setSaveError(!ok);
-        setIsAutoSaved(false);
-        setLastSaved(savedAt);
-        setTimeout(() => setIsSaving(false), 500);
-    };
+    const handleManualSave = () => autosave.save({ backup: true });
 
     // Reset form function — keeps backup intact for recovery
     const handleReset = () => {
-        clearResume();
-        setLastSaved(null);
+        autosave.clear();
         // keepDefaultValues: useAppForm re-applies its options each render, and new defaults
         // would make it put the initial resume back
         form.reset({ ...EMPTY_RESUME, templateId: activeTemplateId }, { keepDefaultValues: true });
