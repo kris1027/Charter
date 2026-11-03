@@ -8,7 +8,6 @@ import { InterestsSection } from '@/features/builder/form-sections/interests-sec
 import { GdprConsentSection } from '@/features/builder/form-sections/gdpr-consent-section';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
-import type { InterestProps } from '@/features/resume/form-types';
 import { resumeFormOptions, useAppForm } from '@/features/builder/resume-form';
 import {
     ArrowLeft,
@@ -46,7 +45,6 @@ import {
     saveResume,
     writeResume,
 } from '@/features/resume/stored-resume';
-import type { FormApi } from '@/features/builder/form-component-types';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
@@ -111,9 +109,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
             navigate({ to: '/preview', search: { templateId: value.templateId } });
         },
     });
-
-    // Form sections take a loosely typed FormApi, so widen the strongly typed form once here
-    const sectionForm = form as unknown as FormApi;
 
     // Sync form templateId when URL parameter changes
     useEffect(() => {
@@ -203,28 +198,6 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
                 fileInputRef.current.value = '';
             }
         }
-    };
-
-    const addInterest = () => {
-        form.setFieldValue('interests', [
-            ...(form.getFieldValue('interests') as InterestProps[]),
-            { name: '' },
-        ]);
-    };
-
-    const removeInterest = (index: number) => {
-        const interests = form.getFieldValue('interests') as InterestProps[];
-        form.setFieldValue(
-            'interests',
-            interests.filter((_, i) => i !== index),
-        );
-    };
-
-    const reorderInterests = (oldIndex: number, newIndex: number) => {
-        const interests = [...(form.getFieldValue('interests') as InterestProps[])];
-        const [removed] = interests.splice(oldIndex, 1);
-        interests.splice(newIndex, 0, removed);
-        form.setFieldValue('interests', interests);
     };
 
     // Calculate form progress
@@ -477,12 +450,7 @@ const BuilderPage = ({ templateId = 'developer' }: BuilderPageProps) => {
 
                         {/* Interests Section */}
                         <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <InterestsSection
-                                form={sectionForm}
-                                addInterest={addInterest}
-                                removeInterest={removeInterest}
-                                reorderInterests={reorderInterests}
-                            />
+                            <InterestsSection form={form} />
                         </motion.div>
 
                         {/* GDPR Consent Section */}
