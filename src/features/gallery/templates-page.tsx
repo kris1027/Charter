@@ -32,6 +32,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ParallaxBackground } from '@/components/parallax-background';
 import { fadeInUp } from '@/lib/animation-variants';
 import { safeStorage } from '@/lib/storage';
+import type { TemplateId } from '@/lib/template-ids';
 
 const templates = [
     {
@@ -58,7 +59,7 @@ const templates = [
         icon: Heart,
         gradient: 'from-emerald-500 to-teal-600',
     },
-];
+] satisfies { id: TemplateId; [key: string]: unknown }[];
 
 export const TemplatesPage = () => {
     const { t } = useTranslation();

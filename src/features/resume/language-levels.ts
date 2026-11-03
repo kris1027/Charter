@@ -1,12 +1,8 @@
 import type { LanguageLevelProps } from '@/features/resume/form-types';
 import type { TFunction } from 'i18next';
 
-export const getLanguageLevels = (t: TFunction): { value: LanguageLevelProps; label: string }[] => [
-    { value: 'A1', label: t('proficiency.A1') },
-    { value: 'A2', label: t('proficiency.A2') },
-    { value: 'B1', label: t('proficiency.B1') },
-    { value: 'B2', label: t('proficiency.B2') },
-    { value: 'C1', label: t('proficiency.C1') },
-    { value: 'C2', label: t('proficiency.C2') },
-    { value: 'NATIVE', label: t('proficiency.NATIVE') },
-];
+// European framework levels plus NATIVE; the schema and the select both read this list
+export const LANGUAGE_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'NATIVE'] as const;
+
+export const getLanguageLevels = (t: TFunction): { value: LanguageLevelProps; label: string }[] =>
+    LANGUAGE_LEVELS.map((level) => ({ value: level, label: t(`proficiency.${level}`) }));

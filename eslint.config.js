@@ -70,6 +70,17 @@ export default defineConfig([
             ecmaVersion: 2020,
             globals: globals.browser,
         },
+        rules: {
+            // The vite preset's options, plus withForm sections count as components (spec 0005)
+            'react-refresh/only-export-components': [
+                'error',
+                {
+                    allowConstantExport: true,
+                    allowCompoundComponents: true,
+                    extraHOCs: ['withForm'],
+                },
+            ],
+        },
     },
     {
         files: ['src/test/**/*.{ts,tsx}', '**/*.test.{ts,tsx}'],
@@ -124,6 +135,12 @@ export default defineConfig([
         ['src/app/**/*.{ts,tsx}'],
         [ban(['@/routes/**'], 'The app shell never imports routes')],
     ),
+    // Builder files stay small (spec 0005); a different rule, so it overrides nothing above
+    {
+        files: ['src/features/builder/**/*.{ts,tsx}'],
+        ignores: ['**/*.test.{ts,tsx}'],
+        rules: { 'max-lines': ['error', { max: 250, skipBlankLines: true, skipComments: true }] },
+    },
     tokenOnly,
     eslintConfigPrettier,
 ]);

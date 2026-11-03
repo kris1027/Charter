@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { TEMPLATE_IDS } from '@/lib/template-ids';
-
-const LANGUAGE_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'NATIVE'] as const;
+import { LANGUAGE_LEVELS } from '@/features/resume/language-levels';
 
 const personalInfoSchema = z.object({
     firstName: z.string().min(1, 'validation.firstNameRequired').max(100, 'validation.maxLength'),

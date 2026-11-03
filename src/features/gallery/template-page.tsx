@@ -1,4 +1,5 @@
 import { useParams, Link } from '@tanstack/react-router';
+import { isTemplateId } from '@/lib/template-ids';
 import { Button } from '@/components/ui/button';
 import {
     sampleResumeData,
@@ -111,7 +112,14 @@ export function TemplatePage() {
                                 size='sm'
                                 className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-md'
                             >
-                                <Link to='/builder' search={{ templateId }}>
+                                <Link
+                                    to='/builder'
+                                    search={{
+                                        templateId: isTemplateId(templateId)
+                                            ? templateId
+                                            : undefined,
+                                    }}
+                                >
                                     <Edit className='mr-2 h-4 w-4' />
                                     {t('templates.useTemplate')}
                                 </Link>

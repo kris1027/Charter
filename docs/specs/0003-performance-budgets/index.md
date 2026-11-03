@@ -1,7 +1,7 @@
 # 0003. Performance budgets: per page JS size and Lighthouse floors enforced in CI
 
 **Date**: 2026-11-02
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
