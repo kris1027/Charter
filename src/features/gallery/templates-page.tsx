@@ -10,9 +10,7 @@ import {
     FileText,
     Heart,
 } from 'lucide-react';
-import { DeveloperPreview } from '@/features/gallery/developer-preview';
-import { DefaultPreview } from '@/features/gallery/default-preview';
-import { VeterinaryPreview } from '@/features/gallery/veterinary-preview';
+import { TemplateCardPreview } from '@/features/gallery/template-card-preview';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import { useState } from 'react';
@@ -39,7 +37,6 @@ const templates = [
         id: 'developer',
         nameKey: 'templates.developer.name',
         descriptionKey: 'templates.developer.description',
-        Preview: DeveloperPreview,
         icon: Code2,
         gradient: 'from-indigo-500 to-violet-600',
     },
@@ -47,7 +44,6 @@ const templates = [
         id: 'default',
         nameKey: 'templates.default.name',
         descriptionKey: 'templates.default.description',
-        Preview: DefaultPreview,
         icon: FileText,
         gradient: 'from-slate-500 to-gray-600',
     },
@@ -55,7 +51,6 @@ const templates = [
         id: 'veterinary',
         nameKey: 'templates.veterinary.name',
         descriptionKey: 'templates.veterinary.description',
-        Preview: VeterinaryPreview,
         icon: Heart,
         gradient: 'from-emerald-500 to-teal-600',
     },
@@ -224,8 +219,7 @@ export const TemplatesPage = () => {
                             <div className='absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-50/0 to-violet-50/0 transition-colors duration-300 group-hover:from-indigo-50/50 group-hover:to-violet-50/30 dark:group-hover:from-indigo-500/5 dark:group-hover:to-violet-500/5' />
 
                             <div className='relative'>
-                                {/* Preview Area — uses div+navigate instead of <Link> because
-                                   template previews contain <a> tags and nested anchors are invalid HTML */}
+                                {/* Preview Area — a div+navigate that opens the template detail page */}
                                 <div
                                     role='link'
                                     tabIndex={0}
@@ -248,7 +242,7 @@ export const TemplatesPage = () => {
                                 >
                                     <div className='relative aspect-square overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 p-4 dark:from-slate-800/50 dark:to-slate-900/50'>
                                         <div className='h-full w-full text-gray-900 transition-transform duration-500 group-hover:scale-105'>
-                                            <template.Preview />
+                                            <TemplateCardPreview templateId={template.id} />
                                         </div>
 
                                         {/* Gradient overlay on hover */}

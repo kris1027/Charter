@@ -33,11 +33,12 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
-        "pre-commit": "prettier --write . && eslint . && vitest run && tsc -b && vite build && pnpm perf:size",
+        "pre-commit": "prettier --write . && pnpm templates:previews --check && eslint . && vitest run && tsc -b && vite build && pnpm perf:size",
         "perf:size": "node scripts/perf/check-bundle-size.ts",
         "perf:lhci": "lhci autorun",
         "perf:lhci-summary": "node scripts/perf/lighthouse-summary.ts",
-        "perf:lighthouse": "pnpm build && pnpm perf:lhci; pnpm perf:lhci-summary"
+        "perf:lighthouse": "pnpm build && pnpm perf:lhci; pnpm perf:lhci-summary",
+        "templates:previews": "node scripts/templates/build-previews.ts"
     },
     "dependencies": {
         "@dnd-kit/core": "^6.3.1",
@@ -67,6 +68,7 @@
         "@babel/core": "^7.29.7",
         "@eslint/js": "^10.0.1",
         "@lhci/cli": "0.15.1",
+        "@napi-rs/canvas": "^1.1.0",
         "@rolldown/plugin-babel": "~0.2.4",
         "@tanstack/router-plugin": "^1.168.47",
         "@testing-library/dom": "^10.4.1",

@@ -32,3 +32,6 @@ dist-ssr
 
 # Lighthouse CI reports (spec 0003)
 .lighthouseci
+
+# Template preview pixel baselines (spec 0006)
+.cache/

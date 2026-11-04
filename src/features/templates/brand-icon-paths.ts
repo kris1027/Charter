@@ -1,8 +1,6 @@
 /**
  * SVG path data for the brand icons lucide-react dropped in 1.0 (24x24, lucide
- * stroke style). Shared by the DOM icons in src/features/templates/html/brand-icons.tsx
- * and the react-pdf icons in src/features/templates/pdf/pdf-icons.tsx, so the web and
- * PDF templates draw the same shapes.
+ * stroke style), drawn by the react-pdf icons in src/features/templates/pdf/pdf-icons.tsx.
  */
 export const GITHUB_ICON = {
     paths: [

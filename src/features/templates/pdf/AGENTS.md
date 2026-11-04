@@ -6,33 +6,47 @@ The three resume templates rendered with `@react-pdf/renderer`. They drive the l
 
 ## Key files
 
-| File                                                                | Owns                                                                          |
-| ------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `src/features/templates/pdf/{developer,default,veterinary}-pdf.tsx` | One PDF component per template, props `data`, `compactScale`, `lang`          |
-| `src/features/templates/pdf/template-pdf.tsx`                       | `TemplatePDF`: picks the PDF component by template id, for preview and export |
-| `src/features/templates/pdf/pdf-icons.tsx`                          | Contact icons drawn as react-pdf SVG                                          |
-| `src/features/templates/pdf/pdf-translations.ts`                    | EN/PL strings for PDFs (`getPDFStrings`)                                      |
-| `src/lib/date-format.ts`                                            | Month and year via `Intl.DateTimeFormat`, `lang` required                     |
-| `src/lib/app-lang.ts`                                               | `AppLang` (`'en' \| 'pl'`) and `normalizeLang`                                |
-| `src/features/templates/pdf/pdf-fonts.ts`                           | Font registration from `public/fonts/`, with a `?v=` cache buster             |
-| `src/features/resume/resume-metadata.ts`                            | Embedded metadata payload (`buildResumeMetadata`, `parseResumeMetadata`)      |
-| `src/features/pdf/pdf-export.tsx`                                   | Download (`exportToPDF`), page counting, filename                             |
-| `src/features/pdf/pdf-parser.ts`                                    | Import: embedded metadata first, text parsing fallback                        |
-| `src/features/pdf/pdfjs-singleton.ts`                               | Lazy pdfjs load, worker at `public/pdf.worker.min.mjs`                        |
-| `src/features/preview/preview-page.tsx`                             | Searches for the compact scale that fits one page                             |
+| File                                                                | Owns                                                                                                                                                                                                |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/features/templates/pdf/{developer,default,veterinary}-pdf.tsx` | One PDF component per template, props `data`, `compactScale`, `lang`; styles, header and one renderer per section                                                                                   |
+| `src/features/templates/model/`                                     | Shared plain TS model: `SECTION_IDS`, `TEMPLATE_LAYOUTS` (titles, contact rows, date and website format), `buildResumeView`, `printedTitle`, `template-strings.ts` (EN/PL strings, `getPDFStrings`) |
+| `src/features/templates/pdf/section-renderers.ts`                   | `SectionRenderers` and `RenderCtx` types, `renderSection` (skips empty sections)                                                                                                                    |
+| `src/features/templates/pdf/resume-document.tsx`                    | `ResumeDocument`: PDF info fields, embedded metadata, the A4 page                                                                                                                                   |
+| `src/features/templates/pdf/pdf-scale.ts`                           | `lerp` for compact sizes                                                                                                                                                                            |
+| `src/features/templates/previews/`                                  | Gallery card WebP images, `manifest.json` (inputs hash), `preview-images.ts`                                                                                                                        |
+| `src/features/templates/fixtures/preview-fixtures.ts`               | Resumes the pixel diff renders                                                                                                                                                                      |
+| `scripts/templates/build-previews.ts`                               | `pnpm templates:previews` (images), `--check`, `--baseline`, `--diff`                                                                                                                               |
+| `src/features/templates/pdf/template-pdf.tsx`                       | `TemplatePDF`: picks the PDF component by template id, for preview and export                                                                                                                       |
+| `src/features/templates/pdf/pdf-icons.tsx`                          | Contact icons drawn as react-pdf SVG                                                                                                                                                                |
+| `src/features/templates/pdf/contact-rows.tsx`                       | `ContactRows`: the header contact rows every template draws, styled per template                                                                                                                    |
+| `src/lib/date-format.ts`                                            | Month and year via `Intl.DateTimeFormat`, `lang` required                                                                                                                                           |
+| `src/lib/app-lang.ts`                                               | `APP_LANGS`, `AppLang` (`'en' \| 'pl'`), `normalizeLang`                                                                                                                                            |
+| `src/features/templates/pdf/pdf-fonts.ts`                           | Font registration from `public/fonts/`, with a `?v=` cache buster                                                                                                                                   |
+| `src/features/resume/resume-metadata.ts`                            | Embedded metadata payload (`buildResumeMetadata`, `parseResumeMetadata`)                                                                                                                            |
+| `src/features/pdf/pdf-export.tsx`                                   | Download (`exportToPDF`), page counting, filename                                                                                                                                                   |
+| `src/features/pdf/pdf-parser.ts`                                    | Import: embedded metadata first, text parsing fallback                                                                                                                                              |
+| `src/features/pdf/pdfjs-singleton.ts`                               | Lazy pdfjs load, worker at `public/pdf.worker.min.mjs`                                                                                                                                              |
+| `src/features/preview/preview-page.tsx`                             | Searches for the compact scale that fits one page                                                                                                                                                   |
 
 ## Conventions
 
-- No `t()` or React context here: react-pdf renders outside the i18n provider. Section titles and the GDPR text come from `pdf-translations.ts`; add new strings there in both `en` and `pl`, keeping the wording in step with `cv.*` keys in the locale files.
+- No `t()` or React context here: react-pdf renders outside the i18n provider. Section titles and the GDPR text come from `model/template-strings.ts`; add new strings there in both `en` and `pl`, keeping the wording in step with `cv.*` keys in the locale files.
 - Dates come from `@/lib/date-format` with the template's `lang` prop, never `@/lib/date-utils`: that one imports `@/i18n/config` to default the language.
-- Every template imports `@/features/templates/pdf/pdf-fonts` and styles through `createStyles(compactScale)`, where `lerp(normal, min, t)` shrinks sizes from 0 (normal) to 1 (most compact). New sizes should go through `lerp` so the one page fit keeps working.
+- Templates render from `buildResumeView(...)` only, never from `ResumeData` lists directly; the view holds formatted strings, so renderers format nothing.
+- Every template imports `@/features/templates/pdf/pdf-fonts` and styles through `createStyles(compactScale)`, where `lerp(normal, min, t)` (`pdf-scale.ts`) shrinks sizes from 0 (normal) to 1 (most compact). New sizes should go through `lerp` so the one page fit keeps working.
 - Colors are literal hex in a local `C` object; the page background stays white.
-- Each template embeds `buildResumeMetadata(templateId, data)` in the PDF `creator` field (versioned payload `v: 1`). Import reads that first, so a shape change to `ResumeData` needs the payload handled (bump `v` or keep it compatible).
-- The text fallback in `pdf-parser.ts` matches the section headers each template prints. Renaming a header or adding a section means updating the parser and `pdf-parser.test.ts`.
+- `ResumeDocument` embeds `buildResumeMetadata(templateId, data)` in the PDF `creator` field (versioned payload `v: 1`). Import reads that first, so a shape change to `ResumeData` needs the payload handled (bump `v` or keep it compatible).
+- A new section is a `SECTION_IDS` entry, a `ResumeView` field, a title per layout and a renderer per template; then run `pnpm templates:previews`.
+- Any template change: run `pnpm templates:previews --baseline` before it and `--diff` after (zero changed pixels when the look should not change), then `pnpm templates:previews` and commit the images and `manifest.json` with the change, or `--check` fails pre-commit and CI.
+- The text fallback in `pdf-parser.ts` reads section headers through `printedTitle` (plus `LEGACY_HEADERS` for older exports), so renaming a title updates render and import together.
 - `@react-pdf/renderer` is heavy: `pdf-export.tsx` and `preview-page.tsx` import it dynamically, and route code splitting keeps the PDF pages in their own chunks. Never import it from shared code the landing page or builder loads eagerly.
 
 ## Gotchas
 
+- react-pdf lays out each JSX text child as its own run: `{a} - {b}` and `{a} -{' '}{b}` print the same text with glyphs shifted by a fraction of a pixel. Keep a split as it is when the look must not change.
+- The pixel diff baseline in `.cache/` is only valid on the machine that made it; never commit it.
+- `scripts/templates/build-previews.ts` runs under plain `node` (erasable TS only) and can't import `@/` paths: it loads app modules through Vite `ssrLoadModule`, but imports `react` and `@react-pdf/renderer` with a plain `import()`, since a bare package id through `ssrLoadModule` gets inlined and fails on CommonJS. Its Vite `base` is the absolute `public/` path, which is why `pdf-fonts.ts` skips `?v=` for a file system base.
+- Gallery images are not precached; `vite.config.ts` serves them through a `CacheFirst` runtime rule (`template-previews`), so a gallery opened once works offline.
 - react-pdf needs WebAssembly and blob frames: the CSP in both `vite.config.ts` and `vercel.json` allows `wasm-unsafe-eval` and `blob:`. Tightening either breaks preview and export in production only.
 - Changing a font file requires bumping `v` in `pdf-fonts.ts`, or the PWA cache serves the old one. JetBrains Mono was dropped for Fira Code because of a fontkit incompatibility.
 

@@ -1,6 +1,6 @@
 import type { AppLang } from '@/lib/app-lang';
 
-interface PDFStrings {
+export interface PDFStrings {
     workExperience: string;
     professionalExperience: string;
     education: string;

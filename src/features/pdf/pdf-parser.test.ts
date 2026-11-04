@@ -201,6 +201,19 @@ describe('parseResumeFromText — veterinary template', () => {
         const skillNames = result.skills.map((s) => s.name);
         expect(skillNames).toContain('Surgery');
     });
+
+    it('should find the education section when an old header only contains EDUCATION', () => {
+        const text = vetText.replace('\nEDUCATION\n', '\nEDUCATION & TRAINING\n');
+        const result = parseResumeFromText(text, 'veterinary');
+        expect(result.education.length).toBeGreaterThan(0);
+        expect(result.skills.map((s) => s.name)).toContain('Surgery');
+    });
+
+    it('should not treat a line containing Interests as the interests header', () => {
+        const text = vetText.replace('• Performed surgeries', '• Research Interests: surgery');
+        const result = parseResumeFromText(text, 'veterinary');
+        expect(result.interests.map((i) => i.name)).toContain('Animal welfare');
+    });
 });
 
 describe('parseResumeFromText — real-world PDF reconstruction quirks', () => {
@@ -278,4 +291,66 @@ describe('parseResumeFromText — native language label', () => {
             expect(native?.proficiency).toBe('NATIVE');
         },
     );
+});
+
+describe('parseResumeFromText — Polish exports', () => {
+    // Synthetic text like the cases above: headers as each template prints them in Polish
+    const polishText = (headers: string[]) =>
+        [
+            'Anna Kowalska',
+            'Inżynier oprogramowania',
+            'Kraków anna@example.com +48 600 100 200',
+            headers[0],
+            'TechPol | Senior Developer',
+            'March 2022 - Present | Kraków',
+            '• Prowadzenie zespołu',
+            headers[1],
+            'Informatyka',
+            'Magister - Politechnika Krakowska',
+            '2014 - 2019',
+            headers[2],
+            'TypeScript React',
+            headers[3],
+            'Polski Ojczysty',
+            headers[4],
+            'Szachy',
+        ].join('\n');
+
+    const developerText = polishText([
+        '// DOŚWIADCZENIE ZAWODOWE',
+        '// WYKSZTAŁCENIE',
+        '// TECHNOLOGIE',
+        '// JĘZYKI',
+        '// ZAINTERESOWANIA',
+    ]);
+    const defaultText = polishText([
+        'DOŚWIADCZENIE ZAWODOWE',
+        'WYKSZTAŁCENIE',
+        'KLUCZOWE KOMPETENCJE',
+        'JĘZYKI',
+        'ZAINTERESOWANIA',
+    ]);
+    const veterinaryText = polishText([
+        'Doświadczenie zawodowe',
+        'Wykształcenie',
+        'Umiejętności',
+        'Języki',
+        'ZAINTERESOWANIA',
+    ]);
+
+    it('should detect each template when the export is in Polish', () => {
+        expect(detectTemplate(developerText)).toBe('developer');
+        expect(detectTemplate(defaultText)).toBe('default');
+        expect(detectTemplate(veterinaryText)).toBe('veterinary');
+    });
+
+    it('should find the experience section when the export is in Polish', () => {
+        for (const [text, templateId] of [
+            [developerText, 'developer'],
+            [defaultText, 'default'],
+            [veterinaryText, 'veterinary'],
+        ] as const) {
+            expect(parseResumeFromText(text, templateId).experiences.length).toBeGreaterThan(0);
+        }
+    });
 });

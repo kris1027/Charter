@@ -81,6 +81,17 @@ export default defineConfig(({ command }) => ({
                 maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
                 // pdf-fonts.ts adds a ?v= cache buster; match the precached font anyway
                 ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^v$/],
+                // Gallery preview images are not precached (about 700 KB); keep the ones seen (spec 0006)
+                runtimeCaching: [
+                    {
+                        urlPattern: /\.webp$/,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'template-previews',
+                            expiration: { maxEntries: 12 },
+                        },
+                    },
+                ],
                 skipWaiting: true,
             },
         }),

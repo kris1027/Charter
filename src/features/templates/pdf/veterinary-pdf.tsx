@@ -1,24 +1,21 @@
 import '@/features/templates/pdf/pdf-fonts';
-import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
+import { Fragment } from 'react';
+import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/features/resume/form-types';
-import { formatLinkedinDisplay } from '@/lib/utils';
-import { formatCVDateShort, formatCVYear } from '@/lib/date-format';
 import type { AppLang } from '@/lib/app-lang';
-import { getPDFStrings } from '@/features/templates/pdf/pdf-translations';
-import { buildResumeMetadata } from '@/features/resume/resume-metadata';
-import {
-    GlobeIcon,
-    LinkedinIcon,
-    MapPinIcon,
-    MailIcon,
-    PhoneIcon,
-} from '@/features/templates/pdf/pdf-icons';
+import { buildResumeView } from '@/features/templates/model/resume-view';
+import { TEMPLATE_LAYOUTS } from '@/features/templates/model/template-layouts';
+import { ContactRows } from '@/features/templates/pdf/contact-rows';
+import { lerp } from '@/features/templates/pdf/pdf-scale';
+import { ResumeDocument } from '@/features/templates/pdf/resume-document';
+import { renderSection } from '@/features/templates/pdf/section-renderers';
+import type { RenderCtx, SectionRenderers } from '@/features/templates/pdf/section-renderers';
 
-interface VeterinaryPDFProps {
+type VeterinaryPDFProps = {
     data: ResumeData;
     compactScale?: number; // 0 = normal, 1 = maximum compact
     lang?: AppLang;
-}
+};
 
 const C = {
     white: '#FFFFFF',
@@ -36,9 +33,6 @@ const C = {
     gray500: '#6B7280',
     gray200: '#E5E7EB',
 } as const;
-
-const lerp = (normal: number, min: number, t: number) =>
-    Math.round((normal + (min - normal) * t) * 10) / 10;
 
 function createStyles(t: number) {
     const s = (n: number, m: number) => lerp(n, m, t);
@@ -174,184 +168,125 @@ function createStyles(t: number) {
     });
 }
 
-function parseDescriptionLines(description: string): string[] {
-    return description
-        .split('\n')
-        .map((l) => l.trim())
-        .filter((l) => l.length > 0)
-        .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
-}
+type Styles = ReturnType<typeof createStyles>;
 
-export function VeterinaryPDF({ data, compactScale = 0, lang = 'en' }: VeterinaryPDFProps) {
+const renderers = {
+    experience: (section, { styles }) => (
+        <View style={styles.section}>
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+            {section.items.map((exp, i) => (
+                <View key={i} style={styles.expBlock} wrap={false}>
+                    <Text style={styles.expPosition}>{exp.position}</Text>
+                    <Text style={styles.expCompany}>{exp.company}</Text>
+                    {/* Keep the text runs split as before the model: other splits shift glyphs */}
+                    <Text style={styles.expMeta}>
+                        {exp.start}
+                        {' -'} {exp.end}
+                        {exp.location ? ` | ${exp.location}` : ''}
+                    </Text>
+                    {exp.bullets.map((line, j) => (
+                        <View key={j} style={styles.bulletRow}>
+                            <Text style={styles.bulletDot}>{'• '}</Text>
+                            <Text style={styles.bulletText}>{line}</Text>
+                        </View>
+                    ))}
+                </View>
+            ))}
+        </View>
+    ),
+    education: (section, { styles }) => (
+        <View style={styles.section} wrap={false}>
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+            {section.items.map((edu, i) => (
+                <View key={i} style={styles.eduBlock} wrap={false}>
+                    <Text style={styles.eduDegree}>
+                        {edu.degree}
+                        {edu.degree && edu.field ? ' in ' : ''}
+                        {edu.field}
+                    </Text>
+                    <Text style={styles.eduInstitution}>{edu.institution}</Text>
+                    <Text style={styles.eduYears}>
+                        {edu.startYear} - {edu.endYear}
+                    </Text>
+                    {edu.description ? (
+                        <Text style={styles.bulletText}>{edu.description}</Text>
+                    ) : null}
+                </View>
+            ))}
+        </View>
+    ),
+    skills: (section, { styles }) => (
+        <View style={[styles.card, styles.cardEmerald]} wrap={false}>
+            <Text style={styles.cardHeader}>{section.title}</Text>
+            <View style={styles.skillsWrap}>
+                {section.items.map((skill, i) => (
+                    <Text key={i} style={styles.skillTag}>
+                        {skill}
+                    </Text>
+                ))}
+            </View>
+        </View>
+    ),
+    languages: (section, { styles }) => (
+        <View style={[styles.card, styles.cardTeal]} wrap={false}>
+            <Text style={[styles.cardHeader, styles.cardHeaderTeal]}>{section.title}</Text>
+            {section.items.map((l, i) => (
+                <View key={i} style={styles.langRow}>
+                    <Text style={styles.langName}>{l.name}</Text>
+                    <Text style={styles.langLevel}>{l.level}</Text>
+                </View>
+            ))}
+        </View>
+    ),
+    interests: (section, { styles }) => (
+        <View style={[styles.card, styles.cardDeep]} wrap={false}>
+            <Text style={[styles.cardHeader, styles.cardHeaderDeep]}>{section.title}</Text>
+            <View style={styles.interestsWrap}>
+                {section.items.map((interest, i) => (
+                    <Text key={i} style={styles.interestTag}>
+                        {interest}
+                    </Text>
+                ))}
+            </View>
+        </View>
+    ),
+} satisfies SectionRenderers<Styles>;
+
+export const VeterinaryPDF = ({ data, compactScale = 0, lang = 'en' }: VeterinaryPDFProps) => {
     const styles = createStyles(compactScale);
-    const iconSize = lerp(9, 7, compactScale);
-    const str = getPDFStrings(lang);
-    const {
-        personalInfo: p,
-        experiences,
-        education,
-        skills,
-        languages,
-        interests,
-        gdprConsent,
-    } = data;
-
-    const gdprText = gdprConsent?.companyName?.trim()
-        ? str.gdprConsent(gdprConsent.companyName)
-        : str.gdprConsentGeneric;
+    const view = buildResumeView('veterinary', data, lang);
+    const ctx: RenderCtx<Styles> = { styles };
 
     return (
-        <Document
-            title={`${p.firstName} ${p.lastName} - Resume`}
-            author={`${p.firstName} ${p.lastName}`}
-            subject='Professional Resume'
-            keywords={skills.map((s) => s.name).join(', ')}
-            creator={buildResumeMetadata('veterinary', data)}
-            language={lang}
+        <ResumeDocument
+            templateId='veterinary'
+            data={data}
+            view={view}
+            lang={lang}
+            pageStyle={styles.page}
         >
-            <Page size='A4' style={styles.page}>
-                <View style={styles.header}>
-                    <Text style={styles.headerName}>
-                        {p.firstName} {p.lastName}
-                    </Text>
-                    {p.title ? <Text style={styles.headerTitle}>{p.title}</Text> : null}
-                    <View style={styles.contactRow}>
-                        {p.location ? (
-                            <View style={styles.contactItem}>
-                                <MapPinIcon size={iconSize} color={C.gray600} />
-                                <Text style={styles.contactLink}>{p.location}</Text>
-                            </View>
-                        ) : null}
-                        {p.email ? (
-                            <View style={styles.contactItem}>
-                                <MailIcon size={iconSize} color={C.gray600} />
-                                <Link src={`mailto:${p.email}`} style={styles.contactLink}>
-                                    {p.email}
-                                </Link>
-                            </View>
-                        ) : null}
-                        {p.phone ? (
-                            <View style={styles.contactItem}>
-                                <PhoneIcon size={iconSize} color={C.gray600} />
-                                <Link src={`tel:${p.phone}`} style={styles.contactLink}>
-                                    {p.phone}
-                                </Link>
-                            </View>
-                        ) : null}
-                        {p.linkedin ? (
-                            <View style={styles.contactItem}>
-                                <LinkedinIcon size={iconSize} color={C.gray600} />
-                                <Link src={p.linkedin} style={styles.contactLink}>
-                                    {formatLinkedinDisplay(p.linkedin)}
-                                </Link>
-                            </View>
-                        ) : null}
-                        {p.website ? (
-                            <View style={styles.contactItem}>
-                                <GlobeIcon size={iconSize} color={C.gray600} />
-                                <Link src={p.website} style={styles.contactLink}>
-                                    {p.website}
-                                </Link>
-                            </View>
-                        ) : null}
-                    </View>
-                </View>
+            <View style={styles.header}>
+                <Text style={styles.headerName}>
+                    {view.name.first} {view.name.last}
+                </Text>
+                {view.title ? <Text style={styles.headerTitle}>{view.title}</Text> : null}
+                <ContactRows
+                    rows={view.contactRows}
+                    rowStyle={styles.contactRow}
+                    itemStyle={styles.contactItem}
+                    textStyle={styles.contactLink}
+                    iconSize={lerp(9, 7, compactScale)}
+                    iconColor={C.gray600}
+                />
+            </View>
 
-                <View style={styles.body}>
-                    {experiences.length > 0 && (
-                        <View style={styles.section}>
-                            <Text style={styles.sectionHeader}>{str.workExperience}</Text>
-                            {experiences.map((exp, i) => (
-                                <View key={i} style={styles.expBlock} wrap={false}>
-                                    <Text style={styles.expPosition}>{exp.position}</Text>
-                                    <Text style={styles.expCompany}>{exp.company}</Text>
-                                    <Text style={styles.expMeta}>
-                                        {formatCVDateShort(exp.startDate, lang)} -{' '}
-                                        {exp.current
-                                            ? str.present
-                                            : formatCVDateShort(exp.endDate, lang)}
-                                        {exp.location ? ` | ${exp.location}` : ''}
-                                    </Text>
-                                    {parseDescriptionLines(exp.description).map((line, j) => (
-                                        <View key={j} style={styles.bulletRow}>
-                                            <Text style={styles.bulletDot}>{'• '}</Text>
-                                            <Text style={styles.bulletText}>{line}</Text>
-                                        </View>
-                                    ))}
-                                </View>
-                            ))}
-                        </View>
-                    )}
+            <View style={styles.body}>
+                {TEMPLATE_LAYOUTS.veterinary.sections.map((id) => (
+                    <Fragment key={id}>{renderSection(renderers, id, view, ctx)}</Fragment>
+                ))}
+            </View>
 
-                    {education.length > 0 && (
-                        <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{str.education}</Text>
-                            {education.map((edu, i) => (
-                                <View key={i} style={styles.eduBlock} wrap={false}>
-                                    <Text style={styles.eduDegree}>
-                                        {edu.degree}
-                                        {edu.degree && edu.field ? ' in ' : ''}
-                                        {edu.field}
-                                    </Text>
-                                    <Text style={styles.eduInstitution}>{edu.institution}</Text>
-                                    <Text style={styles.eduYears}>
-                                        {formatCVYear(edu.startDate)} - {formatCVYear(edu.endDate)}
-                                    </Text>
-                                    {edu.description ? (
-                                        <Text style={styles.bulletText}>{edu.description}</Text>
-                                    ) : null}
-                                </View>
-                            ))}
-                        </View>
-                    )}
-
-                    {skills.length > 0 && (
-                        <View style={[styles.card, styles.cardEmerald]} wrap={false}>
-                            <Text style={styles.cardHeader}>{str.skills}</Text>
-                            <View style={styles.skillsWrap}>
-                                {skills.map((s, i) => (
-                                    <Text key={i} style={styles.skillTag}>
-                                        {s.name}
-                                    </Text>
-                                ))}
-                            </View>
-                        </View>
-                    )}
-
-                    {languages.length > 0 && (
-                        <View style={[styles.card, styles.cardTeal]} wrap={false}>
-                            <Text style={[styles.cardHeader, styles.cardHeaderTeal]}>
-                                {str.languages}
-                            </Text>
-                            {languages.map((l, i) => (
-                                <View key={i} style={styles.langRow}>
-                                    <Text style={styles.langName}>{l.language}</Text>
-                                    <Text style={styles.langLevel}>
-                                        {l.proficiency === 'NATIVE' ? str.native : l.proficiency}
-                                    </Text>
-                                </View>
-                            ))}
-                        </View>
-                    )}
-
-                    {interests.length > 0 && (
-                        <View style={[styles.card, styles.cardDeep]} wrap={false}>
-                            <Text style={[styles.cardHeader, styles.cardHeaderDeep]}>
-                                {str.specialInterests.toUpperCase()}
-                            </Text>
-                            <View style={styles.interestsWrap}>
-                                {interests.map((interest, i) => (
-                                    <Text key={i} style={styles.interestTag}>
-                                        {interest.name}
-                                    </Text>
-                                ))}
-                            </View>
-                        </View>
-                    )}
-                </View>
-
-                {gdprConsent?.enabled ? <Text style={styles.gdpr}>{gdprText}</Text> : null}
-            </Page>
-        </Document>
+            {view.gdpr ? <Text style={styles.gdpr}>{view.gdpr}</Text> : null}
+        </ResumeDocument>
     );
-}
+};

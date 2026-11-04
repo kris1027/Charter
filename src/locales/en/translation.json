@@ -79,6 +79,7 @@
         "pageSubtitle": "Select a template that best represents your professional style",
         "preview": "Preview",
         "useTemplate": "Use Template",
+        "previewAlt": "{{name}} template preview with sample resume",
         "developer": {
             "name": "Developer Template",
             "description": "Tech-focused design with monospace font and developer-friendly styling"
