@@ -93,9 +93,10 @@ export const buildResumeView = (
     return {
         name: { first: p.firstName, last: p.lastName },
         title: p.title,
-        contactRows: layout.contactRows
-            .map((row) => row.map(contact).filter((item) => item !== null))
-            .filter((row) => row.length > 0),
+        // Empty rows stay: the templates draw every row, and a row's margin is part of the look.
+        contactRows: layout.contactRows.map((row) =>
+            row.map(contact).filter((item) => item !== null),
+        ),
         sections: {
             experience: {
                 title: title('experience'),

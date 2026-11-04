@@ -66,11 +66,12 @@ describe('buildResumeView', () => {
         });
     });
 
-    it('should drop an item when its field is empty and a row when every field in it is empty', () => {
+    it('should drop an item when its field is empty and keep a row when every field in it is empty', () => {
         expect(kinds(withInfo({ phone: '' }), 'veterinary')).toEqual([
             ['location', 'email', 'linkedin', 'website'],
         ]);
         expect(kinds(withInfo({ website: '', github: '', linkedin: '' }), 'developer')).toEqual([
+            [],
             ['location', 'email', 'phone'],
         ]);
     });
