@@ -19,11 +19,11 @@ const baselineDir = join(root, '.cache/template-baselines');
 // 2x A4 (595 x 842 pt), so the cards stay sharp on high density screens.
 const RASTER_SCALE = 2;
 const WEBP_QUALITY = 82;
-const LANGS = ['en', 'pl'] as const;
 const SCALES = [0, 1] as const;
 const VERSIONED_PACKAGES = ['@react-pdf/renderer', 'pdfjs-dist', '@napi-rs/canvas'];
 
-type Lang = (typeof LANGS)[number];
+// AppLang, which this script can't import (no `@/` paths under plain node).
+type Lang = 'en' | 'pl';
 type ResumeData = object;
 type Manifest = { inputsHash: string; files: string[] };
 
@@ -36,6 +36,7 @@ type TemplatesModule = {
     }) => unknown;
 };
 type TemplateIdsModule = { TEMPLATE_IDS: readonly string[] };
+type AppLangModule = { APP_LANGS: readonly Lang[] };
 type SamplesModule = { SAMPLE_RESUMES: Record<string, Record<Lang, ResumeData>> };
 type FixturesModule = {
     FIXTURE_IDS: readonly string[];
@@ -77,12 +78,13 @@ try {
         '/src/features/templates/pdf/template-pdf.tsx',
     );
     const { TEMPLATE_IDS } = await load<TemplateIdsModule>('/src/lib/template-ids.ts');
+    const { APP_LANGS } = await load<AppLangModule>('/src/lib/app-lang.ts');
     const { SAMPLE_RESUMES } = await load<SamplesModule>('/src/features/resume/sample-resumes.ts');
     const fixtures = await load<FixturesModule>(
         '/src/features/templates/fixtures/preview-fixtures.ts',
     );
     const inputsHash = hashInputs();
-    const files = TEMPLATE_IDS.flatMap((id) => LANGS.map((lang) => `${id}-${lang}.webp`));
+    const files = TEMPLATE_IDS.flatMap((id) => APP_LANGS.map((lang) => `${id}-${lang}.webp`));
 
     if (mode === 'check') {
         process.exitCode = checkManifest(inputsHash, files) ? 0 : 1;
@@ -109,6 +111,8 @@ try {
                 lang,
             });
             const buffer = await renderToBuffer(element);
+            // The legacy build in Node runs without a worker and creates canvases through its
+            // NodeCanvasFactory, backed by @napi-rs/canvas. pdfjs 6 dropped `isEvalSupported`.
             const task = pdfjs.getDocument({ data: new Uint8Array(buffer) });
             try {
                 return await read(await task.promise);
@@ -131,7 +135,7 @@ try {
         if (mode === 'generate') {
             mkdirSync(previewsDir, { recursive: true });
             for (const templateId of TEMPLATE_IDS) {
-                for (const lang of LANGS) {
+                for (const lang of APP_LANGS) {
                     const data = SAMPLE_RESUMES[templateId][lang];
                     const image = await withPdf(templateId, data, lang, 0, async (pdf) =>
                         (await renderPage(pdf, 1)).encode('webp', WEBP_QUALITY),
@@ -188,7 +192,7 @@ try {
             const failures: string[] = [];
             let renders = 0;
             for (const templateId of TEMPLATE_IDS) {
-                for (const lang of LANGS) {
+                for (const lang of APP_LANGS) {
                     for (const fixtureId of fixtures.FIXTURE_IDS) {
                         for (const scale of SCALES) {
                             const name = `${templateId}-${lang}-${fixtureId}-${scale}`;

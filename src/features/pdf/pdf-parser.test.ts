@@ -201,6 +201,19 @@ describe('parseResumeFromText — veterinary template', () => {
         const skillNames = result.skills.map((s) => s.name);
         expect(skillNames).toContain('Surgery');
     });
+
+    it('should find the education section when an old header only contains EDUCATION', () => {
+        const text = vetText.replace('\nEDUCATION\n', '\nEDUCATION & TRAINING\n');
+        const result = parseResumeFromText(text, 'veterinary');
+        expect(result.education.length).toBeGreaterThan(0);
+        expect(result.skills.map((s) => s.name)).toContain('Surgery');
+    });
+
+    it('should not treat a line containing Interests as the interests header', () => {
+        const text = vetText.replace('• Performed surgeries', '• Research Interests: surgery');
+        const result = parseResumeFromText(text, 'veterinary');
+        expect(result.interests.map((i) => i.name)).toContain('Animal welfare');
+    });
 });
 
 describe('parseResumeFromText — real-world PDF reconstruction quirks', () => {

@@ -2,7 +2,7 @@ import type { ResumeFormValues, LanguageLevelProps } from '@/features/resume/for
 import type { TemplateId } from '@/lib/template-ids';
 import { getPdfjs } from '@/features/pdf/pdfjs-singleton';
 import { buildTextLines } from '@/features/pdf/pdf-text-lines';
-import type { AppLang } from '@/lib/app-lang';
+import { APP_LANGS } from '@/lib/app-lang';
 import type { SectionId } from '@/features/templates/model/section-ids';
 import { printedTitle } from '@/features/templates/model/printed-title';
 import { parseResumeMetadata } from '@/features/resume/resume-metadata';
@@ -26,14 +26,12 @@ export async function extractTextFromPDF(file: File): Promise<string> {
     return lines.join('\n');
 }
 
-const APP_LANGS: AppLang[] = ['en', 'pl'];
-
 // The section titles a template prints, in every language (spec 0006).
 const printedTitles = (templateId: TemplateId, sectionId: SectionId) =>
     APP_LANGS.map((lang) => printedTitle(templateId, sectionId, lang));
 
 // Headers older exports printed (or that the parser always accepted), so they still import.
-// Matched against a whole line.
+// Matched the same way as the printed titles of that lookup.
 const LEGACY_HEADERS: Partial<Record<TemplateId, Partial<Record<SectionId, readonly string[]>>>> = {
     default: {
         experience: ['Professional Experience'],
@@ -53,19 +51,23 @@ const LEGACY_HEADERS: Partial<Record<TemplateId, Partial<Record<SectionId, reado
 
 type HeaderMatch = 'includes' | 'equals';
 
+const matchesHeader = (line: string, header: string, match: HeaderMatch) =>
+    match === 'includes' ? line.includes(header) : line === header;
+
+// `legacyMatch` differs from `match` only where today's lookup compared its old header differently.
 const findHeader = (
     lines: string[],
     templateId: TemplateId,
     sectionId: SectionId,
     match: HeaderMatch,
+    legacyMatch: HeaderMatch = match,
 ) => {
     const titles = printedTitles(templateId, sectionId);
     const legacy = LEGACY_HEADERS[templateId]?.[sectionId] ?? [];
     return lines.findIndex(
         (line) =>
-            titles.some((title) =>
-                match === 'includes' ? line.includes(title) : line === title,
-            ) || legacy.includes(line),
+            titles.some((title) => matchesHeader(line, title, match)) ||
+            legacy.some((header) => matchesHeader(line, header, legacyMatch)),
     );
 };
 
@@ -73,18 +75,18 @@ const findHeader = (
  * Detect which template was used to generate the PDF
  */
 export function detectTemplate(text: string): TemplateId {
-    const prints = (templateId: TemplateId, sectionIds: SectionId[]) =>
+    const printsAnyTitle = (templateId: TemplateId, sectionIds: SectionId[]) =>
         sectionIds.some((id) =>
             printedTitles(templateId, id).some((title) => text.includes(title)),
         );
 
     // Developer template uses // prefixes
-    if (prints('developer', ['experience', 'skills'])) return 'developer';
+    if (printsAnyTitle('developer', ['experience', 'skills'])) return 'developer';
     // Default before veterinary: in Polish both print ZAINTERESOWANIA for interests,
     // while only default prints its uppercase experience and competencies titles
-    if (prints('default', ['experience', 'skills'])) return 'default';
+    if (printsAnyTitle('default', ['experience', 'skills'])) return 'default';
     // Veterinary template uses Special Interests section
-    if (prints('veterinary', ['interests'])) return 'veterinary';
+    if (printsAnyTitle('veterinary', ['interests'])) return 'veterinary';
     // Default to developer if can't detect
     return 'developer';
 }
@@ -254,13 +256,14 @@ function parseVeterinaryTemplate(lines: string[]): ResumeFormValues {
     const result = createEmptyResume('veterinary');
 
     // Find section markers
-    const header = (id: SectionId, match: HeaderMatch) =>
-        findHeader(lines, 'veterinary', id, match);
+    const header = (id: SectionId, match: HeaderMatch, legacyMatch?: HeaderMatch) =>
+        findHeader(lines, 'veterinary', id, match, legacyMatch);
     const workExpIndex = header('experience', 'includes');
     const educationIndex = header('education', 'includes');
     const skillsIndex = header('skills', 'equals');
     const languagesIndex = header('languages', 'equals');
-    const interestsIndex = header('interests', 'includes');
+    // An old export's plain `Interests` header only ever matched a whole line.
+    const interestsIndex = header('interests', 'includes', 'equals');
 
     // Parse header
     if (workExpIndex > 0) {
