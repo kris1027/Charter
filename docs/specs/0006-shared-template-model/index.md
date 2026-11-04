@@ -1,7 +1,7 @@
 # 0006. Shared template model: one section registry for the PDFs, gallery cards from prebuilt PDF images
 
 **Date**: 2026-11-04
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 

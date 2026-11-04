@@ -214,12 +214,12 @@ One description of each template's sections that drives both the web preview and
 spec [0006](../specs/0006-shared-template-model/index.md) · code in `src/features/templates/`, `src/features/gallery/`, `scripts/templates/`
 
 - [x] Design it (spec): `/architect shared template model`
-- [ ] Build it: `/develop shared template model`
-    - [ ] Preview script with baseline and pixel diff of today's PDFs (AC-3, AC-4, AC-11)
-    - [ ] Shared model plus the default template on it (AC-5, AC-6, AC-7, AC-13)
-    - [ ] Gallery cards from prebuilt images, HTML templates deleted, stale check in pre-commit (AC-1, AC-2, AC-9, AC-10)
-    - [ ] Developer and veterinary on the model, parser reads model titles (AC-4, AC-6, AC-8)
-    - [ ] Detail page through TemplatePDF, docs and final pre-commit (AC-12, AC-13)
+- [x] Build it: `/develop shared template model`
+    - [x] Preview script with baseline and pixel diff of today's PDFs (AC-3, AC-4, AC-11)
+    - [x] Shared model plus the default template on it (AC-5, AC-6, AC-7, AC-13)
+    - [x] Gallery cards from prebuilt images, HTML templates deleted, stale check in pre-commit (AC-1, AC-2, AC-9, AC-10)
+    - [x] Developer and veterinary on the model, parser reads model titles (AC-4, AC-6, AC-8)
+    - [x] Detail page through TemplatePDF, docs and final pre-commit (AC-12, AC-13)
 
 ### 9. PDF import parser restructure · needs a decision
 
