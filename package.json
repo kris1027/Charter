@@ -33,7 +33,7 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
-        "pre-commit": "prettier --write . && eslint . && vitest run && tsc -b && vite build && pnpm perf:size",
+        "pre-commit": "prettier --write . && pnpm templates:previews --check && eslint . && vitest run && tsc -b && vite build && pnpm perf:size",
         "perf:size": "node scripts/perf/check-bundle-size.ts",
         "perf:lhci": "lhci autorun",
         "perf:lhci-summary": "node scripts/perf/lighthouse-summary.ts",

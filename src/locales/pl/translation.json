@@ -79,6 +79,7 @@
         "pageSubtitle": "Wybierz szablon, który najlepiej reprezentuje Twój profesjonalny styl",
         "preview": "Podgląd",
         "useTemplate": "Użyj szablonu",
+        "previewAlt": "Podgląd szablonu {{name}} z przykładowym CV",
         "developer": {
             "name": "Szablon dla programistów",
             "description": "Techniczny design z fontem monospace i stylem przyjaznym dla programistów"

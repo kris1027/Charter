@@ -30,6 +30,9 @@ jobs:
             - name: Check formatting
               run: pnpm format:check
 
+            - name: Check template previews are current
+              run: pnpm templates:previews --check
+
             - name: Lint
               run: pnpm lint
 

@@ -1,0 +1,19 @@
+import type { AppLang } from '@/lib/app-lang';
+import type { TemplateId } from '@/lib/template-ids';
+import developerEn from '@/features/templates/previews/developer-en.webp';
+import developerPl from '@/features/templates/previews/developer-pl.webp';
+import defaultEn from '@/features/templates/previews/default-en.webp';
+import defaultPl from '@/features/templates/previews/default-pl.webp';
+import veterinaryEn from '@/features/templates/previews/veterinary-en.webp';
+import veterinaryPl from '@/features/templates/previews/veterinary-pl.webp';
+
+// Page 1 of each template's sample PDF, written by pnpm templates:previews (spec 0006).
+export const PREVIEW_IMAGES: Record<TemplateId, Record<AppLang, string>> = {
+    developer: { en: developerEn, pl: developerPl },
+    default: { en: defaultEn, pl: defaultPl },
+    veterinary: { en: veterinaryEn, pl: veterinaryPl },
+};
+
+// The rendered size in pixels (2x A4), so the card reserves its space before the image loads.
+export const PREVIEW_WIDTH = 1190;
+export const PREVIEW_HEIGHT = 1684;
