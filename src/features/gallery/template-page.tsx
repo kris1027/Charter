@@ -1,30 +1,20 @@
 import { useParams, Link } from '@tanstack/react-router';
 import { isTemplateId } from '@/lib/template-ids';
 import { Button } from '@/components/ui/button';
-import {
-    sampleResumeData,
-    sampleDefaultResumeData,
-    sampleVeterinaryResumeData,
-} from '@/features/resume/sample-resume-data';
-import {
-    sampleResumeDataPl,
-    sampleDefaultResumeDataPl,
-    sampleVeterinaryResumeDataPl,
-} from '@/features/resume/sample-resume-data-pl';
+import { SAMPLE_RESUMES } from '@/features/resume/sample-resumes';
+import { normalizeLang } from '@/lib/app-lang';
 import { ArrowLeft, Edit } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import { useTranslation } from 'react-i18next';
 import { ParallaxBackground } from '@/components/parallax-background';
 import { PDFViewer } from '@react-pdf/renderer';
-import { DeveloperPDF } from '@/features/templates/pdf/developer-pdf';
-import { DefaultPDF } from '@/features/templates/pdf/default-pdf';
-import { VeterinaryPDF } from '@/features/templates/pdf/veterinary-pdf';
+import { TemplatePDF } from '@/features/templates/pdf/template-pdf';
 
 export function TemplatePage() {
     const { t, i18n } = useTranslation();
     const { templateId } = useParams({ from: '/templates_/$templateId' });
-    const isPolish = i18n.language === 'pl';
+    const lang = normalizeLang(i18n.language);
 
     const getTemplateName = () => {
         switch (templateId) {
@@ -39,30 +29,7 @@ export function TemplatePage() {
         }
     };
 
-    const getPDFDocument = () => {
-        switch (templateId) {
-            case 'developer':
-                return <DeveloperPDF data={isPolish ? sampleResumeDataPl : sampleResumeData} />;
-            case 'default':
-                return (
-                    <DefaultPDF
-                        data={isPolish ? sampleDefaultResumeDataPl : sampleDefaultResumeData}
-                    />
-                );
-            case 'veterinary':
-                return (
-                    <VeterinaryPDF
-                        data={isPolish ? sampleVeterinaryResumeDataPl : sampleVeterinaryResumeData}
-                    />
-                );
-            default:
-                return null;
-        }
-    };
-
-    const pdfDocument = getPDFDocument();
-
-    if (!pdfDocument) {
+    if (!isTemplateId(templateId)) {
         return (
             <div className='relative min-h-screen overflow-hidden'>
                 <div className='animate-gradient-shift absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-violet-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/80' />
@@ -112,14 +79,7 @@ export function TemplatePage() {
                                 size='sm'
                                 className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-md'
                             >
-                                <Link
-                                    to='/builder'
-                                    search={{
-                                        templateId: isTemplateId(templateId)
-                                            ? templateId
-                                            : undefined,
-                                    }}
-                                >
+                                <Link to='/builder' search={{ templateId }}>
                                     <Edit className='mr-2 h-4 w-4' />
                                     {t('templates.useTemplate')}
                                 </Link>
@@ -134,7 +94,12 @@ export function TemplatePage() {
             {/* PDF Preview */}
             <div className='relative z-[1] min-h-0 flex-1'>
                 <PDFViewer width='100%' height='100%' showToolbar={false}>
-                    {pdfDocument}
+                    <TemplatePDF
+                        templateId={templateId}
+                        data={SAMPLE_RESUMES[templateId][lang]}
+                        compactScale={0}
+                        lang={lang}
+                    />
                 </PDFViewer>
             </div>
         </div>

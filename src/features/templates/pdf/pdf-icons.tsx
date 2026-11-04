@@ -6,9 +6,8 @@ import type { ContactKind } from '@/features/templates/model/template-layouts';
  * Lucide-style contact icons recreated as @react-pdf/renderer SVG primitives.
  *
  * lucide-react components cannot render inside react-pdf (different renderer),
- * so these mirror the same 24x24 stroke icons used by the on-screen templates
- * (see src/features/templates/html/*). Brand icon paths are shared with the UI via
- * @/features/templates/brand-icon-paths; keep the others in sync with lucide if the UI icons change.
+ * so these copy the same 24x24 stroke icons. Brand icon paths live in
+ * @/features/templates/brand-icon-paths; keep the others in sync with lucide.
  */
 export interface PDFIconProps {
     size?: number;
