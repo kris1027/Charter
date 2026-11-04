@@ -65,15 +65,19 @@ Largest chunks (brotli KiB): `veterinary-pdf` (the `@react-pdf` engine; Rolldown
 
 ### Lighthouse medians and floors
 
-To be filled in by build task 4 from the first green `lighthouse` run on `main` (mobile, 3 runs).
+From the first green `lighthouse` run on `main`: CI run `41433413867` at `cb2f293` (2026-11-02), mobile, 3 runs per page. Each cell is median / floor, where the floor is the median minus 0.02, rounded down.
 
-| Page                   | Perf | A11y | Best practices | SEO |
-| ---------------------- | ---- | ---- | -------------- | --- |
-| `/`                    |      |      |                |     |
-| `/templates`           |      |      |                |     |
-| `/templates/developer` |      |      |                |     |
-| `/builder`             |      |      |                |     |
-| `/preview`             |      |      |                |     |
+| Page                   | Perf        | A11y        | Best practices | SEO         |
+| ---------------------- | ----------- | ----------- | -------------- | ----------- |
+| `/`                    | 1.00 / 0.98 | 1.00 / 0.98 | 1.00 / 0.98    | 1.00 / 0.98 |
+| `/templates`           | 0.98 / 0.96 | 1.00 / 0.98 | 1.00 / 0.98    | 0.92 / 0.90 |
+| `/templates/developer` | 0.78 / 0.68 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
+| `/builder`             | 0.99 / 0.97 | 0.92 / 0.90 | 0.96 / 0.94    | 0.92 / 0.90 |
+| `/preview`             | 0.72 / 0.62 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
+
+The medians are the true median of the 3 runs, the value LHCI's `aggregationMethod: 'median'` asserts against. They match the job summary except `/templates` performance: its runs scored 0.89, 0.98 and 0.99, the summary shows LHCI's representative run (0.99), and the median is 0.98.
+
+Performance on `/templates/developer` and `/preview` uses a 0.10 margin instead. Both pages render a PDF, and their score swings more than 0.02 between CI runners on the same code: `/templates/developer` scored 0.79 on `main` at `05e8d43` and 0.74 a few minutes later on PR #98, which changed only config, and `/preview` scored 0.73 and 0.71.
 
 ### Builder render cost (informational)
 
