@@ -4,7 +4,7 @@ import type { ResumeData } from '@/features/resume/form-types';
 import { formatWebsiteDisplay, formatGithubDisplay, formatLinkedinDisplay } from '@/lib/utils';
 import { formatCVDate, formatCVYear } from '@/lib/date-format';
 import type { AppLang } from '@/lib/app-lang';
-import { getPDFStrings } from '@/features/templates/pdf/pdf-translations';
+import { getPDFStrings } from '@/features/templates/model/template-strings';
 import { buildResumeMetadata } from '@/features/resume/resume-metadata';
 import {
     GlobeIcon,

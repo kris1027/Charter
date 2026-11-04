@@ -1,5 +1,6 @@
 import { Svg, Path, Circle, Rect } from '@react-pdf/renderer';
 import { GITHUB_ICON, LINKEDIN_ICON } from '@/features/templates/brand-icon-paths';
+import type { ContactKind } from '@/features/templates/model/template-layouts';
 
 /**
  * Lucide-style contact icons recreated as @react-pdf/renderer SVG primitives.
@@ -9,7 +10,7 @@ import { GITHUB_ICON, LINKEDIN_ICON } from '@/features/templates/brand-icon-path
  * (see src/features/templates/html/*). Brand icon paths are shared with the UI via
  * @/features/templates/brand-icon-paths; keep the others in sync with lucide if the UI icons change.
  */
-interface PDFIconProps {
+export interface PDFIconProps {
     size?: number;
     color?: string;
 }
@@ -92,3 +93,12 @@ export function LinkedinIcon(props: PDFIconProps) {
         </IconBase>
     );
 }
+
+export const CONTACT_ICONS: Record<ContactKind, (props: PDFIconProps) => React.ReactNode> = {
+    location: MapPinIcon,
+    email: MailIcon,
+    phone: PhoneIcon,
+    linkedin: LinkedinIcon,
+    website: GlobeIcon,
+    github: GithubIcon,
+};

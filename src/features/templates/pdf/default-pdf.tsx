@@ -1,18 +1,15 @@
 import '@/features/templates/pdf/pdf-fonts';
-import { Document, Page, View, Text, Link, StyleSheet } from '@react-pdf/renderer';
+import { Fragment } from 'react';
+import { View, Text, Link, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/features/resume/form-types';
-import { formatLinkedinDisplay } from '@/lib/utils';
-import { formatCVDateShort, formatCVYear } from '@/lib/date-format';
 import type { AppLang } from '@/lib/app-lang';
-import { getPDFStrings } from '@/features/templates/pdf/pdf-translations';
-import { buildResumeMetadata } from '@/features/resume/resume-metadata';
-import {
-    GlobeIcon,
-    LinkedinIcon,
-    MapPinIcon,
-    MailIcon,
-    PhoneIcon,
-} from '@/features/templates/pdf/pdf-icons';
+import { buildResumeView } from '@/features/templates/model/resume-view';
+import { TEMPLATE_LAYOUTS } from '@/features/templates/model/template-layouts';
+import { CONTACT_ICONS } from '@/features/templates/pdf/pdf-icons';
+import { lerp } from '@/features/templates/pdf/pdf-scale';
+import { ResumeDocument } from '@/features/templates/pdf/resume-document';
+import { renderSection } from '@/features/templates/pdf/section-renderers';
+import type { RenderCtx, SectionRenderers } from '@/features/templates/pdf/section-renderers';
 
 interface DefaultPDFProps {
     data: ResumeData;
@@ -32,9 +29,6 @@ const C = {
     gray100: '#F3F4F6',
     gray50: '#F9FAFB',
 } as const;
-
-const lerp = (normal: number, min: number, t: number) =>
-    Math.round((normal + (min - normal) * t) * 10) / 10;
 
 function createStyles(t: number) {
     const s = (n: number, m: number) => lerp(n, m, t);
@@ -151,195 +145,145 @@ function createStyles(t: number) {
     });
 }
 
-function parseDescriptionLines(description: string): string[] {
-    return description
-        .split('\n')
-        .map((l) => l.trim())
-        .filter((l) => l.length > 0)
-        .map((l) => l.replace(/^[-*•‣◦⁃∙]\s*/, ''));
-}
+type Styles = ReturnType<typeof createStyles>;
+
+const renderers = {
+    experience: (section, { styles }) => (
+        <View style={styles.section}>
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+            {section.items.map((exp, i) => (
+                <View key={i} style={styles.expBlock} wrap={false}>
+                    <View style={styles.expTopRow}>
+                        <Text style={styles.expPosition}>{exp.position}</Text>
+                        <Text style={styles.expDate}>
+                            {exp.start} - {exp.end}
+                        </Text>
+                    </View>
+                    <View style={styles.expCompanyRow}>
+                        <Text style={styles.expCompany}>{exp.company}</Text>
+                        {exp.location ? (
+                            <Text style={styles.expLocation}>{exp.location}</Text>
+                        ) : null}
+                    </View>
+                    {exp.bullets.map((line, j) => (
+                        <View key={j} style={styles.bulletRow}>
+                            <Text style={styles.bulletDot}>{'• '}</Text>
+                            <Text style={styles.bulletText}>{line}</Text>
+                        </View>
+                    ))}
+                </View>
+            ))}
+        </View>
+    ),
+    education: (section, { styles }) => (
+        <View style={styles.section} wrap={false}>
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+            {section.items.map((edu, i) => (
+                <View key={i} style={styles.eduBlock} wrap={false}>
+                    <View style={styles.eduTopRow}>
+                        <Text style={styles.eduDegree}>
+                            {edu.degree}
+                            {edu.degree && edu.field ? ' in ' : ''}
+                            {edu.field}
+                        </Text>
+                        <Text style={styles.eduYears}>
+                            {edu.startYear} - {edu.endYear}
+                        </Text>
+                    </View>
+                    <Text style={styles.eduInstitution}>{edu.institution}</Text>
+                    {edu.description ? (
+                        <Text style={styles.bulletText}>{edu.description}</Text>
+                    ) : null}
+                </View>
+            ))}
+        </View>
+    ),
+    skills: (section, { styles }) => (
+        <View style={styles.section} wrap={false}>
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+            <View style={styles.skillsWrap}>
+                {section.items.map((skill, i) => (
+                    <Text key={i} style={styles.skillTag}>
+                        {skill}
+                    </Text>
+                ))}
+            </View>
+        </View>
+    ),
+    languages: (section, { styles }) => (
+        <View style={styles.section} wrap={false}>
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+            {section.items.map((l, i) => (
+                <View key={i} style={styles.langRow}>
+                    <Text style={styles.langName}>{l.name}</Text>
+                    <Text style={styles.langLevel}>{l.level}</Text>
+                </View>
+            ))}
+        </View>
+    ),
+    interests: (section, { styles }) => (
+        <View style={styles.section} wrap={false}>
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+            <View style={styles.interestsWrap}>
+                {section.items.map((interest, i) => (
+                    <Text key={i} style={styles.interestTag}>
+                        {interest}
+                    </Text>
+                ))}
+            </View>
+        </View>
+    ),
+} satisfies SectionRenderers<Styles>;
 
 export function DefaultPDF({ data, compactScale = 0, lang = 'en' }: DefaultPDFProps) {
     const styles = createStyles(compactScale);
     const iconSize = lerp(9, 7, compactScale);
-    const str = getPDFStrings(lang);
-    const {
-        personalInfo: p,
-        experiences,
-        education,
-        skills,
-        languages,
-        interests,
-        gdprConsent,
-    } = data;
-
-    const gdprText = gdprConsent?.companyName?.trim()
-        ? str.gdprConsent(gdprConsent.companyName)
-        : str.gdprConsentGeneric;
+    const view = buildResumeView('default', data, lang);
+    const ctx: RenderCtx<Styles> = { lang, compactScale, styles, contactIconColor: C.gray500 };
 
     return (
-        <Document
-            title={`${p.firstName} ${p.lastName} - Resume`}
-            author={`${p.firstName} ${p.lastName}`}
-            subject='Professional Resume'
-            keywords={skills.map((s) => s.name).join(', ')}
-            creator={buildResumeMetadata('default', data)}
-            language={lang}
+        <ResumeDocument
+            templateId='default'
+            data={data}
+            view={view}
+            lang={lang}
+            pageStyle={styles.page}
         >
-            <Page size='A4' style={styles.page}>
-                <View style={styles.headerBlock}>
-                    <View style={styles.headerNameRow}>
-                        <Text style={styles.headerFirstName}>{p.firstName} </Text>
-                        <Text style={styles.headerLastName}>{p.lastName}</Text>
-                    </View>
-                    {p.title ? <Text style={styles.headerTitle}>{p.title}</Text> : null}
-
-                    <View style={styles.contactRow}>
-                        {p.location ? (
-                            <View style={styles.contactItem}>
-                                <MapPinIcon size={iconSize} color={C.gray500} />
-                                <Text style={styles.contactLink}>{p.location}</Text>
-                            </View>
-                        ) : null}
-                        {p.email ? (
-                            <View style={styles.contactItem}>
-                                <MailIcon size={iconSize} color={C.gray500} />
-                                <Link src={`mailto:${p.email}`} style={styles.contactLink}>
-                                    {p.email}
-                                </Link>
-                            </View>
-                        ) : null}
-                        {p.phone ? (
-                            <View style={styles.contactItem}>
-                                <PhoneIcon size={iconSize} color={C.gray500} />
-                                <Link src={`tel:${p.phone}`} style={styles.contactLink}>
-                                    {p.phone}
-                                </Link>
-                            </View>
-                        ) : null}
-                        {p.linkedin ? (
-                            <View style={styles.contactItem}>
-                                <LinkedinIcon size={iconSize} color={C.gray500} />
-                                <Link src={p.linkedin} style={styles.contactLink}>
-                                    {formatLinkedinDisplay(p.linkedin)}
-                                </Link>
-                            </View>
-                        ) : null}
-                        {p.website ? (
-                            <View style={styles.contactItem}>
-                                <GlobeIcon size={iconSize} color={C.gray500} />
-                                <Link src={p.website} style={styles.contactLink}>
-                                    {p.website}
-                                </Link>
-                            </View>
-                        ) : null}
-                    </View>
+            <View style={styles.headerBlock}>
+                <View style={styles.headerNameRow}>
+                    <Text style={styles.headerFirstName}>{view.name.first} </Text>
+                    <Text style={styles.headerLastName}>{view.name.last}</Text>
                 </View>
+                {view.title ? <Text style={styles.headerTitle}>{view.title}</Text> : null}
 
-                <View style={styles.body}>
-                    {experiences.length > 0 && (
-                        <View style={styles.section}>
-                            <Text style={styles.sectionHeader}>
-                                {str.professionalExperience.toUpperCase()}
-                            </Text>
-                            {experiences.map((exp, i) => (
-                                <View key={i} style={styles.expBlock} wrap={false}>
-                                    <View style={styles.expTopRow}>
-                                        <Text style={styles.expPosition}>{exp.position}</Text>
-                                        <Text style={styles.expDate}>
-                                            {formatCVDateShort(exp.startDate, lang)} -{' '}
-                                            {exp.current
-                                                ? str.present
-                                                : formatCVDateShort(exp.endDate, lang)}
-                                        </Text>
-                                    </View>
-                                    <View style={styles.expCompanyRow}>
-                                        <Text style={styles.expCompany}>{exp.company}</Text>
-                                        {exp.location ? (
-                                            <Text style={styles.expLocation}>{exp.location}</Text>
-                                        ) : null}
-                                    </View>
-                                    {parseDescriptionLines(exp.description).map((line, j) => (
-                                        <View key={j} style={styles.bulletRow}>
-                                            <Text style={styles.bulletDot}>{'• '}</Text>
-                                            <Text style={styles.bulletText}>{line}</Text>
-                                        </View>
-                                    ))}
+                {view.contactRows.map((row, i) => (
+                    <View key={i} style={styles.contactRow}>
+                        {row.map((item) => {
+                            const Icon = CONTACT_ICONS[item.kind];
+                            return (
+                                <View key={item.kind} style={styles.contactItem}>
+                                    <Icon size={iconSize} color={ctx.contactIconColor} />
+                                    {item.href ? (
+                                        <Link src={item.href} style={styles.contactLink}>
+                                            {item.text}
+                                        </Link>
+                                    ) : (
+                                        <Text style={styles.contactLink}>{item.text}</Text>
+                                    )}
                                 </View>
-                            ))}
-                        </View>
-                    )}
+                            );
+                        })}
+                    </View>
+                ))}
+            </View>
 
-                    {education.length > 0 && (
-                        <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{str.education.toUpperCase()}</Text>
-                            {education.map((edu, i) => (
-                                <View key={i} style={styles.eduBlock} wrap={false}>
-                                    <View style={styles.eduTopRow}>
-                                        <Text style={styles.eduDegree}>
-                                            {edu.degree}
-                                            {edu.degree && edu.field ? ' in ' : ''}
-                                            {edu.field}
-                                        </Text>
-                                        <Text style={styles.eduYears}>
-                                            {formatCVYear(edu.startDate)} -{' '}
-                                            {formatCVYear(edu.endDate)}
-                                        </Text>
-                                    </View>
-                                    <Text style={styles.eduInstitution}>{edu.institution}</Text>
-                                    {edu.description ? (
-                                        <Text style={styles.bulletText}>{edu.description}</Text>
-                                    ) : null}
-                                </View>
-                            ))}
-                        </View>
-                    )}
+            <View style={styles.body}>
+                {TEMPLATE_LAYOUTS.default.sections.map((id) => (
+                    <Fragment key={id}>{renderSection(renderers, id, view, ctx)}</Fragment>
+                ))}
 
-                    {skills.length > 0 && (
-                        <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>
-                                {str.coreCompetencies.toUpperCase()}
-                            </Text>
-                            <View style={styles.skillsWrap}>
-                                {skills.map((s, i) => (
-                                    <Text key={i} style={styles.skillTag}>
-                                        {s.name}
-                                    </Text>
-                                ))}
-                            </View>
-                        </View>
-                    )}
-
-                    {languages.length > 0 && (
-                        <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{str.languages.toUpperCase()}</Text>
-                            {languages.map((l, i) => (
-                                <View key={i} style={styles.langRow}>
-                                    <Text style={styles.langName}>{l.language}</Text>
-                                    <Text style={styles.langLevel}>
-                                        {l.proficiency === 'NATIVE' ? str.native : l.proficiency}
-                                    </Text>
-                                </View>
-                            ))}
-                        </View>
-                    )}
-
-                    {interests.length > 0 && (
-                        <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionHeader}>{str.interests.toUpperCase()}</Text>
-                            <View style={styles.interestsWrap}>
-                                {interests.map((interest, i) => (
-                                    <Text key={i} style={styles.interestTag}>
-                                        {interest.name}
-                                    </Text>
-                                ))}
-                            </View>
-                        </View>
-                    )}
-
-                    {gdprConsent?.enabled ? <Text style={styles.gdpr}>{gdprText}</Text> : null}
-                </View>
-            </Page>
-        </Document>
+                {view.gdpr ? <Text style={styles.gdpr}>{view.gdpr}</Text> : null}
+            </View>
+        </ResumeDocument>
     );
 }
