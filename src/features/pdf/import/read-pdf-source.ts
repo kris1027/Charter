@@ -42,6 +42,7 @@ export async function readPdfSource(data: Uint8Array, pdfjs?: Pdfjs): Promise<Pd
     } catch (err) {
         throw toImportError(err);
     } finally {
-        await task.destroy();
+        // Cleanup only: a failed destroy must not replace the source or the import error.
+        await task.destroy().catch(() => {});
     }
 }

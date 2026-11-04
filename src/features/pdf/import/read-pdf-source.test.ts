@@ -8,9 +8,15 @@ type FakePage = { items: object[]; annotations: Record<string, unknown>[]; fail?
 
 const fakePdfjs = (
     pages: FakePage[],
-    { info = {}, openError }: { info?: Record<string, unknown>; openError?: Error } = {},
+    {
+        info = {},
+        openError,
+        destroyError,
+    }: { info?: Record<string, unknown>; openError?: Error; destroyError?: Error } = {},
 ) => {
-    const destroy = vi.fn(async () => {});
+    const destroy = vi.fn(async () => {
+        if (destroyError) throw destroyError;
+    });
     const pdf = {
         numPages: pages.length,
         getMetadata: async () => ({ info }),
@@ -80,5 +86,23 @@ describe('readPdfSource', () => {
         expect(err).toBeInstanceOf(PdfImportError);
         expect(err).toMatchObject({ code });
         expect(destroy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should still return the source when destroying the task fails', async () => {
+        const { pdfjs } = fakePdfjs([{ items: [textItem('Anna', 790)], annotations: [] }], {
+            destroyError: new Error('worker gone'),
+        });
+        const source = await readPdfSource(new Uint8Array(), pdfjs);
+        expect(source.lines).toHaveLength(1);
+    });
+
+    it('should keep the import error when destroying the task also fails', async () => {
+        const { pdfjs } = fakePdfjs([], {
+            openError: named('PasswordException'),
+            destroyError: new Error('worker gone'),
+        });
+        await expect(readPdfSource(new Uint8Array(), pdfjs)).rejects.toMatchObject({
+            code: 'password',
+        });
     });
 });
