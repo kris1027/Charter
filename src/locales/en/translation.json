@@ -245,7 +245,9 @@
         "pdfError": {
             "title": "Unable to Load PDF",
             "ok": "OK",
-            "notFromApp": "This PDF was not created by Resume Builder. Only PDFs exported from this application can be loaded. You can fill out the form manually instead.",
+            "invalid": "This file could not be opened as a PDF. Pick a PDF exported from Resume Builder, or fill out the form manually.",
+            "password": "This PDF is password protected. Remove the password and try again, or fill out the form manually.",
+            "unrecognized": "This PDF does not look like a resume made with Resume Builder. Only PDFs exported from this application can be loaded. You can fill out the form manually instead.",
             "unexpected": "An unexpected error occurred while loading the PDF."
         }
     },

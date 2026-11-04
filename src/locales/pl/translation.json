@@ -245,7 +245,9 @@
         "pdfError": {
             "title": "Nie można wczytać PDF",
             "ok": "OK",
-            "notFromApp": "Ten plik PDF nie został utworzony przez Resume Builder. Można wczytać jedynie pliki PDF wyeksportowane z tej aplikacji. Możesz zamiast tego wypełnić formularz ręcznie.",
+            "invalid": "Nie można otworzyć tego pliku jako PDF. Wybierz plik PDF wyeksportowany z Resume Builder albo wypełnij formularz ręcznie.",
+            "password": "Ten plik PDF jest chroniony hasłem. Usuń hasło i spróbuj ponownie albo wypełnij formularz ręcznie.",
+            "unrecognized": "Ten plik PDF nie wygląda na CV utworzone w Resume Builder. Można wczytać jedynie pliki PDF wyeksportowane z tej aplikacji. Możesz zamiast tego wypełnić formularz ręcznie.",
             "unexpected": "Wystąpił nieoczekiwany błąd podczas wczytywania pliku PDF."
         }
     },
