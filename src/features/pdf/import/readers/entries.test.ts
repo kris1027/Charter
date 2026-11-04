@@ -8,7 +8,7 @@ import { lineText } from '@/features/pdf/import/text-lines';
 import { line } from '@/test/pdf-lines';
 
 describe('readDateLine', () => {
-    it('should read dates and the location after the first bar', () => {
+    it('should read the location after the first bar when the date line has one', () => {
         expect(readDateLine(line('May 2014 - Present | City | 4'), 'en')).toEqual({
             startDate: '2014-05',
             endDate: '',
@@ -17,13 +17,13 @@ describe('readDateLine', () => {
         });
     });
 
-    it('should ignore a bullet that happens to hold a range', () => {
+    it('should ignore a line when it is a bullet that happens to hold a range', () => {
         expect(readDateLine(line('• May 2014 - June 2015'), 'en')).toBeNull();
     });
 });
 
 describe('readTimeline', () => {
-    it('should give each date line the lines before it and the bullets after it', () => {
+    it('should give each entry its head and bullets when several date lines follow each other', () => {
         const entries = readTimeline(
             [
                 line('Company 1 | Position 1'),
@@ -42,7 +42,7 @@ describe('readTimeline', () => {
 });
 
 describe('readYearsLast', () => {
-    it('should take a larger line before the head as part of the next entry', () => {
+    it('should give a larger line to the next entry when it sits right above the head of that entry', () => {
         const entries = readYearsLast([
             line('Degree 5 - University 5'),
             line('2010 - 2014'),
@@ -59,7 +59,7 @@ describe('readYearsLast', () => {
 });
 
 describe('readDegreeField', () => {
-    it('should split at the first in and keep a lone value as the degree', () => {
+    it('should split at the first in when the text holds several and keep a lone value as the degree', () => {
         expect(readDegreeField('MSc in Data in Health')).toEqual({
             degree: 'MSc',
             field: 'Data in Health',

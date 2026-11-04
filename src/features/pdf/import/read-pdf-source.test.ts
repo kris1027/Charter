@@ -39,7 +39,7 @@ const fakePdfjs = (
 const named = (name: string) => Object.assign(new Error(name), { name });
 
 describe('readPdfSource', () => {
-    it('should read creator, lines and links of every page from one open', async () => {
+    it('should read creator, lines and links of every page when the PDF opens once', async () => {
         const { pdfjs, getDocument, destroy } = fakePdfjs(
             [
                 { items: [textItem('Anna', 790)], annotations: [{ url: 'https://a.dev/' }] },

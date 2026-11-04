@@ -20,7 +20,7 @@ const runLine = (...runs: [string, number, number][]): TextLine => ({
 });
 
 describe('buildTextLines', () => {
-    it('should group items on the same row within 2 units, top to bottom and left to right', () => {
+    it('should put items on one line when their rows are within 2 units, top to bottom and left to right', () => {
         const lines = buildTextLines(
             [item('EXPERIENCE', 60, 700.4), item('// WORK', 20, 701), item('Name', 20, 790)],
             2,

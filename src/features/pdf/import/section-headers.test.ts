@@ -8,18 +8,18 @@ describe('findHeaderIndex', () => {
         );
     });
 
-    it('should need the whole line for default headers', () => {
+    it('should match a default header only when it is the whole line', () => {
         const page = lines('CORE COMPETENCIES and more', 'CORE COMPETENCIES');
         expect(findHeaderIndex(page, 'default', 'skills', 'en')).toBe(1);
     });
 
-    it('should match a legacy header only for English', () => {
+    it('should match a legacy header only when the language is English', () => {
         const page = lines('Name', 'SKILLS');
         expect(findHeaderIndex(page, 'veterinary', 'skills', 'en')).toBe(1);
         expect(findHeaderIndex(page, 'veterinary', 'skills', 'pl')).toBe(-1);
     });
 
-    it('should compare case sensitively', () => {
+    it('should not match when the case differs', () => {
         expect(findHeaderIndex(lines('core competencies'), 'default', 'skills', 'en')).toBe(-1);
     });
 

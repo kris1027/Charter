@@ -4,7 +4,7 @@ import { line } from '@/test/pdf-lines';
 const ctx = { lang: 'en' } as const;
 
 describe('veterinary readers', () => {
-    it('should read position then company above the date line', () => {
+    it('should read position then company when both print above the date line', () => {
         expect(
             readers.experience(
                 [
@@ -28,7 +28,7 @@ describe('veterinary readers', () => {
         ]);
     });
 
-    it('should tell a lone position from a lone company by its size', () => {
+    it('should tell a lone position from a lone company by its size when only one prints', () => {
         const [onlyPosition] = readers.experience(
             [line('Vet', { size: 10 }), line('June 2021 - Present')],
             ctx,
@@ -41,7 +41,7 @@ describe('veterinary readers', () => {
         expect(onlyCompany).toMatchObject({ position: '', company: 'Clinic' });
     });
 
-    it('should read degree in field, institution, years and description', () => {
+    it('should read degree, field, institution and description when the years print after the institution', () => {
         expect(
             readers.education([
                 line('DVM in Veterinary Medicine', { size: 10 }),

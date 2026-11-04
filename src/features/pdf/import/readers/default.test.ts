@@ -36,7 +36,7 @@ describe('default readers', () => {
         ]);
     });
 
-    it('should read degree in field with years, then institution and description', () => {
+    it('should read degree, field, institution and description when the years share the degree line', () => {
         expect(
             readers.education([
                 line(['MBA in Business Administration', '2018 - 2020']),

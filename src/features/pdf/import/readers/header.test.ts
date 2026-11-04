@@ -9,7 +9,7 @@ const developerHeader = (title = true) => [
 ];
 
 describe('readHeader', () => {
-    it('should read every field from the printed cells and the link annotations', () => {
+    it('should read every field when the PDF has printed cells and link annotations', () => {
         expect(
             readHeader(developerHeader(), {
                 templateId: 'developer',

@@ -14,7 +14,7 @@ describe('readGdpr', () => {
         expect(readGdpr([], 'en')).toEqual({ enabled: false, companyName: '' });
     });
 
-    it('should read the generic clause as enabled without a company', () => {
+    it('should enable consent without a company when the footer is the generic clause', () => {
         expect(readGdpr(wrapped(getPDFStrings('en').gdprConsentGeneric), 'en')).toEqual({
             enabled: true,
             companyName: '',

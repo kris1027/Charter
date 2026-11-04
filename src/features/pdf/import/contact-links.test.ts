@@ -1,7 +1,7 @@
 import { contactFromLinkUrls } from '@/features/pdf/import/contact-links';
 
 describe('contactFromLinkUrls', () => {
-    it('should sort links into website, github and linkedin exactly as reported', () => {
+    it('should keep each URL exactly as reported when sorting it into website, github or linkedin', () => {
         expect(
             contactFromLinkUrls([
                 'https://www.zaruszaj.pl/o-mnie/',
@@ -17,13 +17,13 @@ describe('contactFromLinkUrls', () => {
         });
     });
 
-    it('should read a country linkedin subdomain as linkedin', () => {
+    it('should read a link as linkedin when it uses a country subdomain', () => {
         expect(contactFromLinkUrls(['https://pl.linkedin.com/in/a'])).toEqual({
             linkedin: 'https://pl.linkedin.com/in/a',
         });
     });
 
-    it('should keep the first link of each kind and ignore other schemes', () => {
+    it('should keep the first link of each kind when several are present and ignore other schemes', () => {
         expect(
             contactFromLinkUrls([
                 'https://example.com',

@@ -26,7 +26,7 @@ describe('readTags', () => {
 });
 
 describe('readLanguages', () => {
-    it('should read the language and its level from the two columns', () => {
+    it('should read the language and its level when they print in two columns', () => {
         expect(
             readLanguages([line(['Polski', 'Ojczysty']), line(['English', 'B2'])], { lang: 'pl' }),
         ).toEqual([
@@ -35,7 +35,7 @@ describe('readLanguages', () => {
         ]);
     });
 
-    it('should skip lines without a known level', () => {
+    it('should skip a line when its level is not known', () => {
         expect(readLanguages([line(['Polish', 'Good']), line('English')], { lang: 'en' })).toEqual(
             [],
         );
@@ -51,12 +51,12 @@ describe('readBullets', () => {
         });
     });
 
-    it('should stop at a line that starts where the bullets start', () => {
+    it('should stop when a line starts where the bullets start', () => {
         const block = [line('• Point'), line('Company 2 | Role')];
         expect(readBullets(block, 0)).toEqual({ bullets: ['• Point'], end: 1 });
     });
 
-    it('should read a bullet printed as its own run', () => {
+    it('should read a bullet when the marker is printed as its own run', () => {
         expect(readBullets([line(['•', 'Point'])], 0).bullets).toEqual(['• Point']);
     });
 
@@ -66,7 +66,7 @@ describe('readBullets', () => {
 });
 
 describe('splitAt', () => {
-    it('should split at the first separator only', () => {
+    it('should split at the first separator only when the text holds several', () => {
         expect(splitAt('a | b | c', '|')).toEqual(['a', 'b | c']);
         expect(splitAt('a', '|')).toEqual(['a', '']);
     });

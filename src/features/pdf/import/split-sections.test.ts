@@ -140,7 +140,7 @@ describe('splitSections', () => {
             expect(texts(slices.sections.skills)).toEqual(['Surgery']);
         });
 
-        it('should not treat a line containing Interests as the interests header', () => {
+        it('should not take a line as the interests header when it only contains Interests', () => {
             expect(texts(slices.sections.experience)).toEqual(['• Research Interests: surgery']);
             expect(texts(slices.sections.interests)).toEqual(['Animal welfare']);
         });

@@ -10,7 +10,7 @@ describe('readResumeFromText', () => {
         );
     });
 
-    it('should read the detected template in its language, section by section', () => {
+    it('should read every section in the detected language when the template is recognized', () => {
         const result = readResumeFromText([
             line('Jan Nowak', { size: 24 }),
             line('jan@example.com'),

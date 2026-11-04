@@ -4,7 +4,7 @@ import { line } from '@/test/pdf-lines';
 const ctx = { lang: 'en' } as const;
 
 describe('developer readers', () => {
-    it('should read company, position, dates, location and bullets', () => {
+    it('should read company, position, dates, location and bullets when the date line follows the company line', () => {
         expect(
             readers.experience(
                 [

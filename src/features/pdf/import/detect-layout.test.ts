@@ -23,7 +23,7 @@ describe('detectLayout', () => {
         ['PROFESSIONAL EXPERIENCE', 'default'],
         ['CORE COMPETENCIES', 'default'],
         ['SPECIAL INTERESTS', 'veterinary'],
-    ] as const)('should detect %s as %s', (header, templateId) => {
+    ] as const)('should detect %s as %s when that header is printed', (header, templateId) => {
         expect(detectLayout(lines('Name', header))).toMatchObject({ templateId, lang: 'en' });
     });
 
@@ -67,7 +67,7 @@ describe('detectLayout', () => {
         ).toEqual({ templateId: 'veterinary', lang: 'pl', headerHits: 5 });
     });
 
-    it('should detect an older veterinary export by its legacy headers', () => {
+    it('should detect veterinary when an older export prints its legacy headers', () => {
         const page = lines(
             'Anna',
             'Work Experience',
