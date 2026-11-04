@@ -5,7 +5,9 @@ Font.registerHyphenationCallback((word) => [word]);
 // v4: Fira Code replaces JetBrains Mono (fontkit incompatibility)
 const v = '4';
 const base = import.meta.env.BASE_URL;
-const url = (file: string) => `${base}fonts/${file}?v=${v}`;
+// The preview script sets base to the absolute public/ path, so react-pdf reads files from disk.
+const isFileBase = base !== '/' && !base.startsWith('http');
+const url = (file: string) => (isFileBase ? `${base}fonts/${file}` : `${base}fonts/${file}?v=${v}`);
 
 Font.register({
     family: 'Fira Code',
