@@ -44,7 +44,8 @@ The three resume templates rendered with `@react-pdf/renderer`. They drive the l
 
 - react-pdf lays out each JSX text child as its own run: `{a} - {b}` and `{a} -{' '}{b}` print the same text with glyphs shifted by a fraction of a pixel. Keep a split as it is when the look must not change.
 - The pixel diff baseline in `.cache/` is only valid on the machine that made it; never commit it.
-
+- `scripts/templates/build-previews.ts` runs under plain `node` (erasable TS only) and can't import `@/` paths: it loads app modules through Vite `ssrLoadModule`, but imports `react` and `@react-pdf/renderer` with a plain `import()`, since a bare package id through `ssrLoadModule` gets inlined and fails on CommonJS. Its Vite `base` is the absolute `public/` path, which is why `pdf-fonts.ts` skips `?v=` for a file system base.
+- Gallery images are not precached; `vite.config.ts` serves them through a `CacheFirst` runtime rule (`template-previews`), so a gallery opened once works offline.
 - react-pdf needs WebAssembly and blob frames: the CSP in both `vite.config.ts` and `vercel.json` allows `wasm-unsafe-eval` and `blob:`. Tightening either breaks preview and export in production only.
 - Changing a font file requires bumping `v` in `pdf-fonts.ts`, or the PWA cache serves the old one. JetBrains Mono was dropped for Fira Code because of a fontkit incompatibility.
 
