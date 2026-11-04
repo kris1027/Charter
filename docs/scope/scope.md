@@ -11,39 +11,39 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 ## At a glance
 
-| #   | Feature                         | Phase      | Status   |
-| --- | ------------------------------- | ---------- | -------- |
-| A   | Landing page                    | Existing   | existing |
-| B   | Template gallery & detail       | Existing   | existing |
-| C   | Builder form                    | Existing   | existing |
-| D   | Resume templates & preview      | Existing   | existing |
-| E   | PDF export                      | Existing   | existing |
-| F   | PDF import                      | Existing   | existing |
-| G   | Local persistence               | Existing   | existing |
-| H   | i18n (EN/PL)                    | Existing   | existing |
-| I   | Theme (light/dark/system)       | Existing   | existing |
-| J   | PWA & offline                   | Existing   | existing |
-| K   | SEO                             | Existing   | existing |
-| 1   | Coding standards & AGENTS.md    | Foundation | done     |
-| 2   | Stack review                    | Foundation | done     |
-| 3   | Upgrades & replacements         | Foundation | done     |
-| 17  | Unified radix-ui package        | Foundation | done     |
-| 18  | Intl dates instead of date-fns  | Foundation | done     |
-| 19  | Single CSP source               | Foundation | done     |
-| 20  | React Compiler                  | Foundation | done     |
-| 4   | Feature based folder structure  | Foundation | done     |
-| 5   | Performance budgets             | Foundation | done     |
-| 6   | Design system refresh           | Foundation | done     |
-| 7   | Builder page split              | Slice 1    | done     |
-| 8   | Shared template model           | Slice 1    | planned  |
-| 9   | PDF import parser restructure   | Slice 1    | planned  |
-| 10  | Lazy load heavy engines         | Slice 2    | planned  |
-| 11  | Builder responsiveness          | Slice 2    | planned  |
-| 12  | Landing page refresh            | Slice 3    | planned  |
-| 13  | Template gallery refresh        | Slice 3    | planned  |
-| 14  | Builder UI refresh              | Slice 3    | planned  |
-| 15  | Preview & export UI refresh     | Slice 3    | planned  |
-| 16  | Accessibility & Lighthouse pass | Slice 3    | planned  |
+| #   | Feature                         | Phase      | Status      |
+| --- | ------------------------------- | ---------- | ----------- |
+| A   | Landing page                    | Existing   | existing    |
+| B   | Template gallery & detail       | Existing   | existing    |
+| C   | Builder form                    | Existing   | existing    |
+| D   | Resume templates & preview      | Existing   | existing    |
+| E   | PDF export                      | Existing   | existing    |
+| F   | PDF import                      | Existing   | existing    |
+| G   | Local persistence               | Existing   | existing    |
+| H   | i18n (EN/PL)                    | Existing   | existing    |
+| I   | Theme (light/dark/system)       | Existing   | existing    |
+| J   | PWA & offline                   | Existing   | existing    |
+| K   | SEO                             | Existing   | existing    |
+| 1   | Coding standards & AGENTS.md    | Foundation | done        |
+| 2   | Stack review                    | Foundation | done        |
+| 3   | Upgrades & replacements         | Foundation | done        |
+| 17  | Unified radix-ui package        | Foundation | done        |
+| 18  | Intl dates instead of date-fns  | Foundation | done        |
+| 19  | Single CSP source               | Foundation | done        |
+| 20  | React Compiler                  | Foundation | done        |
+| 4   | Feature based folder structure  | Foundation | done        |
+| 5   | Performance budgets             | Foundation | done        |
+| 6   | Design system refresh           | Foundation | done        |
+| 7   | Builder page split              | Slice 1    | done        |
+| 8   | Shared template model           | Slice 1    | in-progress |
+| 9   | PDF import parser restructure   | Slice 1    | planned     |
+| 10  | Lazy load heavy engines         | Slice 2    | planned     |
+| 11  | Builder responsiveness          | Slice 2    | planned     |
+| 12  | Landing page refresh            | Slice 3    | planned     |
+| 13  | Template gallery refresh        | Slice 3    | planned     |
+| 14  | Builder UI refresh              | Slice 3    | planned     |
+| 15  | Preview & export UI refresh     | Slice 3    | planned     |
+| 16  | Accessibility & Lighthouse pass | Slice 3    | planned     |
 
 ## Already built
 
@@ -207,12 +207,19 @@ spec [0005](../specs/0005-builder-page-split/index.md) · code in `src/features/
     - [x] Autosave, PDF import, live progress and toolbar extracted, templateId validated (AC-7, AC-8, AC-9, AC-10)
     - [x] max-lines lint rule and final pre-commit and browser pass (AC-2, AC-11)
 
-### 8. Shared template model · needs a decision
+### 8. Shared template model · in-progress
 
 One description of each template's sections that drives both the web preview and the PDF version, so a new section is added in one place instead of six.
 **Done when:** web and PDF output for all three templates come from the shared model, and both still match today's look.
+spec [0006](../specs/0006-shared-template-model/index.md) · code in `src/features/templates/`, `src/features/gallery/`, `scripts/templates/`
 
-- [ ] Design it (spec): `/architect shared template model`
+- [x] Design it (spec): `/architect shared template model`
+- [ ] Build it: `/develop shared template model`
+    - [ ] Preview script with baseline and pixel diff of today's PDFs (AC-3, AC-4, AC-11)
+    - [ ] Shared model plus the default template on it (AC-5, AC-6, AC-7, AC-13)
+    - [ ] Gallery cards from prebuilt images, HTML templates deleted, stale check in pre-commit (AC-1, AC-2, AC-9, AC-10)
+    - [ ] Developer and veterinary on the model, parser reads model titles (AC-4, AC-6, AC-8)
+    - [ ] Detail page through TemplatePDF, docs and final pre-commit (AC-12, AC-13)
 
 ### 9. PDF import parser restructure · needs a decision
 
