@@ -11,23 +11,10 @@ import { ParallaxBackground } from '@/components/parallax-background';
 import { PDFViewer } from '@react-pdf/renderer';
 import { TemplatePDF } from '@/features/templates/pdf/template-pdf';
 
-export function TemplatePage() {
+export const TemplatePage = () => {
     const { t, i18n } = useTranslation();
     const { templateId } = useParams({ from: '/templates_/$templateId' });
     const lang = normalizeLang(i18n.language);
-
-    const getTemplateName = () => {
-        switch (templateId) {
-            case 'developer':
-                return t('templates.developer.name');
-            case 'default':
-                return t('templates.default.name');
-            case 'veterinary':
-                return t('templates.veterinary.name');
-            default:
-                return 'Template';
-        }
-    };
 
     if (!isTemplateId(templateId)) {
         return (
@@ -69,7 +56,7 @@ export function TemplatePage() {
                                 </Link>
                             </Button>
                             <h1 className='font-display bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400'>
-                                {getTemplateName()} {t('templates.preview')}
+                                {t(`templates.${templateId}.name`)} {t('templates.preview')}
                             </h1>
                         </div>
 
@@ -104,4 +91,4 @@ export function TemplatePage() {
             </div>
         </div>
     );
-}
+};
