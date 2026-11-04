@@ -2,14 +2,17 @@ import type { ResumeData, ResumeFormValues } from '@/features/resume/form-types'
 import type { TemplateId } from '@/lib/template-ids';
 import { parseDescriptionLines } from '@/features/templates/model/resume-view';
 import { TEMPLATE_LAYOUTS } from '@/features/templates/model/template-layouts';
+import { CONTACT_LINK_KINDS } from '@/features/pdf/import/contact-links';
 
 // What a resume reads back as from its printed text alone (spec 0007, AC-11): the input with
 // only these losses applied. Any new loss is added here with its reason in the same change.
 export function expectedAfterPrint(data: ResumeData, templateId: TemplateId): ResumeFormValues {
-    const p = data.personalInfo;
-    const name = `${p.firstName} ${p.lastName}`.trim();
+    const info = data.personalInfo;
+    const name = `${info.firstName} ${info.lastName}`.trim();
     const space = name.indexOf(' ');
-    // Split at the first separator, as a text that contains it reads back (loss 8).
+    // Split at the first separator, as a text that contains it reads back (loss 8). Only the
+    // developer company is applied: no fixture holds a `|` in a location or a `-` in a
+    // developer degree or institution, so those rules wait for the fixture that needs them.
     const splitFirst = (a: string, b: string, sep: string): [string, string] => {
         const i = a.indexOf(sep);
         if (i < 0) return [a, b];
@@ -21,17 +24,15 @@ export function expectedAfterPrint(data: ResumeData, templateId: TemplateId): Re
         // 6. The template is the detected one.
         templateId,
         personalInfo: {
-            ...p,
+            ...info,
             // 2. The first word of the printed name is the first name, the rest the last name.
             firstName: space < 0 ? name : name.slice(0, space),
             lastName: space < 0 ? '' : name.slice(space + 1),
             // 9. A contact the template does not print (default and veterinary have no GitHub).
             ...Object.fromEntries(
-                (['website', 'github', 'linkedin'] as const)
-                    .filter(
-                        (kind) => !TEMPLATE_LAYOUTS[templateId].contactRows.flat().includes(kind),
-                    )
-                    .map((kind) => [kind, '']),
+                CONTACT_LINK_KINDS.filter(
+                    (kind) => !TEMPLATE_LAYOUTS[templateId].contactRows.flat().includes(kind),
+                ).map((kind) => [kind, '']),
             ),
             // 7. Links read back as pdfjs reports them; every fixture URL comes back unchanged
             // (pdfjs keeps the trailing slash, and a bare `anna.dev` is also its printed text).
@@ -45,8 +46,6 @@ export function expectedAfterPrint(data: ResumeData, templateId: TemplateId): Re
                 ...exp,
                 company,
                 position,
-                // 8. A location containing `|` splits at the first one (developer, veterinary).
-                location: exp.location,
                 // 4. A current role has no end date.
                 endDate: exp.current ? '' : exp.endDate,
                 // 3. The description comes back as the printed bullets.

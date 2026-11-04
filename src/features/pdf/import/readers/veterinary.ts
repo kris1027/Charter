@@ -10,12 +10,12 @@ import { lineText } from '@/features/pdf/import/text-lines';
 import type { TextLine } from '@/features/pdf/import/text-lines';
 
 // The entry's title line (printed larger than `anchor`) and the plain line after it.
-const titleAndPlain = (head: TextLine[], anchor: TextLine): [string, string] => {
+const titleAndPlain = (head: TextLine[], below: TextLine): [string, string] => {
     const lastTwo = head.slice(-2);
     if (lastTwo.length === 2) return [lineText(lastTwo[0]), lineText(lastTwo[1])];
     const [only] = lastTwo;
     if (!only) return ['', ''];
-    return lineSize(only) > lineSize(anchor) ? [lineText(only), ''] : ['', lineText(only)];
+    return lineSize(only) > lineSize(below) ? [lineText(only), ''] : ['', lineText(only)];
 };
 
 // Veterinary prints `Position`, `Company`, then `start - end[ | location]`, then bullets.
@@ -23,15 +23,14 @@ const titleAndPlain = (head: TextLine[], anchor: TextLine): [string, string] => 
 export const readers = {
     experience: (lines, { lang }) =>
         readTimeline(lines, (line) => readDateLine(line, lang)).map(
-            ({ head, anchorLine, anchor, description }) => {
-                const [position, company] = titleAndPlain(head, anchorLine);
-                const { location, ...dates } = anchor;
+            ({ head, dateLine, dates: { location, ...dates }, description }) => {
+                const [position, company] = titleAndPlain(head, dateLine);
                 return { company, position, location, ...dates, description };
             },
         ),
     education: (lines) =>
-        readYearsLast(lines).map(({ head, anchor, years, description }) => {
-            const [degreeField, institution] = titleAndPlain(head, anchor);
+        readYearsLast(lines).map(({ head, yearsLine, years, description }) => {
+            const [degreeField, institution] = titleAndPlain(head, yearsLine);
             return { ...readDegreeField(degreeField), institution, ...years, description };
         }),
     skills: readTags,

@@ -18,8 +18,8 @@ export const readDateLine = (
 
 export type TimelineEntry<T> = {
     head: TextLine[];
-    anchorLine: TextLine;
-    anchor: T;
+    dateLine: TextLine;
+    dates: T;
     description: string;
 };
 
@@ -29,23 +29,23 @@ export type TimelineEntry<T> = {
  */
 export function readTimeline<T>(
     lines: readonly TextLine[],
-    readAnchor: (line: TextLine) => T | null,
+    readDates: (line: TextLine) => T | null,
 ): TimelineEntry<T>[] {
     const entries: TimelineEntry<T>[] = [];
     let i = 0;
     while (i < lines.length) {
-        let d = i;
-        let anchor: T | null = null;
-        for (; d < lines.length; d++) {
-            anchor = readAnchor(lines[d]);
-            if (anchor) break;
+        let dateAt = i;
+        let dates: T | null = null;
+        for (; dateAt < lines.length; dateAt++) {
+            dates = readDates(lines[dateAt]);
+            if (dates) break;
         }
-        if (!anchor) break;
-        const { bullets, end } = readBullets(lines, d + 1);
+        if (!dates) break;
+        const { bullets, end } = readBullets(lines, dateAt + 1);
         entries.push({
-            head: lines.slice(i, d),
-            anchorLine: lines[d],
-            anchor,
+            head: lines.slice(i, dateAt),
+            dateLine: lines[dateAt],
+            dates,
             description: bullets.join('\n'),
         });
         i = end;
@@ -55,7 +55,7 @@ export function readTimeline<T>(
 
 export type YearsEntry = {
     head: TextLine[];
-    anchor: TextLine;
+    yearsLine: TextLine;
     years: { startDate: string; endDate: string };
     description: string;
 };
@@ -69,9 +69,9 @@ const years = (line: TextLine) => readYearRange(lineText(line));
  * years line and the head is that entry's description.
  */
 export function readYearsLast(lines: readonly TextLine[]): YearsEntry[] {
-    const anchors = lines.flatMap((line, i) => (years(line) ? [i] : []));
-    const starts = anchors.map((y, k) => {
-        const floor = k > 0 ? anchors[k - 1] + 1 : 0;
+    const yearsAt = lines.flatMap((line, i) => (years(line) ? [i] : []));
+    const starts = yearsAt.map((y, k) => {
+        const floor = k > 0 ? yearsAt[k - 1] + 1 : 0;
         const size = lineSize(lines[y]);
         let start = y;
         if (start - 1 >= floor) start--;
@@ -83,9 +83,9 @@ export function readYearsLast(lines: readonly TextLine[]): YearsEntry[] {
             start--;
         return start;
     });
-    return anchors.map((y, k) => ({
+    return yearsAt.map((y, k) => ({
         head: lines.slice(starts[k], y),
-        anchor: lines[y],
+        yearsLine: lines[y],
         years: years(lines[y]) ?? { startDate: '', endDate: '' },
         description: lines
             .slice(y + 1, starts[k + 1] ?? lines.length)

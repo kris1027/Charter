@@ -16,7 +16,7 @@ export const SECTION_FIELDS = {
     interests: 'interests',
 } as const satisfies Record<SectionId, keyof ResumeFormValues>;
 
-export type SectionFields = typeof SECTION_FIELDS;
+type SectionFields = typeof SECTION_FIELDS;
 
 export type ReaderCtx = { lang: AppLang };
 

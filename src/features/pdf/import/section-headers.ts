@@ -5,7 +5,7 @@ import { printedTitle } from '@/features/templates/model/printed-title';
 import { headerText } from '@/features/pdf/import/text-lines';
 import type { TextLine } from '@/features/pdf/import/text-lines';
 
-export type HeaderMatch = 'includes' | 'equals';
+type HeaderMatch = 'includes' | 'equals';
 
 // Headers older exports printed (or that the parser always accepted), so they still import.
 // They count for English only.
@@ -30,7 +30,7 @@ export const LEGACY_HEADERS: Partial<
 
 type MatchModes = Record<SectionId, { title: HeaderMatch; legacy: HeaderMatch }>;
 
-const all = (mode: HeaderMatch): MatchModes => ({
+const sameMode = (mode: HeaderMatch): MatchModes => ({
     experience: { title: mode, legacy: mode },
     education: { title: mode, legacy: mode },
     skills: { title: mode, legacy: mode },
@@ -40,10 +40,10 @@ const all = (mode: HeaderMatch): MatchModes => ({
 
 // How each template's header lines are compared, kept from the old parser.
 export const HEADER_MATCH: Record<TemplateId, MatchModes> = {
-    developer: all('includes'),
-    default: all('equals'),
+    developer: sameMode('includes'),
+    default: sameMode('equals'),
     veterinary: {
-        ...all('includes'),
+        ...sameMode('includes'),
         skills: { title: 'equals', legacy: 'equals' },
         languages: { title: 'equals', legacy: 'equals' },
         // An old export's plain `Interests` header only ever matched a whole line.

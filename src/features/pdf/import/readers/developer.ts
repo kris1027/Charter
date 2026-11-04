@@ -8,16 +8,15 @@ import { lineText } from '@/features/pdf/import/text-lines';
 export const readers = {
     experience: (lines, { lang }) =>
         readTimeline(lines, (line) => readDateLine(line, lang)).map(
-            ({ head, anchor, description }) => {
+            ({ head, dates: { location, ...dates }, description }) => {
                 const last = head.at(-1);
                 const [company, position] = last ? splitAt(lineText(last), '|') : ['', ''];
-                const { location, ...dates } = anchor;
                 return { company, position, location, ...dates, description };
             },
         ),
     education: (lines) =>
-        readYearsLast(lines).map(({ head, anchor, years, description }) => {
-            const fieldLine = head.find((line) => lineSize(line) > lineSize(anchor));
+        readYearsLast(lines).map(({ head, yearsLine, years, description }) => {
+            const fieldLine = head.find((line) => lineSize(line) > lineSize(yearsLine));
             const field = fieldLine ? lineText(fieldLine) : '';
             const rest = head.filter((line) => line !== fieldLine).map(lineText)[0] ?? '';
             const [before, after] = splitAt(rest, ' - ');

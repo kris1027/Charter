@@ -1,8 +1,11 @@
 import type { ResumeFormValues } from '@/features/resume/form-types';
 
-export type ContactLinks = Partial<
-    Pick<ResumeFormValues['personalInfo'], 'website' | 'github' | 'linkedin'>
->;
+// The contact fields a link annotation can fill.
+export const CONTACT_LINK_KINDS = ['website', 'github', 'linkedin'] as const;
+
+export type ContactLinkKind = (typeof CONTACT_LINK_KINDS)[number];
+
+export type ContactLinks = Partial<Pick<ResumeFormValues['personalInfo'], ContactLinkKind>>;
 
 const GITHUB = /^https?:\/\/(www\.)?github\.com\//i;
 const LINKEDIN = /^https?:\/\/([a-z]{2,3}\.|www\.)?linkedin\.com\//i;

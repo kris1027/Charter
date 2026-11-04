@@ -1,18 +1,20 @@
 import type { TextLine, TextRun } from '@/features/pdf/import/text-lines';
 
-type LineOptions = { size?: number; x?: number; page?: number };
+type LineOptions = { size?: number; x?: number; y?: number; page?: number };
 
 // A width per character close enough for tests; real widths come from the font.
 const CHAR = 0.5;
 
+const TOP = 800;
+const LEADING = 12;
+
 /**
  * A text line as buildTextLines would return it: each cell one run, cells far apart, word
- * spaces inside a cell. Lines get descending y in the order they are made, like a page.
+ * spaces inside a cell. The readers never look at y; `lines` sets it so a page reads top down.
  */
-let nextY = 800;
 export const line = (
     cells: string | string[],
-    { size = 9, x = 20, page = 1 }: LineOptions = {},
+    { size = 9, x = 20, y = TOP, page = 1 }: LineOptions = {},
 ) => {
     const runs: TextRun[] = [];
     let at = x;
@@ -25,8 +27,9 @@ export const line = (
         runs.push({ text, x: at, width, fontSize: size });
         at += width;
     }
-    nextY -= 12;
-    return { y: nextY, page, runs } satisfies TextLine;
+    return { y, page, runs } satisfies TextLine;
 };
 
-export const lines = (...texts: (string | string[])[]) => texts.map((t) => line(t));
+// Lines of one page, top to bottom.
+export const lines = (...texts: (string | string[])[]) =>
+    texts.map((t, i) => line(t, { y: TOP - LEADING * (i + 1) }));

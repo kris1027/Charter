@@ -4,16 +4,16 @@ import { formatGithubDisplay, formatLinkedinDisplay, formatWebsiteDisplay } from
 import type { ContactKind } from '@/features/templates/model/template-layouts';
 import { TEMPLATE_LAYOUTS } from '@/features/templates/model/template-layouts';
 import { contactFromLinkUrls } from '@/features/pdf/import/contact-links';
+import type { ContactLinkKind } from '@/features/pdf/import/contact-links';
 import { lineSize } from '@/features/pdf/import/readers/shared';
 import { cells, lineText } from '@/features/pdf/import/text-lines';
 import type { TextLine } from '@/features/pdf/import/text-lines';
 
 type PersonalInfo = ResumeFormValues['personalInfo'];
-type LinkKind = 'website' | 'github' | 'linkedin';
 
 export type HeaderCtx = { templateId: TemplateId; linkUrls: readonly string[] };
 
-const DISPLAY: Record<LinkKind, (url: string) => string> = {
+const DISPLAY: Record<ContactLinkKind, (url: string) => string> = {
     website: formatWebsiteDisplay,
     github: formatGithubDisplay,
     linkedin: formatLinkedinDisplay,
@@ -33,7 +33,7 @@ const FITS: Record<ContactKind, (text: string) => boolean> = {
 };
 
 // A printed handle or address back into the URL the form stores.
-const REBUILD: Record<LinkKind, (text: string) => string> = {
+const REBUILD: Record<ContactLinkKind, (text: string) => string> = {
     website: (text) => (/^https?:\/\//iu.test(text) ? text : `https://${text}`),
     github: (handle) => `https://github.com/${handle}`,
     linkedin: (handle) => `https://linkedin.com/in/${handle}`,
@@ -80,7 +80,7 @@ export function readHeader(lines: readonly TextLine[], ctx: HeaderCtx): Personal
         if (!info.email && text.includes('@')) info.email = text;
         else if (!info.phone && isPhone(text)) info.phone = text;
         else {
-            const kind = (Object.keys(links) as LinkKind[]).find((k) => {
+            const kind = (Object.keys(links) as ContactLinkKind[]).find((k) => {
                 const url = links[k];
                 return url !== undefined && (DISPLAY[k](url) === text || url === text);
             });
@@ -98,7 +98,8 @@ export function readHeader(lines: readonly TextLine[], ctx: HeaderCtx): Personal
             : TEMPLATE_LAYOUTS[ctx.templateId].contactRows
                   .flat()
                   .filter(
-                      (kind): kind is LinkKind | 'location' => kind !== 'email' && kind !== 'phone',
+                      (kind): kind is ContactLinkKind | 'location' =>
+                          kind !== 'email' && kind !== 'phone',
                   )
                   .filter((kind) => !info[kind]);
     let k = 0;
