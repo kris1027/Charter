@@ -1,4 +1,5 @@
 import { getPDFStrings } from '@/features/templates/model/template-strings';
+import { detectLayout } from '@/features/pdf/import/detect-layout';
 import { splitSections } from '@/features/pdf/import/split-sections';
 import { lineText } from '@/features/pdf/import/text-lines';
 import type { TextLine } from '@/features/pdf/import/text-lines';
@@ -60,6 +61,65 @@ describe('splitSections', () => {
         expect(texts(slices.sections.languages)).toEqual(['Polski Ojczysty']);
         expect(texts(slices.footer)).toEqual(clause);
     });
+
+    // Ported from the old parser: each template's Polish headers, as the template prints them.
+    it.each([
+        [
+            'developer',
+            [
+                '// DOŚWIADCZENIE ZAWODOWE',
+                '// WYKSZTAŁCENIE',
+                '// TECHNOLOGIE',
+                '// JĘZYKI',
+                '// ZAINTERESOWANIA',
+            ],
+        ],
+        [
+            'default',
+            [
+                'DOŚWIADCZENIE ZAWODOWE',
+                'WYKSZTAŁCENIE',
+                'KLUCZOWE KOMPETENCJE',
+                'JĘZYKI',
+                'ZAINTERESOWANIA',
+            ],
+        ],
+        [
+            'veterinary',
+            [
+                'Doświadczenie zawodowe',
+                'Wykształcenie',
+                'Umiejętności',
+                'Języki',
+                'ZAINTERESOWANIA',
+            ],
+        ],
+    ] as const)(
+        'should find the experience section when the %s export is in Polish',
+        (templateId, headers) => {
+            const page = lines(
+                'Anna Kowalska',
+                headers[0],
+                'TechPol | Senior Developer',
+                '• Prowadzenie zespołu',
+                headers[1],
+                'Informatyka',
+                headers[2],
+                'TypeScript',
+                headers[3],
+                'Polski Ojczysty',
+                headers[4],
+                'Szachy',
+            );
+            const detected = detectLayout(page);
+            expect(detected).toMatchObject({ templateId, lang: 'pl' });
+            const slices = splitSections(page, detected!);
+            expect(texts(slices.sections.experience)).toEqual([
+                'TechPol | Senior Developer',
+                '• Prowadzenie zespołu',
+            ]);
+        },
+    );
 
     describe('older veterinary exports', () => {
         const vet = lines(
