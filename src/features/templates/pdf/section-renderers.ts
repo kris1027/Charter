@@ -1,14 +1,8 @@
 import type { ReactNode } from 'react';
-import type { AppLang } from '@/lib/app-lang';
 import type { SectionId } from '@/features/templates/model/section-ids';
 import type { ResumeView } from '@/features/templates/model/resume-view';
 
-export type RenderCtx<S> = {
-    lang: AppLang;
-    compactScale: number;
-    styles: S;
-    contactIconColor: string;
-};
+export type RenderCtx<S> = { styles: S };
 
 // One renderer per section; `satisfies SectionRenderers<…>` fails the build when one is missing.
 export type SectionRenderers<S> = {

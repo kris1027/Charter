@@ -1,21 +1,21 @@
 import '@/features/templates/pdf/pdf-fonts';
 import { Fragment } from 'react';
-import { View, Text, Link, StyleSheet } from '@react-pdf/renderer';
+import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/features/resume/form-types';
 import type { AppLang } from '@/lib/app-lang';
 import { buildResumeView } from '@/features/templates/model/resume-view';
 import { TEMPLATE_LAYOUTS } from '@/features/templates/model/template-layouts';
-import { CONTACT_ICONS } from '@/features/templates/pdf/pdf-icons';
+import { ContactRows } from '@/features/templates/pdf/contact-rows';
 import { lerp } from '@/features/templates/pdf/pdf-scale';
 import { ResumeDocument } from '@/features/templates/pdf/resume-document';
 import { renderSection } from '@/features/templates/pdf/section-renderers';
 import type { RenderCtx, SectionRenderers } from '@/features/templates/pdf/section-renderers';
 
-interface VeterinaryPDFProps {
+type VeterinaryPDFProps = {
     data: ResumeData;
     compactScale?: number; // 0 = normal, 1 = maximum compact
     lang?: AppLang;
-}
+};
 
 const C = {
     white: '#FFFFFF',
@@ -252,11 +252,10 @@ const renderers = {
     ),
 } satisfies SectionRenderers<Styles>;
 
-export function VeterinaryPDF({ data, compactScale = 0, lang = 'en' }: VeterinaryPDFProps) {
+export const VeterinaryPDF = ({ data, compactScale = 0, lang = 'en' }: VeterinaryPDFProps) => {
     const styles = createStyles(compactScale);
-    const iconSize = lerp(9, 7, compactScale);
     const view = buildResumeView('veterinary', data, lang);
-    const ctx: RenderCtx<Styles> = { lang, compactScale, styles, contactIconColor: C.gray600 };
+    const ctx: RenderCtx<Styles> = { styles };
 
     return (
         <ResumeDocument
@@ -271,25 +270,14 @@ export function VeterinaryPDF({ data, compactScale = 0, lang = 'en' }: Veterinar
                     {view.name.first} {view.name.last}
                 </Text>
                 {view.title ? <Text style={styles.headerTitle}>{view.title}</Text> : null}
-                {view.contactRows.map((row, i) => (
-                    <View key={i} style={styles.contactRow}>
-                        {row.map((item) => {
-                            const Icon = CONTACT_ICONS[item.kind];
-                            return (
-                                <View key={item.kind} style={styles.contactItem}>
-                                    <Icon size={iconSize} color={ctx.contactIconColor} />
-                                    {item.href ? (
-                                        <Link src={item.href} style={styles.contactLink}>
-                                            {item.text}
-                                        </Link>
-                                    ) : (
-                                        <Text style={styles.contactLink}>{item.text}</Text>
-                                    )}
-                                </View>
-                            );
-                        })}
-                    </View>
-                ))}
+                <ContactRows
+                    rows={view.contactRows}
+                    rowStyle={styles.contactRow}
+                    itemStyle={styles.contactItem}
+                    textStyle={styles.contactLink}
+                    iconSize={lerp(9, 7, compactScale)}
+                    iconColor={C.gray600}
+                />
             </View>
 
             <View style={styles.body}>
@@ -301,4 +289,4 @@ export function VeterinaryPDF({ data, compactScale = 0, lang = 'en' }: Veterinar
             {view.gdpr ? <Text style={styles.gdpr}>{view.gdpr}</Text> : null}
         </ResumeDocument>
     );
-}
+};

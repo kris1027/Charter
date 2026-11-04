@@ -1,21 +1,21 @@
 import '@/features/templates/pdf/pdf-fonts';
 import { Fragment } from 'react';
-import { View, Text, Link, StyleSheet } from '@react-pdf/renderer';
+import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/features/resume/form-types';
 import type { AppLang } from '@/lib/app-lang';
 import { buildResumeView } from '@/features/templates/model/resume-view';
 import { TEMPLATE_LAYOUTS } from '@/features/templates/model/template-layouts';
-import { CONTACT_ICONS } from '@/features/templates/pdf/pdf-icons';
+import { ContactRows } from '@/features/templates/pdf/contact-rows';
 import { lerp } from '@/features/templates/pdf/pdf-scale';
 import { ResumeDocument } from '@/features/templates/pdf/resume-document';
 import { renderSection } from '@/features/templates/pdf/section-renderers';
 import type { RenderCtx, SectionRenderers } from '@/features/templates/pdf/section-renderers';
 
-interface DeveloperPDFProps {
+type DeveloperPDFProps = {
     data: ResumeData;
     compactScale?: number; // 0 = normal, 1 = maximum compact
     lang?: AppLang;
-}
+};
 
 const C = {
     purple: '#7C3AED',
@@ -207,11 +207,10 @@ const renderers = {
     ),
 } satisfies SectionRenderers<Styles>;
 
-export function DeveloperPDF({ data, compactScale = 0, lang = 'en' }: DeveloperPDFProps) {
+export const DeveloperPDF = ({ data, compactScale = 0, lang = 'en' }: DeveloperPDFProps) => {
     const styles = createStyles(compactScale);
-    const iconSize = lerp(9, 8, compactScale);
     const view = buildResumeView('developer', data, lang);
-    const ctx: RenderCtx<Styles> = { lang, compactScale, styles, contactIconColor: C.white };
+    const ctx: RenderCtx<Styles> = { styles };
 
     return (
         <ResumeDocument
@@ -226,25 +225,14 @@ export function DeveloperPDF({ data, compactScale = 0, lang = 'en' }: DeveloperP
                     {view.name.first} {view.name.last}
                 </Text>
                 {view.title ? <Text style={styles.headerTitle}>{view.title}</Text> : null}
-                {view.contactRows.map((row, i) => (
-                    <View key={i} style={styles.headerRow}>
-                        {row.map((item) => {
-                            const Icon = CONTACT_ICONS[item.kind];
-                            return (
-                                <View key={item.kind} style={styles.contactItem}>
-                                    <Icon size={iconSize} color={ctx.contactIconColor} />
-                                    {item.href ? (
-                                        <Link src={item.href} style={styles.headerLink}>
-                                            {item.text}
-                                        </Link>
-                                    ) : (
-                                        <Text style={styles.headerLink}>{item.text}</Text>
-                                    )}
-                                </View>
-                            );
-                        })}
-                    </View>
-                ))}
+                <ContactRows
+                    rows={view.contactRows}
+                    rowStyle={styles.headerRow}
+                    itemStyle={styles.contactItem}
+                    textStyle={styles.headerLink}
+                    iconSize={lerp(9, 8, compactScale)}
+                    iconColor={C.white}
+                />
             </View>
 
             <View style={styles.body}>
@@ -256,4 +244,4 @@ export function DeveloperPDF({ data, compactScale = 0, lang = 'en' }: DeveloperP
             {view.gdpr ? <Text style={styles.gdpr}>{view.gdpr}</Text> : null}
         </ResumeDocument>
     );
-}
+};

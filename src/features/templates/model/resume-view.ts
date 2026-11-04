@@ -60,13 +60,13 @@ export const buildResumeView = (
     lang: AppLang,
 ): ResumeView => {
     const layout = TEMPLATE_LAYOUTS[templateId];
-    const str = getPDFStrings(lang);
-    const p = data.personalInfo;
+    const strings = getPDFStrings(lang);
+    const personal = data.personalInfo;
     const formatDate = layout.dateStyle === 'long' ? formatCVDate : formatCVDateShort;
     const title = (id: keyof ResumeView['sections']) => printedTitle(templateId, id, lang);
 
     const contact = (kind: ContactKind): ContactItem | null => {
-        const value = p[kind];
+        const value = personal[kind];
         if (!value) return null;
         switch (kind) {
             case 'location':
@@ -91,8 +91,8 @@ export const buildResumeView = (
     const gdpr = data.gdprConsent;
 
     return {
-        name: { first: p.firstName, last: p.lastName },
-        title: p.title,
+        name: { first: personal.firstName, last: personal.lastName },
+        title: personal.title,
         // Empty rows stay: the templates draw every row, and a row's margin is part of the look.
         contactRows: layout.contactRows.map((row) =>
             row.map(contact).filter((item) => item !== null),
@@ -105,7 +105,7 @@ export const buildResumeView = (
                     company: exp.company,
                     location: exp.location,
                     start: formatDate(exp.startDate, lang),
-                    end: exp.current ? str.present : formatDate(exp.endDate, lang),
+                    end: exp.current ? strings.present : formatDate(exp.endDate, lang),
                     bullets: parseDescriptionLines(exp.description),
                 })),
             },
@@ -125,7 +125,7 @@ export const buildResumeView = (
                 title: title('languages'),
                 items: data.languages.map((l) => ({
                     name: l.language,
-                    level: l.proficiency === 'NATIVE' ? str.native : l.proficiency,
+                    level: l.proficiency === 'NATIVE' ? strings.native : l.proficiency,
                 })),
             },
             interests: { title: title('interests'), items: data.interests.map((i) => i.name) },
@@ -133,7 +133,7 @@ export const buildResumeView = (
         gdpr: !gdpr?.enabled
             ? null
             : gdpr.companyName?.trim()
-              ? str.gdprConsent(gdpr.companyName)
-              : str.gdprConsentGeneric,
+              ? strings.gdprConsent(gdpr.companyName)
+              : strings.gdprConsentGeneric,
     };
 };
