@@ -43,7 +43,8 @@ export function buildTextLines(items: readonly object[], page: number): TextLine
         .map(([y, runs]) => ({ y, page, runs: runs.sort((a, b) => a.x - b.x) }));
 }
 
-const collapse = (text: string) => text.replace(/\s+/g, ' ').trim();
+// Whitespace runs closed up to single spaces, ends trimmed.
+export const collapse = (text: string) => text.replace(/\s+/gu, ' ').trim();
 
 // The line as one string: runs joined as printed, whitespace collapsed.
 export const lineText = (line: TextLine): string => collapse(line.runs.map((r) => r.text).join(''));

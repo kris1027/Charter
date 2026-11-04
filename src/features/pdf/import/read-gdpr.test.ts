@@ -1,5 +1,5 @@
 import { getPDFStrings } from '@/features/templates/model/template-strings';
-import { readGdpr } from '@/features/pdf/import/read-gdpr';
+import { findGdprStart, readGdpr } from '@/features/pdf/import/read-gdpr';
 import { lines } from '@/test/pdf-lines';
 
 // The clause wrapped onto two lines at a word boundary, as the templates print it.
@@ -31,5 +31,20 @@ describe('readGdpr', () => {
             enabled: false,
             companyName: '',
         });
+    });
+});
+
+describe('findGdprStart', () => {
+    it('should find the first clause line when the clause ends the PDF', () => {
+        const page = [
+            ...lines('Jan', 'Running'),
+            ...wrapped(getPDFStrings('en').gdprConsent('Acme')),
+        ];
+        expect(findGdprStart(page, 0, 'en')).toBe(2);
+    });
+
+    it('should find nothing when a line only opens with the same words', () => {
+        const page = lines('Jan', 'I hereby give my consent to nothing', 'Running');
+        expect(findGdprStart(page, 0, 'en')).toBe(-1);
     });
 });

@@ -1,26 +1,14 @@
 import type { SectionId } from '@/features/templates/model/section-ids';
 import { SECTION_IDS } from '@/features/templates/model/section-ids';
-import { getPDFStrings } from '@/features/templates/model/template-strings';
 import type { Detected } from '@/features/pdf/import/detect-layout';
+import { findGdprStart } from '@/features/pdf/import/read-gdpr';
 import { findHeaderIndex } from '@/features/pdf/import/section-headers';
-import { lineText } from '@/features/pdf/import/text-lines';
 import type { TextLine } from '@/features/pdf/import/text-lines';
 
 export type SectionSlices = {
     header: TextLine[];
     sections: Partial<Record<SectionId, TextLine[]>>;
     footer: TextLine[];
-};
-
-// The words the GDPR clause starts with, the same in its company and generic forms.
-const gdprOpening = (detected: Detected) => {
-    const strings = getPDFStrings(detected.lang);
-    const generic = strings.gdprConsentGeneric;
-    const withCompany = strings.gdprConsent('\u0000');
-    let i = 0;
-    while (i < generic.length && generic[i] === withCompany[i]) i++;
-    // A few words are enough to tell the clause from resume text.
-    return generic.slice(0, i).split(' ').slice(0, 3).join(' ');
 };
 
 /**
@@ -37,10 +25,7 @@ export function splitSections(lines: readonly TextLine[], detected: Detected): S
         .sort((a, b) => a.index - b.index);
 
     const firstHeader = found[0]?.index ?? lines.length;
-    const opening = gdprOpening(detected);
-    const footerStart = lines.findIndex(
-        (line, i) => i > firstHeader && lineText(line).startsWith(opening),
-    );
+    const footerStart = findGdprStart(lines, firstHeader, detected.lang);
     const end = footerStart >= 0 ? footerStart : lines.length;
 
     const sections: SectionSlices['sections'] = {};
