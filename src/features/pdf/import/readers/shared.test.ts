@@ -14,6 +14,15 @@ describe('readTags', () => {
             { name: 'Go' },
         ]);
     });
+
+    it('should keep a multi word tag whole when it arrives as word runs on the first line', () => {
+        const runs = [
+            { text: 'React', x: 20, width: 15, fontSize: 9 },
+            { text: ' ', x: 35, width: 3, fontSize: 9 },
+            { text: 'Native', x: 38, width: 18, fontSize: 9 },
+        ];
+        expect(readTags([{ y: 700, page: 1, runs }])).toEqual([{ name: 'React Native' }]);
+    });
 });
 
 describe('readLanguages', () => {

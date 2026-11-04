@@ -1,17 +1,18 @@
-import type { AppLang } from '@/lib/app-lang';
 import type { ResumeFormValues } from '@/features/resume/form-types';
+import type { ReaderCtx } from '@/features/pdf/import/readers';
 import { readLevel } from '@/features/pdf/import/readers/dates';
 import { cells, lineText } from '@/features/pdf/import/text-lines';
 import type { TextLine, TextRun } from '@/features/pdf/import/text-lines';
 
 // Tags (skills, interests): every cell is one item, so `React Native` stays one.
+// `cells` is wrapped so flatMap's index never lands in its `gap` parameter.
 export const readTags = (lines: readonly TextLine[]): { name: string }[] =>
-    lines.flatMap(cells).map((name) => ({ name }));
+    lines.flatMap((line) => cells(line)).map((name) => ({ name }));
 
 // One language per line: the name in the first cell, the level in the last.
 export const readLanguages = (
     lines: readonly TextLine[],
-    { lang }: { lang: AppLang },
+    { lang }: ReaderCtx,
 ): ResumeFormValues['languages'] =>
     lines.flatMap((line) => {
         const parts = cells(line);
@@ -56,7 +57,7 @@ export function readBullets(
     return { bullets, end: i };
 }
 
-// `a | b` split at the first `|`; the second part is '' without one.
+// The text split at the first `separator`, both parts trimmed; the second is '' without one.
 export const splitAt = (text: string, separator: string): [string, string] => {
     const i = text.indexOf(separator);
     return i < 0
