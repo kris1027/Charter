@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { loadResumeFromPDF } from '@/features/pdf/pdf-parser';
+import { loadResumeFromPDF } from '@/features/pdf/import/load-resume';
+import { PdfImportError } from '@/features/pdf/import/pdf-import-error';
 import type { ResumeFormValues } from '@/features/resume/form-types';
 import { normalizeResume, writeResume } from '@/features/resume/stored-resume';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
@@ -60,7 +61,12 @@ export const usePdfImport = ({ form, activeTemplateId }: UsePdfImportOptions) =>
             form.reset(newValues, { keepDefaultValues: true });
         } catch (err) {
             if (import.meta.env.DEV) console.error('Error loading PDF:', err);
-            setError(err instanceof Error ? err.message : t('dialogs.pdfError.unexpected'));
+            // Never a raw err.message: only translated, known reasons reach the dialog
+            setError(
+                err instanceof PdfImportError
+                    ? t(`dialogs.pdfError.${err.code}`)
+                    : t('dialogs.pdfError.unexpected'),
+            );
         } finally {
             setIsLoading(false);
             resetInput();

@@ -42,7 +42,7 @@ type FixturesModule = {
     FIXTURE_IDS: readonly string[];
     getPreviewFixture: (fixtureId: string, templateId: string, lang: Lang) => ResumeData;
 };
-type TextLinesModule = { buildTextLines: (items: readonly object[]) => string[] };
+type TextLinesModule = { buildTextLineStrings: (items: readonly object[]) => string[] };
 type RendererModule = { renderToBuffer: (element: unknown) => Promise<Uint8Array> };
 type ReactModule = { createElement: (type: unknown, props: object) => unknown };
 
@@ -149,8 +149,8 @@ try {
             writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 4)}\n`);
             console.log(`wrote ${relative(root, manifestPath)}`);
         } else {
-            const { buildTextLines } = await load<TextLinesModule>(
-                '/src/features/pdf/pdf-text-lines.ts',
+            const { buildTextLineStrings } = await load<TextLinesModule>(
+                '/src/features/pdf/import/text-lines.ts',
             );
 
             const snapshot = async (pdf: PdfDocument): Promise<RenderSnapshot> => {
@@ -158,7 +158,7 @@ try {
                 const links: string[] = [];
                 for (let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
-                    lines.push(...buildTextLines((await page.getTextContent()).items));
+                    lines.push(...buildTextLineStrings((await page.getTextContent()).items));
                     for (const annotation of await page.getAnnotations()) {
                         if (annotation.subtype === 'Link' && annotation.url)
                             links.push(annotation.url);

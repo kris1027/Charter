@@ -2,12 +2,13 @@ import { act } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import BuilderPage from '@/features/builder/builder-page';
-import { loadResumeFromPDF } from '@/features/pdf/pdf-parser';
+import { loadResumeFromPDF } from '@/features/pdf/import/load-resume';
+import { PdfImportError } from '@/features/pdf/import/pdf-import-error';
 import type { ResumeFormValues } from '@/features/resume/form-types';
 import { EMPTY_GDPR_CONSENT, EMPTY_PERSONAL_INFO } from '@/features/resume/stored-resume';
 import { renderWithRouter, screen, userEvent, waitFor } from '@/test/test-utils';
 
-vi.mock('@/features/pdf/pdf-parser', () => ({ loadResumeFromPDF: vi.fn() }));
+vi.mock('@/features/pdf/import/load-resume', () => ({ loadResumeFromPDF: vi.fn() }));
 
 // Characterization suite (spec 0005, AC-1): written against the old page, kept unchanged
 // through the split. Later steps only add cases.
@@ -290,7 +291,7 @@ describe('BuilderPage', () => {
         await waitFor(() => expect(storedResume().templateId).toBe('veterinary'));
     });
 
-    it('should show the error message when the PDF import fails', async () => {
+    it('should show the generic message and never the raw error when the PDF import fails', async () => {
         const user = userEvent.setup();
         vi.mocked(loadResumeFromPDF).mockRejectedValue(new Error('Not a resume PDF'));
         vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -298,9 +299,32 @@ describe('BuilderPage', () => {
 
         await user.upload(fileInput(), pdfFile());
 
-        expect(await screen.findByText('Not a resume PDF')).toBeInTheDocument();
+        expect(
+            await screen.findByText('An unexpected error occurred while loading the PDF.'),
+        ).toBeInTheDocument();
+        expect(screen.queryByText('Not a resume PDF')).not.toBeInTheDocument();
         expect(screen.getByText('Unable to Load PDF')).toBeInTheDocument();
     });
+
+    it.each([
+        ['unrecognized', 'does not look like a resume made with Resume Builder'],
+        ['password', 'is password protected'],
+        ['invalid', 'could not be opened as a PDF'],
+    ] as const)(
+        'should show the translated reason and keep the resume when the import fails with %s',
+        async (code, message) => {
+            const user = userEvent.setup();
+            vi.mocked(loadResumeFromPDF).mockRejectedValue(new PdfImportError(code));
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+            await renderWithRouter(BuilderPage);
+            await user.type(firstNameInput(), 'Kept');
+
+            await user.upload(fileInput(), pdfFile());
+
+            expect(await screen.findByText(new RegExp(message))).toBeInTheDocument();
+            expect(firstNameInput()).toHaveValue('Kept');
+        },
+    );
 
     it('should unlock Preview when the required fields are filled', async () => {
         const user = userEvent.setup();

@@ -36,7 +36,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 6   | Design system refresh           | Foundation | done     |
 | 7   | Builder page split              | Slice 1    | done     |
 | 8   | Shared template model           | Slice 1    | done     |
-| 9   | PDF import parser restructure   | Slice 1    | planned  |
+| 9   | PDF import parser restructure   | Slice 1    | done     |
 | 10  | Lazy load heavy engines         | Slice 2    | planned  |
 | 11  | Builder responsiveness          | Slice 2    | planned  |
 | 12  | Landing page refresh            | Slice 3    | planned  |
@@ -221,12 +221,18 @@ spec [0006](../specs/0006-shared-template-model/index.md) · code in `src/featur
     - [x] Developer and veterinary on the model, parser reads model titles (AC-4, AC-6, AC-8)
     - [x] Detail page through TemplatePDF, docs and final pre-commit (AC-12, AC-13)
 
-### 9. PDF import parser restructure · needs a decision
+### 9. PDF import parser restructure · done
 
 Split the 872 line parser into small, testable steps (extract text, detect template, map sections) so it is easier to extend when templates change.
 **Done when:** each step is its own module with tests, and PDFs exported by all three templates still import correctly.
+spec [0007](../specs/0007-pdf-import-parser/index.md) · code in `src/features/pdf/import/`
 
-- [ ] Design it (spec): `/architect pdf import parser`
+- [x] Design it (spec): `/architect pdf import parser`
+- [x] Build it: `/develop pdf import parser`
+    - [x] Round trip harness, one open, text runs, detect and split, developer readers live behind the new entry (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-9, AC-11, AC-12)
+    - [x] Default and veterinary readers, bridge removed (AC-7, AC-11)
+    - [x] Polish dates and levels, GDPR recovery, typed translated errors (AC-6, AC-8, AC-10, AC-11)
+    - [x] Old parser deleted, context files updated, final pre-commit (AC-12, AC-13)
 
 ## Slice 2: Make it fast
 

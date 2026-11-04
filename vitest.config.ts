@@ -2,6 +2,9 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 import { reactPlugins } from './react-plugins.ts';
 
+// Real PDF renders (react-pdf plus pdfjs) run in Node in their own project (spec 0007, AC-11).
+const PDF_TESTS = 'src/**/*.pdf.test.{ts,tsx}';
+
 export default defineConfig({
     plugins: reactPlugins(),
     resolve: {
@@ -15,9 +18,34 @@ export default defineConfig({
     },
     test: {
         globals: true,
-        environment: 'jsdom',
         setupFiles: ['./src/test/setup.ts'],
-        include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts', 'eslint.config.test.ts'],
+        projects: [
+            {
+                extends: true,
+                test: {
+                    name: 'unit',
+                    environment: 'jsdom',
+                    include: [
+                        'src/**/*.test.{ts,tsx}',
+                        'scripts/**/*.test.ts',
+                        'eslint.config.test.ts',
+                    ],
+                    exclude: [PDF_TESTS],
+                },
+            },
+            {
+                extends: true,
+                test: {
+                    name: 'pdf',
+                    environment: 'node',
+                    // Absolute public/ base, so pdf-fonts.ts reads the fonts from disk like the
+                    // preview script (a project level Vite `base` does not reach import.meta.env).
+                    env: { BASE_URL: `${resolve(import.meta.dirname, 'public')}/` },
+                    testTimeout: 60000,
+                    include: [PDF_TESTS],
+                },
+            },
+        ],
         coverage: {
             provider: 'v8',
             include: ['src/**/*.{ts,tsx}'],
