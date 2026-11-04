@@ -71,11 +71,13 @@ From the first green `lighthouse` run on `main`: CI run `41433413867` at `cb2f29
 | ---------------------- | ----------- | ----------- | -------------- | ----------- |
 | `/`                    | 1.00 / 0.98 | 1.00 / 0.98 | 1.00 / 0.98    | 1.00 / 0.98 |
 | `/templates`           | 0.98 / 0.96 | 1.00 / 0.98 | 1.00 / 0.98    | 0.92 / 0.90 |
-| `/templates/developer` | 0.78 / 0.76 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
+| `/templates/developer` | 0.78 / 0.68 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
 | `/builder`             | 0.99 / 0.97 | 0.92 / 0.90 | 0.96 / 0.94    | 0.92 / 0.90 |
-| `/preview`             | 0.72 / 0.70 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
+| `/preview`             | 0.72 / 0.62 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
 
 The medians are the true median of the 3 runs, the value LHCI's `aggregationMethod: 'median'` asserts against. They match the job summary except `/templates` performance: its runs scored 0.89, 0.98 and 0.99, the summary shows LHCI's representative run (0.99), and the median is 0.98.
+
+Performance on `/templates/developer` and `/preview` uses a 0.10 margin instead. Both pages render a PDF, and their score swings more than 0.02 between CI runners on the same code: `/templates/developer` scored 0.79 on `main` at `05e8d43` and 0.74 a few minutes later on PR #98, which changed only config, and `/preview` scored 0.73 and 0.71.
 
 ### Builder render cost (informational)
 

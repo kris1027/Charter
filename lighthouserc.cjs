@@ -1,4 +1,5 @@
-// Lighthouse CI config (spec 0003). Floors are each page's first CI median minus 0.02.
+// Lighthouse CI config (spec 0003). Floors are each page's first CI median minus 0.02,
+// except performance on the two PDF pages, which is minus 0.10 (runner noise; see rationale).
 // Raise a floor only together with the baseline table in docs/specs/0003-performance-budgets/rationale.md.
 const PORT = 4173;
 const ORIGIN = `http://localhost:${PORT}`;
@@ -8,13 +9,13 @@ const floors = {
     '/': { performance: 0.98, accessibility: 0.98, 'best-practices': 0.98, seo: 0.98 },
     '/templates': { performance: 0.96, accessibility: 0.98, 'best-practices': 0.98, seo: 0.9 },
     '/templates/developer': {
-        performance: 0.76,
+        performance: 0.68,
         accessibility: 0.93,
         'best-practices': 0.98,
         seo: 0.9,
     },
     '/builder': { performance: 0.97, accessibility: 0.9, 'best-practices': 0.94, seo: 0.9 },
-    '/preview': { performance: 0.7, accessibility: 0.93, 'best-practices': 0.98, seo: 0.9 },
+    '/preview': { performance: 0.62, accessibility: 0.93, 'best-practices': 0.98, seo: 0.9 },
 };
 
 const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
