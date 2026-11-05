@@ -275,6 +275,29 @@ describe('BuilderPage', () => {
         expect(screen.getByText('Go')).toBeInTheDocument();
     });
 
+    // Spec 0009, AC-2: the lists follow only their length, so the fields must follow the values
+    it('should show the new values in every field when the import keeps the list lengths', async () => {
+        const user = userEvent.setup();
+        storeResume(
+            resume({
+                experiences: [experience('Old A'), experience('Old B')],
+                languages: [{ language: 'Old', proficiency: 'A1' }],
+            }),
+        );
+        vi.mocked(loadResumeFromPDF).mockResolvedValue(
+            resume({
+                experiences: [experience('New A'), experience('New B')],
+                languages: [{ language: 'New', proficiency: 'C2' }],
+            }),
+        );
+        await renderWithRouter(BuilderPage);
+
+        await user.upload(fileInput(), pdfFile());
+
+        await waitFor(() => expect(valuesOf('Company')).toEqual(['New A', 'New B']));
+        expect(valuesOf('Language')).toEqual(['New']);
+    });
+
     it('should fall back to the active template when the imported PDF names an unknown one', async () => {
         const user = userEvent.setup();
         // Embedded JSON is untyped at runtime, so a PDF can carry a template that no longer exists

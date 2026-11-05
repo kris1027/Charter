@@ -70,11 +70,12 @@ export const LanguagesSection = withForm({
                             </Button>
                         }
                     >
-                        {/* Array mode rerenders only on its helpers; this also catches form.reset */}
-                        <form.Subscribe selector={(state) => state.values.languages}>
-                            {(items) => (
+                        {/* Only the length: a card reads its own fields, so typing redraws one field. Array
+                            mode rerenders only on its helpers; this also catches form.reset */}
+                        <form.Subscribe selector={(state) => state.values.languages.length}>
+                            {(count) => (
                                 <div className='space-y-4'>
-                                    {items.length === 0 && (
+                                    {count === 0 && (
                                         <ListEmptyState
                                             icon={Globe}
                                             iconGradient='from-cyan-500 to-blue-600'
@@ -82,15 +83,15 @@ export const LanguagesSection = withForm({
                                             hint={t('sections.languages.emptyHint')}
                                         />
                                     )}
-                                    {items.length > 0 && (
+                                    {count > 0 && (
                                         <SortableList
-                                            items={items}
+                                            count={count}
                                             idPrefix='language'
                                             strategy='vertical'
                                             onMove={field.moveValue}
                                             className='space-y-4'
                                         >
-                                            {(_, index, id) => (
+                                            {(index, id) => (
                                                 <LanguageItem
                                                     key={id}
                                                     form={form}

@@ -104,11 +104,12 @@ export const ExperienceSection = withForm({
                             </Button>
                         }
                     >
-                        {/* Array mode rerenders only on its helpers; this also catches form.reset */}
-                        <form.Subscribe selector={(state) => state.values.experiences}>
-                            {(items) => (
+                        {/* Only the length: a card reads its own fields, so typing redraws one field. Array
+                            mode rerenders only on its helpers; this also catches form.reset */}
+                        <form.Subscribe selector={(state) => state.values.experiences.length}>
+                            {(count) => (
                                 <div className='space-y-6'>
-                                    {items.length === 0 && (
+                                    {count === 0 && (
                                         <ListEmptyState
                                             icon={Briefcase}
                                             iconGradient='from-emerald-500 to-teal-600'
@@ -116,15 +117,15 @@ export const ExperienceSection = withForm({
                                             hint={t('sections.experience.emptyHint')}
                                         />
                                     )}
-                                    {items.length > 0 && (
+                                    {count > 0 && (
                                         <SortableList
-                                            items={items}
+                                            count={count}
                                             idPrefix='experience'
                                             strategy='vertical'
                                             onMove={field.moveValue}
                                             className='space-y-6'
                                         >
-                                            {(_, index, id) => (
+                                            {(index, id) => (
                                                 <ExperienceItem
                                                     key={id}
                                                     form={form}
