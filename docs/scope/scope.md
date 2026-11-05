@@ -38,7 +38,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 8   | Shared template model           | Slice 1    | done     |
 | 9   | PDF import parser restructure   | Slice 1    | done     |
 | 10  | Lazy load heavy engines         | Slice 2    | done     |
-| 11  | Builder responsiveness          | Slice 2    | planned  |
+| 11  | Builder responsiveness          | Slice 2    | done     |
 | 12  | Landing page refresh            | Slice 3    | planned  |
 | 13  | Template gallery refresh        | Slice 3    | planned  |
 | 14  | Builder UI refresh              | Slice 3    | planned  |
@@ -248,12 +248,19 @@ spec [0008](../specs/0008-lazy-load-heavy-engines/index.md) · code in `src/app/
     - [x] Motion load failure and stall fallback (AC-5, AC-6)
     - [x] Lint guard and engine leak check in `perf:size` (AC-7, AC-8)
 
-### 11. Builder responsiveness · needs a decision
+### 11. Builder responsiveness · done
 
-Keep typing and the live preview smooth on long resumes: fewer rerenders, cheaper autosave, preview that never blocks input.
-**Done when:** typing in any field on a long sample resume shows no dropped frames in a profile, and autosave never runs on every keystroke.
+Keep typing smooth on long resumes and add a live PDF preview beside the form: fewer rerenders, autosave that also saves on hide, a preview built in a worker that never blocks input.
+**Done when:** typing in any field on a long sample resume shows no dropped frames in a profile, autosave never runs on every keystroke, and the live preview updates without blocking input.
+spec [0009](../specs/0009-builder-responsiveness/index.md) · code in `src/features/builder/`, `src/features/pdf/live-preview/`
 
-- [ ] Design it (spec): `/architect builder responsiveness`
+- [x] Design it (spec): `/architect builder responsiveness`
+- [x] Build it: `/develop builder responsiveness`
+    - [x] Long fixture, before profile, and the worker tracer (go or no go) (AC-4, AC-5, AC-6, AC-7, AC-9)
+    - [x] Live preview panel: client, debounce, page drawing, toggle, narrow sheet (AC-6, AC-8, AC-9, AC-10, AC-11, AC-15)
+    - [x] Preview failure states (AC-12, AC-13)
+    - [x] Card level redraws and autosave on hide (AC-1, AC-2, AC-3)
+    - [x] Strings, offline check, worker size, after profiles (AC-5, AC-7, AC-14, AC-15) (Safari offline check skipped, Chromium passed)
 
 ## Slice 3: Refresh the UI
 
