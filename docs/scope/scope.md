@@ -260,7 +260,7 @@ spec [0009](../specs/0009-builder-responsiveness/index.md) · code in `src/featu
     - [x] Live preview panel: client, debounce, page drawing, toggle, narrow sheet (AC-6, AC-8, AC-9, AC-10, AC-11, AC-15)
     - [x] Preview failure states (AC-12, AC-13)
     - [x] Card level redraws and autosave on hide (AC-1, AC-2, AC-3)
-    - [x] Strings, offline check, worker size, after profiles (AC-5, AC-7, AC-14, AC-15) (Safari offline check skipped, Chromium passed)
+    - [x] Strings, offline check, worker size, after profiles (AC-5, AC-7, AC-14, AC-15) (offline check passed in Chromium and Safari)
 
 ## Slice 3: Refresh the UI
 
