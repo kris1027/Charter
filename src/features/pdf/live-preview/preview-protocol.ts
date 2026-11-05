@@ -8,7 +8,7 @@ export type PreviewRequest = { type: 'render'; seq: number; input: TemplatePdfIn
 export type PreviewResponse =
     | { type: 'ready' }
     | { type: 'rendered'; seq: number; pdf: ArrayBuffer }
-    | { type: 'failed'; seq: number; message: string };
+    | { type: 'failed'; seq: number };
 
 // What the builder asks the worker to render: the form values as typed (valid or not, since
 // ResumeFormValues fits ResumeData), the form's template, full size (no one page fit)

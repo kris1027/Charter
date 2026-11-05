@@ -119,7 +119,7 @@ describe('createPreviewClient', () => {
         worker.reply({ type: 'ready' });
         client.request(input('A'));
 
-        worker.reply({ type: 'failed', seq: worker.sent[0].seq, message: 'boom' });
+        worker.reply({ type: 'failed', seq: worker.sent[0].seq });
 
         expect(results).toEqual([{ ok: false }]);
         expect(statuses.at(-1)).toBe('ready');

@@ -13,8 +13,8 @@ const render = async ({ seq, input }: PreviewRequest) => {
         const blob = await pdf(<TemplatePDF {...input} />).toBlob();
         const bytes = await blob.arrayBuffer();
         post({ type: 'rendered', seq, pdf: bytes }, [bytes]);
-    } catch (error) {
-        post({ type: 'failed', seq, message: error instanceof Error ? error.message : 'unknown' });
+    } catch {
+        post({ type: 'failed', seq });
     }
 };
 
