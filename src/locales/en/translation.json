@@ -126,7 +126,23 @@
         "validation": {
             "fixErrors": "Please fix the errors above before proceeding."
         },
-        "pdfTooLarge": "The PDF file is too large. Maximum size is 10MB."
+        "pdfTooLarge": "The PDF file is too large. Maximum size is 10MB.",
+        "livePreview": {
+            "title": "Live preview",
+            "show": "Show preview",
+            "hide": "Hide preview",
+            "open": "Preview",
+            "close": "Close preview",
+            "preparing": "Preparing preview…",
+            "updating": "Updating…",
+            "fullSizeHint": "Full size, Preview can fit it to one page",
+            "updateFailed": "Preview could not update",
+            "unavailable": "Live preview is unavailable here",
+            "openPreviewPage": "Open preview",
+            "pageLabel": "Resume preview, page {{page}} of {{total}}",
+            "pageCount_one": "{{count}} page",
+            "pageCount_other": "{{count}} pages"
+        }
     },
     "form": {
         "firstName": "First Name",

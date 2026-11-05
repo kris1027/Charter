@@ -21,11 +21,18 @@ import { calculateProgress } from '@/features/builder/calculate-progress';
 import { FormProgress } from '@/features/builder/form-progress';
 import { BuilderToolbar } from '@/features/builder/toolbar/builder-toolbar';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
+import { normalizeLang } from '@/lib/app-lang';
+import { useMediaQuery } from '@/hooks/use-media-query';
+import { useLivePreview } from '@/features/builder/live-preview/use-live-preview';
+import { usePreviewOpen } from '@/features/builder/live-preview/use-preview-open';
+import { LivePreviewPanel } from '@/features/builder/live-preview/live-preview-panel';
+import { LivePreviewSheet } from '@/features/builder/live-preview/live-preview-sheet';
+import { OpenPreviewButton } from '@/features/builder/live-preview/open-preview-button';
 
 const emptyResumeFor = (templateId: TemplateId) => ({ ...EMPTY_RESUME, templateId });
 
 const BuilderPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const search = useSearch({ from: '/builder' });
     const shouldReduceMotion = useReducedMotion();
@@ -64,6 +71,19 @@ const BuilderPage = () => {
     const autosave = useResumeAutosave(form);
     const pdfImport = usePdfImport({ form, activeTemplateId });
 
+    // Live preview (spec 0009): a side panel from 1280px, a sheet below that
+    const isWide = useMediaQuery('(min-width: 1280px)');
+    const previewOpen = usePreviewOpen();
+    const [sheetOpen, setSheetOpen] = useState(false);
+    const showPanel = isWide && previewOpen.open;
+    const livePreview = useLivePreview({
+        form,
+        templateId: activeTemplateId,
+        lang: normalizeLang(i18n.language),
+        active: showPanel || (!isWide && sheetOpen),
+    });
+    const openPreviewButton = <OpenPreviewButton form={form} />;
+
     // Manual save function
     const handleManualSave = () => autosave.save({ backup: true });
 
@@ -86,96 +106,115 @@ const BuilderPage = () => {
                 autosave={autosave}
                 onSave={handleManualSave}
                 onReset={handleReset}
+                previewOpen={previewOpen.open}
+                onTogglePreview={previewOpen.toggle}
             />
 
-            <div className='relative z-[1] container mx-auto max-w-5xl px-4 py-8'>
-                {/* Progress Indicator */}
-                <FormProgress form={form} />
+            <div
+                className={`relative z-[1] container mx-auto px-4 py-8 ${showPanel ? 'grid max-w-[1600px] grid-cols-2 items-start gap-8' : 'max-w-5xl'}`}
+            >
+                <div className='min-w-0'>
+                    {/* Progress Indicator */}
+                    <FormProgress form={form} />
 
-                <ErrorBoundary>
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            form.handleSubmit();
-                        }}
-                        className='space-y-8'
-                    >
-                        {/* Personal Information Section */}
-                        <m.div {...fadeInUp(0, shouldReduceMotion)}>
-                            <PersonalInfoSection form={form} />
-                        </m.div>
-
-                        {/* Work Experience Section */}
-                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <ExperienceSection form={form} />
-                        </m.div>
-
-                        {/* Education Section */}
-                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <EducationSection form={form} />
-                        </m.div>
-
-                        {/* Skills Section */}
-                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <SkillsSection form={form} />
-                        </m.div>
-
-                        {/* Languages Section */}
-                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <LanguagesSection form={form} />
-                        </m.div>
-
-                        {/* Interests Section */}
-                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <InterestsSection form={form} />
-                        </m.div>
-
-                        {/* GDPR Consent Section */}
-                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                            <GdprConsentSection form={form} />
-                        </m.div>
-
-                        {/* Submit Button */}
-                        <m.div
-                            className='flex items-center justify-between pt-6'
-                            {...fadeInUp(0.05, shouldReduceMotion)}
+                    <ErrorBoundary>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                form.handleSubmit();
+                            }}
+                            className='space-y-8'
                         >
-                            <form.Subscribe
-                                selector={(state) =>
-                                    [
-                                        state.canSubmit,
-                                        state.isSubmitting,
-                                        state.isValid,
-                                        calculateProgress(state.values),
-                                    ] as const
-                                }
-                                children={([canSubmit, isSubmitting, isValid, progress]) => (
-                                    <>
-                                        <div className='text-sm'>
-                                            {!isValid && (
-                                                <span className='font-medium text-red-500'>
-                                                    {t('builder.validation.fixErrors')}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <Button
-                                            type='submit'
-                                            disabled={!canSubmit || progress < 30}
-                                            size='lg'
-                                            className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl'
-                                        >
-                                            {isSubmitting
-                                                ? t('builder.processing')
-                                                : `${t('builder.previewCv')} →`}
-                                        </Button>
-                                    </>
-                                )}
-                            />
-                        </m.div>
-                    </form>
-                </ErrorBoundary>
+                            {/* Personal Information Section */}
+                            <m.div {...fadeInUp(0, shouldReduceMotion)}>
+                                <PersonalInfoSection form={form} />
+                            </m.div>
+
+                            {/* Work Experience Section */}
+                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                                <ExperienceSection form={form} />
+                            </m.div>
+
+                            {/* Education Section */}
+                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                                <EducationSection form={form} />
+                            </m.div>
+
+                            {/* Skills Section */}
+                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                                <SkillsSection form={form} />
+                            </m.div>
+
+                            {/* Languages Section */}
+                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                                <LanguagesSection form={form} />
+                            </m.div>
+
+                            {/* Interests Section */}
+                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                                <InterestsSection form={form} />
+                            </m.div>
+
+                            {/* GDPR Consent Section */}
+                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                                <GdprConsentSection form={form} />
+                            </m.div>
+
+                            {/* Submit Button */}
+                            <m.div
+                                className='flex items-center justify-between pt-6'
+                                {...fadeInUp(0.05, shouldReduceMotion)}
+                            >
+                                <form.Subscribe
+                                    selector={(state) =>
+                                        [
+                                            state.canSubmit,
+                                            state.isSubmitting,
+                                            state.isValid,
+                                            calculateProgress(state.values),
+                                        ] as const
+                                    }
+                                    children={([canSubmit, isSubmitting, isValid, progress]) => (
+                                        <>
+                                            <div className='text-sm'>
+                                                {!isValid && (
+                                                    <span className='font-medium text-red-500'>
+                                                        {t('builder.validation.fixErrors')}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <Button
+                                                type='submit'
+                                                disabled={!canSubmit || progress < 30}
+                                                size='lg'
+                                                className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl'
+                                            >
+                                                {isSubmitting
+                                                    ? t('builder.processing')
+                                                    : `${t('builder.previewCv')} →`}
+                                            </Button>
+                                        </>
+                                    )}
+                                />
+                            </m.div>
+                        </form>
+                    </ErrorBoundary>
+                </div>
+
+                {showPanel && (
+                    <LivePreviewPanel preview={livePreview} unavailableAction={openPreviewButton} />
+                )}
             </div>
+
+            {!isWide && (
+                <LivePreviewSheet
+                    open={sheetOpen}
+                    onOpenChange={setSheetOpen}
+                    preview={livePreview}
+                    unavailableAction={openPreviewButton}
+                />
+            )}
         </div>
     );
 };
