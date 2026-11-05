@@ -110,8 +110,10 @@ export const measureRoutes = (manifest: Manifest, sizeOf: (file: string) => numb
     return { manifest, routes, chunks };
 };
 
-const hasReason = (budget: Budget) =>
-    typeof budget.reason === 'string' && budget.reason.trim() !== '';
+// budgets.json is hand edited and only cast to Budgets on read, so every check below validates the
+// shape at runtime too, and reports a bad entry as a problem rather than crashing
+const hasReason = (entry: { reason?: unknown }) =>
+    typeof entry.reason === 'string' && entry.reason.trim() !== '';
 const validMax = (budget: Budget) => typeof budget.maxKb === 'number' && budget.maxKb > 0;
 
 type Check = { rows: BudgetRow[]; problems: string[] };
@@ -184,6 +186,8 @@ const checkChunkCap = (chunks: MeasuredChunk[], cap: Budget): Check => {
  * Fails a route whose first load contains a lazy engine's own chunk (spec 0008). An engine's
  * files are the manifest files of every key that contains its `match`; chunks an engine merely
  * shares with a route are not its own, so they never count. Returns problems only, never throws.
+ * `engines` may be missing and `match` may not be a string: like the budgets, the list comes from
+ * unchecked JSON, so those cases are reported instead of trusted to the type.
  */
 export const checkEngines = (
     manifest: Manifest,
@@ -204,7 +208,7 @@ export const checkEngines = (
             problems.push('lazyEngines: an entry has no match');
             continue;
         }
-        if (typeof engine.reason !== 'string' || engine.reason.trim() === '') {
+        if (!hasReason(engine)) {
             problems.push(`lazy engine "${match}": entry has no reason`);
         }
 
