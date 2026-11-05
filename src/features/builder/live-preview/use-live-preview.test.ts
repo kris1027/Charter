@@ -81,7 +81,7 @@ describe('useLivePreview', () => {
         expect(requests[0]).toMatchObject({ templateId: 'developer', compactScale: 0, lang: 'en' });
     });
 
-    it('should request once 700ms after the last of several edits', () => {
+    it('should request once 700ms after the last edit when several edits land close together', () => {
         const { form, requests } = setup();
 
         act(() => form.setValues(withName('A')));
@@ -118,7 +118,7 @@ describe('useLivePreview', () => {
         expect(requests).toHaveLength(1);
     });
 
-    it('should request 700ms after the language changes', () => {
+    it('should request after 700ms when the language changes', () => {
         const { hook, requests } = setup();
 
         hook.rerender({ active: true, lang: 'pl' });

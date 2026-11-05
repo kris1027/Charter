@@ -92,7 +92,7 @@ describe('builder live preview layout', () => {
         expect(requests).toHaveLength(1);
     });
 
-    it('should start no worker on a narrow screen until the sheet opens', async () => {
+    it('should start no worker when the screen is narrow and the sheet is still closed', async () => {
         const user = userEvent.setup();
         setWidth(false);
         await renderWithRouter(BuilderPage);

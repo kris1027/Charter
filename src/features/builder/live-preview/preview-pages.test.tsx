@@ -84,7 +84,7 @@ describe('PreviewPages', () => {
         expect(screen.queryByText(/Full size/)).not.toBeInTheDocument();
     });
 
-    it('should keep the old pages until the new set is drawn, then swap in one step', async () => {
+    it('should keep the old pages, then swap in one step, when a new set is drawn', async () => {
         vi.mocked(drawPdfPages).mockResolvedValueOnce(canvases(2, 'old'));
         const { rerender } = render(<PreviewPages pdf={new ArrayBuffer(1)} renderFailed={false} />);
         await screen.findAllByRole('img');

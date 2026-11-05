@@ -36,9 +36,9 @@ vi.mock('@/features/builder/form-sections/form-section-card', async (importActua
 const rendered = (map: Map<string, number>) => [...map.entries()].filter(([, n]) => n > 0);
 
 const cases = [
-    { list: 'experience', field: 'experiences[2].position', id: 'experience-2' },
-    { list: 'education', field: 'education[2].degree', id: 'education-2' },
-    { list: 'languages', field: 'languages[2].language', id: 'language-2' },
+    { list: 'experience', label: 'Position', id: 'experience-2' },
+    { list: 'education', label: 'Degree', id: 'education-2' },
+    { list: 'languages', label: 'Language', id: 'language-2' },
 ];
 
 describe('builder render counts', () => {
@@ -49,18 +49,18 @@ describe('builder render counts', () => {
 
     it.each(cases)(
         'should render no other card when typing into $list card 3',
-        async ({ field, id }) => {
+        async ({ label, id }) => {
             const user = userEvent.setup();
             await renderWithRouter(BuilderPage);
-            const input = document.querySelector<HTMLInputElement>(`[name="${field}"]`);
-            expect(input).not.toBeNull();
-            await user.click(input!);
+            const input = screen.getAllByRole<HTMLInputElement>('textbox', { name: label })[2];
+            expect(input).toBeDefined();
+            await user.click(input);
             counts.cards.clear();
             counts.sections.clear();
 
             await user.keyboard('x');
 
-            expect(input!.value.endsWith('x')).toBe(true);
+            expect(input.value.endsWith('x')).toBe(true);
             expect(rendered(counts.cards).filter(([key]) => key !== id)).toEqual([]);
             expect(rendered(counts.sections)).toEqual([]);
             expect(screen.getAllByRole('heading', { level: 3 }).length).toBeGreaterThan(0);
