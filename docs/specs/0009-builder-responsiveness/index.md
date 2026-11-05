@@ -199,6 +199,6 @@ Tracer Bullet: the riskiest unknown (react-pdf inside a worker) is proven first 
 ## Follow-up
 
 - [ ] Decide later whether `perf:size` should watch worker bundles (size cap plus the 3 MB precache limit), so the step 10 hand check becomes automatic.
-- [ ] `/sync`: add `builderPreviewOpen` to the storage key list in `AGENTS.md`, and the "react-pdf runs in the preview worker on `/builder`" rule to `src/features/templates/pdf/AGENTS.md`.
+- [x] `/sync`: add `builderPreviewOpen` to the storage key list in `AGENTS.md`, and the "react-pdf runs in the preview worker on `/builder`" rule to `src/features/templates/pdf/AGENTS.md`.
 - [ ] If AC-4 trips (Zod over 2ms per keystroke), open a validation spec: field level validators from the same schema.
 - [ ] Feature 14 (builder UI refresh) should restyle the panel, sheet and floating button with the rest of the builder.

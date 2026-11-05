@@ -2,6 +2,8 @@
 
 _Steps derived from spec 0009 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones._
 
+_Run 2026-11-05 against `vite preview` of a fresh build, offline only: in Chromium through Playwright (context offline switch) and in Safari 27.0.1 through `safaridriver` (server stopped, since Safari has no scriptable offline switch), with the long fixture at 1440 by 900. Both passed: the service worker cache held `preview-worker-*.js` after one online visit, the offline reload drew all 4 pages in about a second, and typing into first name redrew them in about 1.5 seconds with no notice. The other steps are still to run._
+
 Setup for the browser steps: `pnpm build && pnpm preview`, then put `src/test/fixtures/long-resume.json` into `localStorage.resumeData` and open `/builder?templateId=developer`.
 
 ## UI / manual
@@ -24,7 +26,7 @@ Setup for the browser steps: `pnpm build && pnpm preview`, then put `src/test/fi
 - [ ] Dark mode → the resume pages stay white → AC-15
 - [ ] DevTools, block `assets/preview-worker-*.js`, reload at 1440px → after up to 20 seconds the panel shows "Live preview is unavailable here" and an "Open preview" button, disabled until the form passes 30% and is valid; when enabled it saves and opens `/preview` → AC-13
 - [ ] Make a render fail (for example DevTools, block `fonts/` requests after the first render, then type) → the last pages stay and "Preview could not update" shows; unblock and type again → the notice goes → AC-12
-- [ ] Offline: after one online visit to `/builder` that started the preview, DevTools offline, reload, type → the panel still draws and updates. Run in Chrome (done once in Chromium through Playwright) and in Safari (done once in Safari 27.0.1 through `safaridriver`, server stopped) → AC-14
+- [x] Offline: after one online visit to `/builder` that started the preview, DevTools offline, reload, type → the panel still draws and updates. Run in Chrome (done once in Chromium through Playwright) and in Safari (done once in Safari 27.0.1 through `safaridriver`, server stopped) → AC-14
 - [ ] Type into experience 3, then close the tab within 30 seconds; reopen `/builder` → the edit is there. Repeat by switching tabs (hidden), and by leaving through "Back to templates" → AC-3
 - [ ] DevTools Performance, 4x CPU slowdown, panel open, type 20 characters into experience 3's description → no main thread task over 50ms from a keystroke or a preview update (see rationale.md Baseline) → AC-5
 
@@ -37,7 +39,7 @@ Setup for the browser steps: `pnpm build && pnpm preview`, then put `src/test/fi
 - [ ] `pnpm vitest run --project pdf src/features/pdf/live-preview` → long and empty resumes render for all three templates → AC-6, AC-9
 - [ ] `pnpm build && pnpm perf:size` → `/builder` within 262 KB, `lazyEngines` unchanged and passing → AC-7
 - [ ] `grep -rnE "renderResumePdf|template-pdf|template-viewer|@react-pdf" src/features/builder --include='*.ts' --include='*.tsx' | grep -v test` → no output → AC-7
-- [ ] `ls -l dist/assets/preview-worker-*.js` and `grep preview-worker dist/sw.js` → each worker file under 3 MB and listed in the precache → AC-14
+- [x] `ls -l dist/assets/preview-worker-*.js` and `grep preview-worker dist/sw.js` → each worker file under 3 MB and listed in the precache → AC-14
 - [ ] Zod time per parse of the long fixture at 4x stays under 2ms (rationale.md Baseline, 0.07ms) → AC-4
 
 ## Value sourcing checks
