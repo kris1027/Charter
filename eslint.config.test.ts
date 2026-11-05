@@ -73,3 +73,41 @@ describe('builder max-lines lint rule', () => {
         expect(await maxLinesErrors(251, 'src/features/landing/fixture.ts')).toHaveLength(0);
     });
 });
+
+// Full motion components ban from spec 0008
+const importErrors = async (code: string, filePath: string) => {
+    const [result] = await eslint.lintText(code, { filePath });
+    return result.messages.filter((message) => message.ruleId === 'no-restricted-imports');
+};
+
+describe('motion import lint rule', () => {
+    it.each([
+        ["import { motion } from 'motion/react';", 'src/features/landing/fixture.tsx'],
+        ["import { motion } from 'framer-motion';", 'src/components/fixture.tsx'],
+        ["import { m, motion } from 'motion/react';", 'src/app/fixture.test.tsx'],
+    ])('should error with the use m message when %s is in %s', async (code, filePath) => {
+        const errors = await importErrors(`${code}\nexport const a = motion;\n`, filePath);
+
+        expect(errors).toHaveLength(1);
+        expect(errors[0].message).toContain('Use `m` inside LazyMotion, not `motion` (spec 0008).');
+    });
+
+    it('should pass when a file imports m and the hooks from motion/react', async () => {
+        const errors = await importErrors(
+            "import { m, useReducedMotion } from 'motion/react';\nexport const a = [m, useReducedMotion];\n",
+            'src/features/landing/fixture.tsx',
+        );
+
+        expect(errors).toHaveLength(0);
+    });
+
+    it('should keep the area import bans when the motion ban is added', async () => {
+        const errors = await importErrors(
+            "import { a } from '@/features/landing/x';\nexport const b = a;\n",
+            'src/features/gallery/fixture.ts',
+        );
+
+        expect(errors).toHaveLength(1);
+        expect(errors[0].message).toContain('Page areas never import each other');
+    });
+});
