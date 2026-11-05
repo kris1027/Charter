@@ -4,7 +4,9 @@ const never = () => new Promise<never>(() => {});
 
 // `settle` decides how `import('@/lib/motion-features')` ends. A fresh module graph per test makes
 // the factory run again (doMock, since a resolved factory is cached); React and the renderer come
-// from that graph too, so they match the provider's copy.
+// from that graph too, so they match the provider's copy. That is why this file imports
+// `@testing-library/react` directly instead of `@/test/test-utils`: the shared wrapper would come
+// from the outer graph and render a second copy of React.
 const renderProvider = async (settle: () => Promise<unknown>) => {
     vi.resetModules();
     vi.doMock('@/lib/motion-features', settle);
@@ -12,7 +14,7 @@ const renderProvider = async (settle: () => Promise<unknown>) => {
     const { act, render, screen } = await import('@testing-library/react');
     const { m } = await import('motion/react');
     const { fadeInUp } = await import('@/lib/animation-variants');
-    const { MotionProvider } = await import('./motion-provider');
+    const { MotionProvider, MOTION_STALL_MS } = await import('./motion-provider');
 
     const view = render(
         createElement(
@@ -25,7 +27,7 @@ const renderProvider = async (settle: () => Promise<unknown>) => {
     await act(async () => {
         await Promise.resolve();
     });
-    return { act, view, element: screen.getByText('Entrance content') };
+    return { act, view, stallMs: MOTION_STALL_MS, element: screen.getByText('Entrance content') };
 };
 
 const isFailed = () => document.documentElement.hasAttribute('data-motion-failed');
@@ -49,9 +51,9 @@ describe('MotionProvider', () => {
 
     it('should flag motion as failed when the features file has not loaded after 8 seconds', async () => {
         vi.useFakeTimers();
-        const { act, view } = await renderProvider(never);
+        const { act, view, stallMs } = await renderProvider(never);
         await act(async () => {
-            vi.advanceTimersByTime(7999);
+            vi.advanceTimersByTime(stallMs - 1);
         });
         expect(isFailed()).toBe(false);
 
@@ -64,12 +66,12 @@ describe('MotionProvider', () => {
 
     it('should not flag motion as failed when the features file loads before 8 seconds', async () => {
         vi.useFakeTimers();
-        const { act, view } = await renderProvider(async () => {
+        const { act, view, stallMs } = await renderProvider(async () => {
             const { domAnimation } = await import('motion/react');
             return { default: domAnimation };
         });
         await act(async () => {
-            vi.advanceTimersByTime(10_000);
+            vi.advanceTimersByTime(stallMs * 2);
         });
 
         expect(isFailed()).toBe(false);
