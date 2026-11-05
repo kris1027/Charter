@@ -1,10 +1,15 @@
-import { memo, useEffect, useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearch } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Download, Edit, Loader2, FileWarning, FileText, Files } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
-import { exportToPDF, countPdfPages, generateResumeFilename } from '@/features/pdf/pdf-export';
+import {
+    exportToPDF,
+    countPdfPages,
+    generateResumeFilename,
+    renderResumePdf,
+} from '@/features/pdf/pdf-export';
 import { TEMPLATE_IDS } from '@/lib/template-ids';
 import type { TemplateId } from '@/lib/template-ids';
 import { useTranslation } from 'react-i18next';
@@ -19,20 +24,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { loadStoredResume } from '@/features/resume/stored-resume';
-import { PDFViewer, type DocumentProps } from '@react-pdf/renderer';
-import { TemplatePDF } from '@/features/templates/pdf/template-pdf';
-
-const PdfPreview = memo(function PdfPreview({
-    document,
-}: {
-    document: ReactElement<DocumentProps>;
-}) {
-    return (
-        <PDFViewer width='100%' height='100%' showToolbar={false}>
-            {document}
-        </PDFViewer>
-    );
-});
+import { LazyTemplateViewer } from '@/features/templates/pdf/lazy-template-viewer';
 
 // Binary search: find the minimum compactScale (0–1) that makes the PDF fit on one page.
 // Returns null when content can't fit even at maximum compaction.
@@ -94,16 +86,7 @@ export const PreviewPage = () => {
         let cancelled = false;
 
         async function run() {
-            const { pdf } = await import('@react-pdf/renderer');
-
-            const normalBlob = await pdf(
-                <TemplatePDF
-                    data={resumeData!}
-                    templateId={templateId}
-                    compactScale={0}
-                    lang={lang}
-                />,
-            ).toBlob();
+            const normalBlob = await renderResumePdf(resumeData!, templateId, 0, lang);
             if (cancelled) return;
 
             const pages = await countPdfPages(normalBlob);
@@ -115,14 +98,7 @@ export const PreviewPage = () => {
             setIsMultiPage(true);
 
             const scale = await findMinCompactScale((s) =>
-                pdf(
-                    <TemplatePDF
-                        data={resumeData!}
-                        templateId={templateId}
-                        compactScale={s}
-                        lang={lang}
-                    />,
-                ).toBlob(),
+                renderResumePdf(resumeData!, templateId, s, lang),
             );
             if (!cancelled) {
                 setOptimalScale(scale === null ? 'cannot-fit' : scale);
@@ -163,17 +139,10 @@ export const PreviewPage = () => {
     };
 
     const activeScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
-    const pdfDocument = useMemo(
-        () =>
-            resumeData ? (
-                <TemplatePDF
-                    data={resumeData}
-                    templateId={templateId}
-                    compactScale={activeScale}
-                    lang={lang}
-                />
-            ) : null,
-        [resumeData, templateId, activeScale, lang],
+    const previewPlaceholder = (
+        <div className='flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950'>
+            <p className='text-sm text-gray-500 dark:text-gray-400'>{t('preview.title')}...</p>
+        </div>
     );
     // Hide toggle entirely when content can't fit even at max compaction
     const showToggle = isPreviewReady && isMultiPage && optimalScale !== 'cannot-fit';
@@ -299,14 +268,16 @@ export const PreviewPage = () => {
 
             {/* PDF Preview */}
             <div className='min-h-0 flex-1'>
-                {isPreviewReady && pdfDocument ? (
-                    <PdfPreview document={pdfDocument} />
+                {isPreviewReady ? (
+                    <LazyTemplateViewer
+                        data={resumeData}
+                        templateId={templateId}
+                        compactScale={activeScale}
+                        lang={lang}
+                        fallback={previewPlaceholder}
+                    />
                 ) : (
-                    <div className='flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950'>
-                        <p className='text-sm text-gray-500 dark:text-gray-400'>
-                            {t('preview.title')}...
-                        </p>
-                    </div>
+                    previewPlaceholder
                 )}
             </div>
 

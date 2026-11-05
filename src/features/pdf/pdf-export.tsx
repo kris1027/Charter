@@ -1,6 +1,6 @@
 import type { ResumeData } from '@/features/resume/form-types';
 import type { TemplateId } from '@/lib/template-ids';
-import { normalizeLang } from '@/lib/app-lang';
+import { normalizeLang, type AppLang } from '@/lib/app-lang';
 import { getPdfjs } from '@/features/pdf/pdfjs-singleton';
 
 export interface PDFExportOptions {
@@ -9,20 +9,19 @@ export interface PDFExportOptions {
     lang?: string;
 }
 
-export async function exportToPDF(
+// Renders one template to a PDF blob, loading the @react-pdf engine on demand (spec 0008)
+export async function renderResumePdf(
     resumeData: ResumeData,
     templateId: TemplateId,
-    options: PDFExportOptions = {},
-): Promise<void> {
-    const { filename = 'resume.pdf', compactScale = 0, lang: rawLang = 'en' } = options;
-    const lang = normalizeLang(rawLang);
-
+    compactScale: number,
+    lang: AppLang,
+): Promise<Blob> {
     const [{ pdf }, { TemplatePDF }] = await Promise.all([
         import('@react-pdf/renderer'),
         import('@/features/templates/pdf/template-pdf'),
     ]);
 
-    const blob = await pdf(
+    return pdf(
         <TemplatePDF
             data={resumeData}
             templateId={templateId}
@@ -30,6 +29,20 @@ export async function exportToPDF(
             lang={lang}
         />,
     ).toBlob();
+}
+
+export async function exportToPDF(
+    resumeData: ResumeData,
+    templateId: TemplateId,
+    options: PDFExportOptions = {},
+): Promise<void> {
+    const { filename = 'resume.pdf', compactScale = 0, lang: rawLang = 'en' } = options;
+    const blob = await renderResumePdf(
+        resumeData,
+        templateId,
+        compactScale,
+        normalizeLang(rawLang),
+    );
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
