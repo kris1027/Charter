@@ -37,7 +37,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 7   | Builder page split              | Slice 1    | done     |
 | 8   | Shared template model           | Slice 1    | done     |
 | 9   | PDF import parser restructure   | Slice 1    | done     |
-| 10  | Lazy load heavy engines         | Slice 2    | planned  |
+| 10  | Lazy load heavy engines         | Slice 2    | done     |
 | 11  | Builder responsiveness          | Slice 2    | planned  |
 | 12  | Landing page refresh            | Slice 3    | planned  |
 | 13  | Template gallery refresh        | Slice 3    | planned  |
@@ -236,12 +236,17 @@ spec [0007](../specs/0007-pdf-import-parser/index.md) · code in `src/features/p
 
 ## Slice 2: Make it fast
 
-### 10. Lazy load heavy engines
+### 10. Lazy load heavy engines · done
 
 Load the PDF renderer, pdf.js, fonts and the animation library only on the pages and actions that need them, within the budgets from feature 5.
 **Done when:** the landing page ships none of those engines, export and import still work offline, and every page meets its JS budget.
+spec [0008](../specs/0008-lazy-load-heavy-engines/index.md) · code in `src/app/motion-provider.tsx`, `src/features/templates/pdf/lazy-template-viewer.tsx`, `src/features/pdf/pdf-export.tsx`
 
-- [ ] Build it: `/develop lazy load heavy engines`
+- [x] Design it (spec): `/architect lazy load heavy engines: ratify the assumed LazyMotion decision`
+- [x] Build it: `/develop lazy load heavy engines`
+    - [x] Lazy PDF viewer, LazyMotion, motion chunk rule dropped, budgets lowered (AC-1, AC-2, AC-3, AC-4, AC-5)
+    - [x] Motion load failure and stall fallback (AC-5, AC-6)
+    - [x] Lint guard and engine leak check in `perf:size` (AC-7, AC-8)
 
 ### 11. Builder responsiveness · needs a decision
 

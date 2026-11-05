@@ -253,6 +253,7 @@
     },
     "preview": {
         "title": "Podgląd Twojego CV",
+        "loadingPreview": "Podgląd Twojego CV...",
         "noData": "Nie znaleziono danych CV",
         "noDataHint": "Proszę najpierw wypełnić formularz, aby zobaczyć podgląd CV.",
         "startBuilding": "Zacznij tworzyć CV",

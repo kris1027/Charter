@@ -12,14 +12,15 @@ const TEMPLATE_PDFS = {
     veterinary: VeterinaryPDF,
 } satisfies Record<TemplateId, unknown>;
 
-interface TemplatePDFProps {
+// Everything one template needs to render: the on screen viewer and the blob export both take it
+export type TemplatePdfInput = {
     data: ResumeData;
     templateId: TemplateId;
     compactScale: number;
     lang: AppLang;
-}
+};
 
-export function TemplatePDF({ templateId, ...props }: TemplatePDFProps) {
+export function TemplatePDF({ templateId, ...props }: TemplatePdfInput) {
     const SelectedPDF = TEMPLATE_PDFS[templateId];
     return <SelectedPDF {...props} />;
 }

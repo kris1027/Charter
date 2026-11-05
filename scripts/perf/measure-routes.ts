@@ -1,4 +1,5 @@
-// Per route initial JS from Vite's build manifest, checked against perf/budgets.json (spec 0003).
+// Per route initial JS from Vite's build manifest, checked against perf/budgets.json (spec 0003),
+// plus the lazy engine leak check (spec 0008).
 
 export type ManifestChunk = {
     file: string;
@@ -11,13 +12,16 @@ export type Manifest = Record<string, ManifestChunk>;
 
 export type MeasuredRoute = { path: string; files: string[]; bytes: number };
 export type MeasuredChunk = { file: string; bytes: number };
-export type BuildSizes = { routes: MeasuredRoute[]; chunks: MeasuredChunk[] };
+// Carries the manifest it was measured from, so the engine check reads the same build
+export type BuildSizes = { manifest: Manifest; routes: MeasuredRoute[]; chunks: MeasuredChunk[] };
 
 export type Budget = { maxKb: number; reason?: string };
+export type LazyEngine = { match: string; reason?: string };
 export type Budgets = {
     compression: string;
     routes: Record<string, Budget>;
     chunkCap: Budget;
+    lazyEngines: LazyEngine[];
 };
 
 export type BudgetRow = { label: string; bytes: number; maxKb: number | null; ok: boolean };
@@ -103,11 +107,13 @@ export const measureRoutes = (manifest: Manifest, sizeOf: (file: string) => numb
     const chunks = [...jsFiles].map((file) => ({ file, bytes: cachedSize(file) }));
 
     routes.sort((a, b) => a.path.localeCompare(b.path));
-    return { routes, chunks };
+    return { manifest, routes, chunks };
 };
 
-const hasReason = (budget: Budget) =>
-    typeof budget.reason === 'string' && budget.reason.trim() !== '';
+// budgets.json is hand edited and only cast to Budgets on read, so every check below validates the
+// shape at runtime too, and reports a bad entry as a problem rather than crashing
+const hasReason = (entry: { reason?: unknown }) =>
+    typeof entry.reason === 'string' && entry.reason.trim() !== '';
 const validMax = (budget: Budget) => typeof budget.maxKb === 'number' && budget.maxKb > 0;
 
 type Check = { rows: BudgetRow[]; problems: string[] };
@@ -176,6 +182,58 @@ const checkChunkCap = (chunks: MeasuredChunk[], cap: Budget): Check => {
     return { rows, problems };
 };
 
+/**
+ * Fails a route whose first load contains a lazy engine's own chunk (spec 0008). An engine's
+ * files are the manifest files of every key that contains its `match`; chunks an engine merely
+ * shares with a route are not its own, so they never count. Returns problems only, never throws.
+ * `engines` may be missing and `match` may not be a string: like the budgets, the list comes from
+ * unchecked JSON, so those cases are reported instead of trusted to the type.
+ */
+export const checkEngines = (
+    manifest: Manifest,
+    routes: MeasuredRoute[],
+    engines: LazyEngine[] | undefined,
+): string[] => {
+    if (!Array.isArray(engines) || engines.length === 0) {
+        return ['lazyEngines: list is empty, so no engine is checked'];
+    }
+
+    const problems: string[] = [];
+    const reported = new Set<string>();
+    const keys = Object.keys(manifest);
+
+    for (const engine of engines) {
+        const match = typeof engine.match === 'string' ? engine.match : '';
+        if (match.trim() === '') {
+            problems.push('lazyEngines: an entry has no match');
+            continue;
+        }
+        if (!hasReason(engine)) {
+            problems.push(`lazy engine "${match}": entry has no reason`);
+        }
+
+        const matched = keys.filter((key) => key.includes(match));
+        if (matched.length === 0) {
+            problems.push(`lazy engine "${match}" matches no manifest key`);
+            continue;
+        }
+
+        const engineFiles = new Set(matched.map((key) => manifest[key].file));
+        for (const route of routes) {
+            for (const file of route.files) {
+                const pair = `${route.path}\n${file}`;
+                if (!engineFiles.has(file) || reported.has(pair)) continue;
+                reported.add(pair);
+                problems.push(
+                    `${route.path}: first load contains lazy engine "${match}" (${file})`,
+                );
+            }
+        }
+    }
+
+    return problems;
+};
+
 export const checkBudgets = (buildSizes: BuildSizes, budgets: Budgets): BudgetResult => {
     const compressionProblems =
         budgets.compression === 'brotli'
@@ -183,7 +241,8 @@ export const checkBudgets = (buildSizes: BuildSizes, budgets: Budgets): BudgetRe
             : [`compression must be "brotli", got "${budgets.compression}"`];
     const routes = checkRoutes(buildSizes.routes, budgets.routes);
     const chunkCap = checkChunkCap(buildSizes.chunks, budgets.chunkCap);
+    const engines = checkEngines(buildSizes.manifest, buildSizes.routes, budgets.lazyEngines);
 
-    const problems = [...compressionProblems, ...routes.problems, ...chunkCap.problems];
+    const problems = [...compressionProblems, ...routes.problems, ...chunkCap.problems, ...engines];
     return { ok: problems.length === 0, rows: [...routes.rows, ...chunkCap.rows], problems };
 };

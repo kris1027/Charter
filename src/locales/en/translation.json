@@ -253,6 +253,7 @@
     },
     "preview": {
         "title": "Your Resume Preview",
+        "loadingPreview": "Your Resume Preview...",
         "noData": "No resume data found",
         "noDataHint": "Please fill out the form first to preview your resume.",
         "startBuilding": "Start Building Your Resume",

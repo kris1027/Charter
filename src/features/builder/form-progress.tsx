@@ -2,7 +2,7 @@ import { calculateProgress } from '@/features/builder/calculate-progress';
 import { resumeFormOptions, withForm } from '@/features/builder/resume-form';
 import { fadeInUp } from '@/lib/animation-variants';
 import { CheckCircle } from 'lucide-react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 
 export const FormProgress = withForm({
@@ -12,7 +12,7 @@ export const FormProgress = withForm({
         const shouldReduceMotion = useReducedMotion();
 
         return (
-            <motion.div
+            <m.div
                 className='mb-8 rounded-2xl border border-white/20 bg-white/60 p-5 backdrop-blur-sm dark:border-white/5 dark:bg-white/[0.03]'
                 {...fadeInUp(0, shouldReduceMotion)}
             >
@@ -50,7 +50,7 @@ export const FormProgress = withForm({
                         </>
                     )}
                 </form.Subscribe>
-            </motion.div>
+            </m.div>
         );
     },
 });

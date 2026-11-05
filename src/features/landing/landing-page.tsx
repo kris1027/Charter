@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { useParallax } from '@/hooks/use-parallax';
 import { GeometricShapes } from '@/components/geometric-shapes';
 import { fadeInUp, fadeInScale } from '@/lib/animation-variants';
@@ -82,14 +82,14 @@ export const IndexPage = () => {
             {/* ===== HERO SECTION ===== */}
             <section className='relative min-h-[90vh] overflow-hidden'>
                 {/* Background gradient mesh */}
-                <motion.div
+                <m.div
                     ref={heroGradientRef}
                     style={{ y: heroGradientY }}
                     className='animate-gradient-shift absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-violet-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/80'
                 />
 
                 {/* Dot grid pattern */}
-                <motion.div
+                <m.div
                     ref={heroDotsRef}
                     style={{
                         y: heroDotsY,
@@ -101,9 +101,9 @@ export const IndexPage = () => {
                     aria-hidden='true'
                 />
 
-                <motion.div ref={heroShapesRef} style={{ y: heroShapesY }}>
+                <m.div ref={heroShapesRef} style={{ y: heroShapesY }}>
                     <GeometricShapes />
-                </motion.div>
+                </m.div>
 
                 <div className='relative z-10 container mx-auto flex min-h-[90vh] items-center px-4 py-20'>
                     <div className='grid w-full items-center gap-12 lg:grid-cols-2 lg:gap-16'>
@@ -149,13 +149,13 @@ export const IndexPage = () => {
                         </div>
 
                         {/* Right: Floating CV Mockup */}
-                        <motion.div
+                        <m.div
                             ref={heroMockupRef}
                             style={{ y: heroMockupY }}
                             className='hidden justify-center lg:flex'
                         >
                             <FloatingCvMockup />
-                        </motion.div>
+                        </m.div>
                     </div>
                 </div>
 
@@ -166,7 +166,7 @@ export const IndexPage = () => {
             {/* ===== FEATURES SECTION ===== */}
             <section className='relative bg-white py-24 dark:bg-slate-950'>
                 <div className='container mx-auto px-4'>
-                    <motion.div
+                    <m.div
                         className='mx-auto mb-16 max-w-2xl text-center'
                         {...fadeInUp(0, shouldReduceMotion)}
                     >
@@ -176,7 +176,7 @@ export const IndexPage = () => {
                         <p className='text-muted-foreground text-lg'>
                             {t('home.features.subtitle')}
                         </p>
-                    </motion.div>
+                    </m.div>
 
                     <div className='mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                         {(
@@ -213,7 +213,7 @@ export const IndexPage = () => {
                                 },
                             ] as const
                         ).map(({ icon: Icon, key, gradient }, i) => (
-                            <motion.div
+                            <m.div
                                 key={key}
                                 className='group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/60 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200/60 hover:shadow-lg hover:shadow-indigo-500/5 dark:border-white/5 dark:bg-white/[0.03] dark:hover:border-indigo-500/20 dark:hover:shadow-indigo-500/5'
                                 {...fadeInUp(i * 0.1, shouldReduceMotion)}
@@ -233,7 +233,7 @@ export const IndexPage = () => {
                                         {t(`home.features.${key}.desc`)}
                                     </p>
                                 </div>
-                            </motion.div>
+                            </m.div>
                         ))}
                     </div>
                 </div>
@@ -242,7 +242,7 @@ export const IndexPage = () => {
             {/* ===== HOW IT WORKS SECTION ===== */}
             <section className='relative overflow-hidden bg-slate-50/50 py-24 dark:bg-slate-900/50'>
                 {/* Subtle background texture */}
-                <motion.div
+                <m.div
                     ref={howItWorksDotsRef}
                     style={{
                         y: howItWorksDotsY,
@@ -255,7 +255,7 @@ export const IndexPage = () => {
                 />
 
                 <div className='relative container mx-auto px-4'>
-                    <motion.div
+                    <m.div
                         className='mx-auto mb-20 max-w-2xl text-center'
                         {...fadeInUp(0, shouldReduceMotion)}
                     >
@@ -265,7 +265,7 @@ export const IndexPage = () => {
                         <p className='text-muted-foreground text-lg'>
                             {t('home.howItWorks.subtitle')}
                         </p>
-                    </motion.div>
+                    </m.div>
 
                     <div className='mx-auto max-w-4xl'>
                         <div className='relative grid gap-8 md:grid-cols-3 md:gap-12'>
@@ -297,7 +297,7 @@ export const IndexPage = () => {
                                     },
                                 ] as const
                             ).map(({ icon: Icon, step, titleKey, descKey, gradient }, i) => (
-                                <motion.div
+                                <m.div
                                     key={step}
                                     className='text-center'
                                     {...fadeInUp(i * 0.15, shouldReduceMotion)}
@@ -320,7 +320,7 @@ export const IndexPage = () => {
                                     <p className='text-muted-foreground mx-auto max-w-xs text-sm leading-relaxed'>
                                         {t(`home.howItWorks.${descKey}`)}
                                     </p>
-                                </motion.div>
+                                </m.div>
                             ))}
                         </div>
                     </div>
@@ -350,7 +350,7 @@ export const IndexPage = () => {
                                 },
                             ] as const
                         ).map(({ value, label, gradient }, i) => (
-                            <motion.div key={value} {...fadeInScale(i * 0.1, shouldReduceMotion)}>
+                            <m.div key={value} {...fadeInScale(i * 0.1, shouldReduceMotion)}>
                                 <p
                                     className={`font-display mb-2 bg-gradient-to-r ${gradient} bg-clip-text text-4xl font-extrabold text-transparent sm:text-5xl`}
                                 >
@@ -359,7 +359,7 @@ export const IndexPage = () => {
                                 <p className='text-muted-foreground text-sm font-medium tracking-wider uppercase'>
                                     {t(label)}
                                 </p>
-                            </motion.div>
+                            </m.div>
                         ))}
                     </div>
                 </div>
@@ -371,12 +371,12 @@ export const IndexPage = () => {
                 <div className='absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-violet-50/50 dark:from-indigo-950/30 dark:via-slate-950 dark:to-violet-950/20' />
                 {/* Decorative shapes */}
                 <div className='pointer-events-none absolute inset-0' aria-hidden='true'>
-                    <motion.div
+                    <m.div
                         ref={ctaCircleLeftRef}
                         style={{ y: ctaCircleLeftY }}
                         className='animate-float absolute top-12 left-[10%] h-32 w-32 rounded-full bg-indigo-500/5 blur-2xl dark:bg-indigo-500/10'
                     />
-                    <motion.div
+                    <m.div
                         ref={ctaCircleRightRef}
                         style={{ y: ctaCircleRightY }}
                         className='animate-float-reverse absolute right-[10%] bottom-12 h-40 w-40 rounded-full bg-violet-500/5 blur-2xl dark:bg-violet-500/10'
@@ -384,7 +384,7 @@ export const IndexPage = () => {
                 </div>
 
                 <div className='relative container mx-auto px-4 text-center'>
-                    <motion.div className='mx-auto max-w-2xl' {...fadeInUp(0, shouldReduceMotion)}>
+                    <m.div className='mx-auto max-w-2xl' {...fadeInUp(0, shouldReduceMotion)}>
                         <h2 className='font-display mb-6 text-4xl font-bold tracking-tight sm:text-5xl'>
                             {t('home.cta.title')}
                         </h2>
@@ -401,7 +401,7 @@ export const IndexPage = () => {
                                 <ArrowRight className='ml-2 h-5 w-5 transition-transform group-hover:translate-x-1' />
                             </Link>
                         </Button>
-                    </motion.div>
+                    </m.div>
                 </div>
             </section>
         </div>

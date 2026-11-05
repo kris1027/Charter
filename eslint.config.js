@@ -15,10 +15,20 @@ const noParent = {
 };
 const ban = (paths, why) => ({ group: paths, message: `${why} (spec 0002).` });
 
-// ESLint applies the last matching block for a rule, so every block repeats noParent.
+// Full `motion` components bundle the animation engine; pages use `m` inside LazyMotion (spec 0008).
+const MOTION_MESSAGE = 'Use `m` inside LazyMotion, not `motion` (spec 0008).';
+const MOTION_BANS = ['motion/react', 'framer-motion'].map((name) => ({
+    name,
+    importNames: ['motion'],
+    message: MOTION_MESSAGE,
+}));
+
+// ESLint applies the last matching block for a rule, so every block repeats noParent and MOTION_BANS.
 const restrict = (files, bans) => ({
     files,
-    rules: { 'no-restricted-imports': ['error', { patterns: [noParent, ...bans] }] },
+    rules: {
+        'no-restricted-imports': ['error', { paths: MOTION_BANS, patterns: [noParent, ...bans] }],
+    },
 });
 
 const featureDirs = (names) => names.map((n) => `@/features/${n}/**`);

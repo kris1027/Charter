@@ -1141,3 +1141,12 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ===== Motion Failure Fallback ===== */
+
+/* The motion features file failed or stalled (spec 0008): show every entrance element as is.
+   `m` sets its inline opacity and offset once at mount, so only !important can undo them. */
+[data-motion-failed] [data-entrance] {
+    opacity: 1 !important;
+    transform: none !important;
+}

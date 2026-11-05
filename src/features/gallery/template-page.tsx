@@ -8,8 +8,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
 import { useTranslation } from 'react-i18next';
 import { ParallaxBackground } from '@/components/parallax-background';
-import { PDFViewer } from '@react-pdf/renderer';
-import { TemplatePDF } from '@/features/templates/pdf/template-pdf';
+import { LazyTemplateViewer } from '@/features/templates/pdf/lazy-template-viewer';
 
 export const TemplatePage = () => {
     const { t, i18n } = useTranslation();
@@ -80,14 +79,13 @@ export const TemplatePage = () => {
 
             {/* PDF Preview */}
             <div className='relative z-[1] min-h-0 flex-1'>
-                <PDFViewer width='100%' height='100%' showToolbar={false}>
-                    <TemplatePDF
-                        templateId={templateId}
-                        data={SAMPLE_RESUMES[templateId][lang]}
-                        compactScale={0}
-                        lang={lang}
-                    />
-                </PDFViewer>
+                <LazyTemplateViewer
+                    templateId={templateId}
+                    data={SAMPLE_RESUMES[templateId][lang]}
+                    compactScale={0}
+                    lang={lang}
+                    fallback={null}
+                />
             </div>
         </div>
     );

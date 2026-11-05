@@ -1,4 +1,5 @@
-// pnpm perf:size: fails when a route's initial JS or any single chunk is over budget (spec 0003).
+// pnpm perf:size: fails when a route's initial JS or any single chunk is over budget (spec 0003),
+// or when a route's first load contains a lazy engine (spec 0008).
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { brotliCompressSync } from 'node:zlib';

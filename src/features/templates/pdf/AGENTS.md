@@ -42,7 +42,7 @@ The three resume templates rendered with `@react-pdf/renderer`. They drive the l
 - Any template change: run `pnpm templates:previews --baseline` before it and `--diff` after (zero changed pixels when the look should not change), then `pnpm templates:previews` and commit the images and `manifest.json` with the change, or `--check` fails pre-commit and CI.
 - The text fallback in `src/features/pdf/import/` reads section headers through `printedTitle` (plus `LEGACY_HEADERS` for older English exports), so renaming a title updates render and import together. A printed layout change (line order, separators, columns) needs the matching `readers/<templateId>.ts` change; the round trip test (`*.pdf.test.tsx`, its own Vitest project in Node) fails until it reads back. A new loss goes into `expected-after-print.ts` with its reason.
 - Import failures throw `PdfImportError` (`invalid`, `password`, `unrecognized`); the builder shows `dialogs.pdfError.<code>`, never `err.message`.
-- `@react-pdf/renderer` is heavy: `pdf-export.tsx` and `preview-page.tsx` import it dynamically, and route code splitting keeps the PDF pages in their own chunks. Never import it from shared code the landing page or builder loads eagerly.
+- `@react-pdf/renderer` is heavy and never in a page's first load (spec 0008): blobs go through `renderResumePdf` in `pdf-export.tsx` (dynamic import), and on screen PDFs through `LazyTemplateViewer` (`lazy-template-viewer.tsx`, `React.lazy` over `template-viewer.tsx`). Never import it, `template-pdf.tsx` or `template-viewer.tsx` statically from page code; `pnpm perf:size` fails on a leak listed in `perf/budgets.json` `lazyEngines`.
 
 ## Gotchas
 
