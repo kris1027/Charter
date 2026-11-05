@@ -95,7 +95,8 @@ export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
     });
 
     useEffect(() => {
-        // pdf.js takes the bytes, so the same buffer is never loaded twice (StrictMode replays)
+        // Draw each PDF once per mount (StrictMode replays the effect); a remount, such as a
+        // reopened panel or sheet, draws the kept PDF again, which loadPdf allows as it copies it
         if (!pdf || pdf === handledPdfRef.current) return;
         handledPdfRef.current = pdf;
         void draw(() => loadPdf(pdf));

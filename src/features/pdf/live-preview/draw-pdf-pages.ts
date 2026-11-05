@@ -1,12 +1,13 @@
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { getPdfjs } from '@/features/pdf/pdfjs-singleton';
 
-// pdf.js takes ownership of the bytes (they get transferred to its worker), so never reuse them.
+// pdf.js transfers the bytes it gets to its own worker, emptying them, so it gets a copy: the
+// caller keeps the PDF and can load it again (a reopened panel or sheet draws the kept bytes).
 // disableFontFace draws glyphs as paths: adding and removing a PDF's fonts in document.fonts
 // would lay out the whole builder page again on every update (spec 0009, AC-5)
 export const loadPdf = async (pdf: ArrayBuffer): Promise<PDFDocumentProxy> => {
     const { getDocument } = await getPdfjs();
-    return getDocument({ data: new Uint8Array(pdf), disableFontFace: true }).promise;
+    return getDocument({ data: new Uint8Array(pdf.slice(0)), disableFontFace: true }).promise;
 };
 
 // Frees the document on both threads; pdf.js destroys a document through its loading task
