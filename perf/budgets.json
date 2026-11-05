@@ -1,11 +1,51 @@
 {
     "compression": "brotli",
     "routes": {
-        "/": { "maxKb": 211, "reason": "baseline 2026-11-02 (200.1) +5%" },
-        "/templates": { "maxKb": 222, "reason": "baseline 2026-11-02 (210.5) +5%" },
-        "/templates/$templateId": { "maxKb": 587, "reason": "baseline 2026-11-02 (558.5) +5%" },
-        "/builder": { "maxKb": 270, "reason": "baseline 2026-11-02 (257.1) +5%" },
-        "/preview": { "maxKb": 584, "reason": "baseline 2026-11-02 (555.9) +5%" }
+        "/": {
+            "maxKb": 198,
+            "reason": "lazy engines 2026-11-05 (188.8) +5%, spec 0008"
+        },
+        "/templates": {
+            "maxKb": 199,
+            "reason": "lazy engines 2026-11-05 (189.4) +5%, spec 0008"
+        },
+        "/templates/$templateId": {
+            "maxKb": 200,
+            "reason": "lazy engines 2026-11-05 (190.4) +5%, spec 0008"
+        },
+        "/builder": {
+            "maxKb": 262,
+            "reason": "lazy engines 2026-11-05 (249.7) +5%, spec 0008"
+        },
+        "/preview": {
+            "maxKb": 188,
+            "reason": "lazy engines 2026-11-05 (179.2) +5%, spec 0008"
+        }
     },
-    "chunkCap": { "maxKb": 375, "reason": "largest chunk, @react-pdf engine (356.6) +5%" }
+    "chunkCap": {
+        "maxKb": 367,
+        "reason": "largest chunk, @react-pdf engine (349.6) +5%, spec 0008"
+    },
+    "lazyEngines": [
+        {
+            "match": "react-pdf.browser",
+            "reason": "@react-pdf/renderer library chunk, loaded on PDF render only (spec 0008)"
+        },
+        {
+            "match": "src/features/templates/pdf/template-viewer.tsx",
+            "reason": "on screen PDF viewer, reached only through React.lazy (spec 0008)"
+        },
+        {
+            "match": "src/features/templates/pdf/template-pdf.tsx",
+            "reason": "template renderers and PDF font registration (spec 0008)"
+        },
+        {
+            "match": "pdfjs-dist/build/pdf.mjs",
+            "reason": "pdf.js, loaded on PDF import only; a substring since the key carries the pnpm store path (spec 0008)"
+        },
+        {
+            "match": "src/lib/motion-features.ts",
+            "reason": "motion animation engine, loaded by MotionProvider after first paint (spec 0008)"
+        }
+    ]
 }

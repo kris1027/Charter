@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { checkBudgets, measureRoutes, routePathFromFile } from './measure-routes.ts';
+import { checkBudgets, checkEngines, measureRoutes, routePathFromFile } from './measure-routes.ts';
 import type { Budgets, Manifest } from './measure-routes.ts';
 
 const KB = 1024;
@@ -33,6 +33,7 @@ const budgets = (overrides: Partial<Budgets> = {}): Budgets => ({
     compression: 'brotli',
     routes: { '/builder': { maxKb: 40, reason: 'test' } },
     chunkCap: { maxKb: 400, reason: 'test' },
+    lazyEngines: [{ match: 'src/lazy.ts', reason: 'test' }],
     ...overrides,
 });
 
@@ -104,7 +105,7 @@ describe('checkBudgets', () => {
     const buildSizes = measureRoutes(manifest, sizeOf);
 
     it('should pass with a row per route plus the largest chunk when all is within budget', () => {
-        const result = checkBudgets(buildSizes, budgets());
+        const result = checkBudgets(buildSizes, budgets(), manifest);
 
         expect(result.ok).toBe(true);
         expect(result.problems).toEqual([]);
@@ -118,6 +119,7 @@ describe('checkBudgets', () => {
         const result = checkBudgets(
             buildSizes,
             budgets({ routes: { '/builder': { maxKb: 30, reason: 'test' } } }),
+            manifest,
         );
 
         expect(result.ok).toBe(false);
@@ -128,6 +130,7 @@ describe('checkBudgets', () => {
         const result = checkBudgets(
             buildSizes,
             budgets({ chunkCap: { maxKb: 100, reason: 'test' } }),
+            manifest,
         );
 
         expect(result.ok).toBe(false);
@@ -137,7 +140,7 @@ describe('checkBudgets', () => {
     });
 
     it('should fail with the path and size when a route has no budget', () => {
-        const result = checkBudgets(buildSizes, budgets({ routes: {} }));
+        const result = checkBudgets(buildSizes, budgets({ routes: {} }), manifest);
 
         expect(result.ok).toBe(false);
         expect(result.problems).toEqual([
@@ -154,6 +157,7 @@ describe('checkBudgets', () => {
                     '/gone': { maxKb: 40, reason: 'test' },
                 },
             }),
+            manifest,
         );
 
         expect(result.problems).toEqual(['/gone: budget matches no route chunk (stale budget)']);
@@ -166,6 +170,7 @@ describe('checkBudgets', () => {
                 routes: { '/builder': { maxKb: 40, reason: ' ' } },
                 chunkCap: { maxKb: 400 },
             }),
+            manifest,
         );
 
         expect(result.problems).toEqual([
@@ -175,8 +180,84 @@ describe('checkBudgets', () => {
     });
 
     it('should fail when compression is not brotli', () => {
-        const result = checkBudgets(buildSizes, budgets({ compression: 'gzip' }));
+        const result = checkBudgets(buildSizes, budgets({ compression: 'gzip' }), manifest);
 
         expect(result.problems).toEqual(['compression must be "brotli", got "gzip"']);
+    });
+});
+
+describe('checkEngines', () => {
+    // The route statically imports the engine's own chunk; engine and route share _shared.js
+    const leaky: Manifest = {
+        ...manifest,
+        'src/routes/builder.tsx?tsr-split=component': {
+            file: 'assets/builder.js',
+            imports: ['_shared.js', 'src/lazy.ts', 'index.html'],
+        },
+    };
+    const leakyRoutes = measureRoutes(leaky, sizeOf).routes;
+    const lazy = [{ match: 'src/lazy.ts', reason: 'test' }];
+
+    it('should name the route, engine and file when a route first load contains an engine chunk', () => {
+        expect(checkEngines(leaky, leakyRoutes, lazy)).toEqual([
+            '/builder: first load contains lazy engine "src/lazy.ts" (assets/lazy.js)',
+        ]);
+    });
+
+    it('should not count a chunk the route and the engine both import when the engine stays lazy', () => {
+        const { routes } = measureRoutes(manifest, sizeOf);
+
+        expect(routes[0].files).toContain('assets/shared.js');
+        expect(checkEngines(manifest, routes, lazy)).toEqual([]);
+    });
+
+    it('should report a route and file pair once when two entries match the same file', () => {
+        const engines = [...lazy, { match: 'lazy.ts', reason: 'test' }];
+
+        expect(checkEngines(leaky, leakyRoutes, engines)).toHaveLength(1);
+    });
+
+    it('should fail when an engine match hits no manifest key', () => {
+        const { routes } = measureRoutes(manifest, sizeOf);
+
+        expect(
+            checkEngines(manifest, routes, [{ match: 'src/renamed.ts', reason: 'test' }]),
+        ).toEqual(['lazy engine "src/renamed.ts" matches no manifest key']);
+    });
+
+    it('should fail when the engine list is empty or missing', () => {
+        const { routes } = measureRoutes(manifest, sizeOf);
+        const empty = ['lazyEngines: list is empty, so no engine is checked'];
+
+        expect(checkEngines(manifest, routes, [])).toEqual(empty);
+        expect(checkEngines(manifest, routes, undefined)).toEqual(empty);
+    });
+
+    it('should fail when an entry has no reason or no match', () => {
+        const { routes } = measureRoutes(manifest, sizeOf);
+
+        expect(
+            checkEngines(manifest, routes, [{ match: 'src/lazy.ts', reason: ' ' }, { match: '' }]),
+        ).toEqual([
+            'lazy engine "src/lazy.ts": entry has no reason',
+            'lazyEngines: an entry has no match',
+        ]);
+    });
+
+    it('should fail the whole budget check when an engine leaks', () => {
+        const result = checkBudgets(
+            measureRoutes(leaky, sizeOf),
+            budgets({
+                routes: {
+                    '/builder': { maxKb: 400, reason: 'test' },
+                },
+            }),
+            leaky,
+        );
+
+        expect(result.ok).toBe(false);
+        expect(result.problems).toContain(
+            '/builder: first load contains lazy engine "src/lazy.ts" (assets/lazy.js)',
+        );
     });
 });
