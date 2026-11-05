@@ -86,7 +86,12 @@ export const PreviewPage = () => {
         let cancelled = false;
 
         async function run() {
-            const normalBlob = await renderResumePdf(resumeData!, templateId, 0, lang);
+            const normalBlob = await renderResumePdf({
+                data: resumeData!,
+                templateId,
+                compactScale: 0,
+                lang,
+            });
             if (cancelled) return;
 
             const pages = await countPdfPages(normalBlob);
@@ -98,7 +103,7 @@ export const PreviewPage = () => {
             setIsMultiPage(true);
 
             const scale = await findMinCompactScale((s) =>
-                renderResumePdf(resumeData!, templateId, s, lang),
+                renderResumePdf({ data: resumeData!, templateId, compactScale: s, lang }),
             );
             if (!cancelled) {
                 setOptimalScale(scale === null ? 'cannot-fit' : scale);

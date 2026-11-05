@@ -1,9 +1,9 @@
 import { lazy, Suspense, type ReactNode } from 'react';
-import type { TemplateViewerProps } from '@/features/templates/pdf/template-viewer';
+import type { TemplatePdfInput } from '@/features/templates/pdf/template-pdf';
 
 const TemplateViewer = lazy(() => import('@/features/templates/pdf/template-viewer'));
 
-type LazyTemplateViewerProps = TemplateViewerProps & {
+type LazyTemplateViewerProps = TemplatePdfInput & {
     fallback: ReactNode;
 };
 
