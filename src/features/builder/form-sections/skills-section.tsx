@@ -70,17 +70,17 @@ export const SkillsSection = withForm({
                                                 />
                                             ) : (
                                                 <SortableList
-                                                    items={items}
+                                                    count={items.length}
                                                     idPrefix='skill'
                                                     strategy='horizontal'
                                                     onMove={field.moveValue}
                                                     className='flex flex-wrap gap-2'
                                                 >
-                                                    {(item, index, id) => (
+                                                    {(index, id) => (
                                                         <SortableChip
                                                             key={id}
                                                             id={id}
-                                                            name={item.name}
+                                                            name={items[index].name}
                                                             removeLabel={t(
                                                                 'accessibility.removeSkill',
                                                             )}

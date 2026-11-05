@@ -8,7 +8,7 @@ import type { PdfImport } from '@/features/builder/use-pdf-import';
 import type { ResumeAutosave } from '@/features/builder/use-resume-autosave';
 import type { TemplateId } from '@/lib/template-ids';
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, Save, Upload } from 'lucide-react';
+import { ArrowLeft, PanelRight, Save, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 type BuilderToolbarProps = {
@@ -17,6 +17,8 @@ type BuilderToolbarProps = {
     autosave: ResumeAutosave;
     onSave: () => void;
     onReset: () => void;
+    previewOpen: boolean;
+    onTogglePreview: () => void;
 };
 
 export const BuilderToolbar = ({
@@ -25,6 +27,8 @@ export const BuilderToolbar = ({
     autosave,
     onSave,
     onReset,
+    previewOpen,
+    onTogglePreview,
 }: BuilderToolbarProps) => {
     const { t } = useTranslation();
     const { fileInputRef, isLoading, error, clearError, handleFileChange } = pdfImport;
@@ -77,6 +81,21 @@ export const BuilderToolbar = ({
                             {autosave.isSaving ? t('builder.saving') : t('builder.save')}
                         </Button>
                         <ResetDialog onConfirm={onReset} />
+                        {/* Wide screens only; narrow screens get the floating Preview button */}
+                        <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            aria-pressed={previewOpen}
+                            onClick={onTogglePreview}
+                            // xl matches WIDE_PREVIEW_QUERY, where the panel can show
+                            className='hidden xl:inline-flex'
+                        >
+                            <PanelRight className='mr-2 h-4 w-4' />
+                            {previewOpen
+                                ? t('builder.livePreview.hide')
+                                : t('builder.livePreview.show')}
+                        </Button>
 
                         <PdfErrorDialog error={error} onClose={clearError} />
 

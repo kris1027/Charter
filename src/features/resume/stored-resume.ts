@@ -81,6 +81,9 @@ export const loadStoredResume = (): StoredResume | null => {
     }
 };
 
+// The stored resume as written, so a caller can tell whether saving would change anything
+export const readStoredResumeJson = () => safeStorage.getItem('resumeData') ?? '';
+
 // The only writers of the resume storage keys. A PDF import writes resumeData alone (no
 // saved time), so a reload shows the import without it counting as a save.
 export const writeResume = (values: ResumeFormValues) =>

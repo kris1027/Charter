@@ -102,6 +102,8 @@ export default defineConfig(({ command }) => ({
             '@': path.resolve(import.meta.dirname, 'src'),
         },
     },
+    // ES workers split chunks like the app; the live preview worker needs it (spec 0009)
+    worker: { format: 'es' },
     build: {
         // dist/.vite/manifest.json feeds the per route JS budget check (spec 0003)
         manifest: true,

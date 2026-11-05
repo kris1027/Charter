@@ -126,7 +126,25 @@
         "validation": {
             "fixErrors": "Proszę naprawić błędy powyżej przed kontynuowaniem."
         },
-        "pdfTooLarge": "Plik PDF jest zbyt duży. Maksymalny rozmiar to 10MB."
+        "pdfTooLarge": "Plik PDF jest zbyt duży. Maksymalny rozmiar to 10MB.",
+        "livePreview": {
+            "title": "Podgląd na żywo",
+            "show": "Pokaż podgląd",
+            "hide": "Ukryj podgląd",
+            "open": "Podgląd",
+            "close": "Zamknij podgląd",
+            "preparing": "Przygotowuję podgląd…",
+            "updating": "Aktualizuję…",
+            "fullSizeHint": "Pełny rozmiar, Podgląd może zmieścić go na jednej stronie",
+            "updateFailed": "Nie udało się odświeżyć podglądu",
+            "unavailable": "Podgląd na żywo jest tu niedostępny",
+            "openPreviewPage": "Otwórz podgląd",
+            "pageLabel": "Podgląd CV, strona {{page}} z {{total}}",
+            "pageCount_one": "{{count}} strona",
+            "pageCount_few": "{{count}} strony",
+            "pageCount_many": "{{count}} stron",
+            "pageCount_other": "{{count}} strony"
+        }
     },
     "form": {
         "firstName": "Imię",

@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { ResumeFormValues } from '@/features/resume/form-types';
-import { clearResume, saveResume } from '@/features/resume/stored-resume';
+import { clearResume, readStoredResumeJson, saveResume } from '@/features/resume/stored-resume';
 
 const AUTOSAVE_INTERVAL_MS = 30_000;
 const SAVING_HOLD_MS = 500;
@@ -13,8 +13,10 @@ export const useResumeAutosave = (form: FormWithValues) => {
     const [isAutoSaved, setIsAutoSaved] = useState(false);
     const [saveError, setSaveError] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    // Starts empty, so the first tick after mount writes once even with no edit
-    const lastSavedJsonRef = useRef('');
+    // Starts from what is stored, so leaving or hiding the builder with no edit writes nothing,
+    // while values that differ from storage (a template from the URL) still get saved
+    const [storedJson] = useState(readStoredResumeJson);
+    const lastSavedJsonRef = useRef(storedJson);
 
     // The manual save is the one that writes a backup, and it shows Saving… for a moment
     const save = ({ backup = false, autosaved = false } = {}) => {
@@ -38,6 +40,24 @@ export const useResumeAutosave = (form: FormWithValues) => {
         const interval = setInterval(autosaveTick, AUTOSAVE_INTERVAL_MS);
         return () => clearInterval(interval);
     }, []);
+
+    // Closing or hiding the tab saves the last edits too; leaving /builder through an in app link
+    // fires neither event, so the unmount runs the same check. It only writes: no state updates
+    // on an unmounting component (spec 0009, AC-3)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') autosaveTick();
+        };
+        window.addEventListener('pagehide', autosaveTick);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            window.removeEventListener('pagehide', autosaveTick);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            const values = form.state.values;
+            if (JSON.stringify(values) === lastSavedJsonRef.current) return;
+            lastSavedJsonRef.current = saveResume(values).json;
+        };
+    }, [form]);
 
     // Keeps the backup; the last saved JSON, error and autosaved flag stay as they were
     const clear = () => {

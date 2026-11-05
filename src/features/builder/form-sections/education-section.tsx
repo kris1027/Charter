@@ -108,11 +108,12 @@ export const EducationSection = withForm({
                             </Button>
                         }
                     >
-                        {/* Array mode rerenders only on its helpers; this also catches form.reset */}
-                        <form.Subscribe selector={(state) => state.values.education}>
-                            {(items) => (
+                        {/* Only the length: a card reads its own fields, so typing redraws one field. Array
+                            mode rerenders only on its helpers; this also catches form.reset */}
+                        <form.Subscribe selector={(state) => state.values.education.length}>
+                            {(count) => (
                                 <div className='space-y-6'>
-                                    {items.length === 0 && (
+                                    {count === 0 && (
                                         <ListEmptyState
                                             icon={GraduationCap}
                                             iconGradient='from-violet-500 to-purple-600'
@@ -120,15 +121,15 @@ export const EducationSection = withForm({
                                             hint={t('sections.education.emptyHint')}
                                         />
                                     )}
-                                    {items.length > 0 && (
+                                    {count > 0 && (
                                         <SortableList
-                                            items={items}
+                                            count={count}
                                             idPrefix='education'
                                             strategy='vertical'
                                             onMove={field.moveValue}
                                             className='space-y-6'
                                         >
-                                            {(_, index, id) => (
+                                            {(index, id) => (
                                                 <EducationItem
                                                     key={id}
                                                     form={form}

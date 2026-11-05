@@ -1,0 +1,281 @@
+{
+    "personalInfo": {
+        "firstName": "Alexandra",
+        "lastName": "Kowalczyk-Brennan",
+        "location": "Warsaw, Poland",
+        "title": "Principal Software Engineer",
+        "phone": "+48 600 123 456",
+        "email": "alexandra.kb@example.com",
+        "website": "alexandra.dev",
+        "linkedin": "alexandra-kb",
+        "github": "alexandra-kb"
+    },
+    "experiences": [
+        {
+            "company": "Northwind Labs",
+            "position": "Principal Engineer",
+            "location": "Berlin, Germany",
+            "startDate": "2024-01",
+            "endDate": "",
+            "current": true,
+            "description": "• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture\n• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge\n• Mentored six engineers through a structured growth plan, four of whom were promoted within a year\n• Introduced contract tests between teams, which removed most integration bugs before release\n• Built a self service reporting tool used daily by 300 people across finance and operations\n• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents\n• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%\n• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards"
+        },
+        {
+            "company": "Blue Harbor Systems",
+            "position": "Staff Engineer",
+            "location": "Warsaw, Poland",
+            "startDate": "2022-02",
+            "endDate": "2024-02",
+            "current": false,
+            "description": "• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge\n• Mentored six engineers through a structured growth plan, four of whom were promoted within a year\n• Introduced contract tests between teams, which removed most integration bugs before release\n• Built a self service reporting tool used daily by 300 people across finance and operations\n• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents\n• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%\n• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards\n• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture"
+        },
+        {
+            "company": "Atlas Fintech",
+            "position": "Senior Software Engineer",
+            "location": "London, UK",
+            "startDate": "2020-03",
+            "endDate": "2022-03",
+            "current": false,
+            "description": "• Mentored six engineers through a structured growth plan, four of whom were promoted within a year\n• Introduced contract tests between teams, which removed most integration bugs before release\n• Built a self service reporting tool used daily by 300 people across finance and operations\n• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents\n• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%\n• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards\n• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture\n• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge"
+        },
+        {
+            "company": "Cedar Health",
+            "position": "Senior Software Engineer",
+            "location": "Amsterdam, Netherlands",
+            "startDate": "2018-04",
+            "endDate": "2020-04",
+            "current": false,
+            "description": "• Introduced contract tests between teams, which removed most integration bugs before release\n• Built a self service reporting tool used daily by 300 people across finance and operations\n• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents\n• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%\n• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards\n• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture\n• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge\n• Mentored six engineers through a structured growth plan, four of whom were promoted within a year"
+        },
+        {
+            "company": "Orbit Media",
+            "position": "Software Engineer",
+            "location": "Krakow, Poland",
+            "startDate": "2016-05",
+            "endDate": "2018-05",
+            "current": false,
+            "description": "• Built a self service reporting tool used daily by 300 people across finance and operations\n• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents\n• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%\n• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards\n• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture\n• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge\n• Mentored six engineers through a structured growth plan, four of whom were promoted within a year\n• Introduced contract tests between teams, which removed most integration bugs before release"
+        },
+        {
+            "company": "Granite Logistics",
+            "position": "Software Engineer",
+            "location": "Munich, Germany",
+            "startDate": "2014-06",
+            "endDate": "2016-06",
+            "current": false,
+            "description": "• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents\n• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%\n• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards\n• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture\n• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge\n• Mentored six engineers through a structured growth plan, four of whom were promoted within a year\n• Introduced contract tests between teams, which removed most integration bugs before release\n• Built a self service reporting tool used daily by 300 people across finance and operations"
+        },
+        {
+            "company": "Pioneer Retail",
+            "position": "Junior Developer",
+            "location": "Gdansk, Poland",
+            "startDate": "2012-07",
+            "endDate": "2014-07",
+            "current": false,
+            "description": "• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%\n• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards\n• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture\n• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge\n• Mentored six engineers through a structured growth plan, four of whom were promoted within a year\n• Introduced contract tests between teams, which removed most integration bugs before release\n• Built a self service reporting tool used daily by 300 people across finance and operations\n• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents"
+        },
+        {
+            "company": "Summit Analytics",
+            "position": "Developer Intern",
+            "location": "Wroclaw, Poland",
+            "startDate": "2010-08",
+            "endDate": "2012-08",
+            "current": false,
+            "description": "• Migrated the main database to a managed cluster with zero downtime and full point in time recovery\n• Automated the release pipeline end to end so any engineer could ship safely several times a day\n• Wrote internal guides on accessibility and performance that became the default team checklist\n• Reduced cloud spend by 27% through right sizing, reserved capacity and removing idle resources\n• Represented the team at the architecture review board and drove three cross team standards\n• Led the redesign of the customer billing platform, moving 40 services to an event driven architecture\n• Cut median page load time from 3.1s to 1.2s by splitting bundles and caching API responses at the edge\n• Mentored six engineers through a structured growth plan, four of whom were promoted within a year\n• Introduced contract tests between teams, which removed most integration bugs before release\n• Built a self service reporting tool used daily by 300 people across finance and operations\n• Ran the on call rotation and wrote the runbooks that halved the time to resolve incidents\n• Partnered with product and design to ship a new onboarding flow that lifted activation by 18%"
+        }
+    ],
+    "education": [
+        {
+            "institution": "Warsaw University of Technology",
+            "degree": "Master of Science",
+            "field": "Computer Science",
+            "startDate": "2012",
+            "endDate": "2014",
+            "description": "Thesis on distributed consensus in unreliable networks. Graduated with distinction."
+        },
+        {
+            "institution": "Warsaw University of Technology",
+            "degree": "Bachelor of Science",
+            "field": "Computer Science",
+            "startDate": "2008",
+            "endDate": "2012",
+            "description": "Dean's list for four semesters. Teaching assistant for algorithms."
+        },
+        {
+            "institution": "Technical University of Munich",
+            "degree": "Exchange semester",
+            "field": "Informatics",
+            "startDate": "2011",
+            "endDate": "2011",
+            "description": "Erasmus exchange focused on databases and compilers."
+        },
+        {
+            "institution": "Coursera",
+            "degree": "Certificate",
+            "field": "Machine Learning",
+            "startDate": "2016",
+            "endDate": "2016",
+            "description": "Completed with honours."
+        }
+    ],
+    "skills": [
+        {
+            "name": "TypeScript"
+        },
+        {
+            "name": "JavaScript"
+        },
+        {
+            "name": "React"
+        },
+        {
+            "name": "Node.js"
+        },
+        {
+            "name": "GraphQL"
+        },
+        {
+            "name": "PostgreSQL"
+        },
+        {
+            "name": "Redis"
+        },
+        {
+            "name": "Kafka"
+        },
+        {
+            "name": "Docker"
+        },
+        {
+            "name": "Kubernetes"
+        },
+        {
+            "name": "Terraform"
+        },
+        {
+            "name": "AWS"
+        },
+        {
+            "name": "GCP"
+        },
+        {
+            "name": "Go"
+        },
+        {
+            "name": "Python"
+        },
+        {
+            "name": "Rust"
+        },
+        {
+            "name": "CI/CD"
+        },
+        {
+            "name": "Testing"
+        },
+        {
+            "name": "Vitest"
+        },
+        {
+            "name": "Playwright"
+        },
+        {
+            "name": "Web Performance"
+        },
+        {
+            "name": "Accessibility"
+        },
+        {
+            "name": "System Design"
+        },
+        {
+            "name": "Domain Driven Design"
+        },
+        {
+            "name": "Event Sourcing"
+        },
+        {
+            "name": "Observability"
+        },
+        {
+            "name": "Security"
+        },
+        {
+            "name": "Mentoring"
+        },
+        {
+            "name": "Agile"
+        },
+        {
+            "name": "Technical Writing"
+        }
+    ],
+    "languages": [
+        {
+            "language": "Polish",
+            "proficiency": "NATIVE"
+        },
+        {
+            "language": "English",
+            "proficiency": "C2"
+        },
+        {
+            "language": "German",
+            "proficiency": "B2"
+        },
+        {
+            "language": "Spanish",
+            "proficiency": "B1"
+        },
+        {
+            "language": "French",
+            "proficiency": "A2"
+        },
+        {
+            "language": "Italian",
+            "proficiency": "A1"
+        }
+    ],
+    "interests": [
+        {
+            "name": "Open Source"
+        },
+        {
+            "name": "Rock Climbing"
+        },
+        {
+            "name": "Photography"
+        },
+        {
+            "name": "Chess"
+        },
+        {
+            "name": "Cycling"
+        },
+        {
+            "name": "Cooking"
+        },
+        {
+            "name": "Travel"
+        },
+        {
+            "name": "Board Games"
+        },
+        {
+            "name": "Running"
+        },
+        {
+            "name": "Jazz"
+        },
+        {
+            "name": "Reading"
+        },
+        {
+            "name": "Sailing"
+        }
+    ],
+    "gdprConsent": {
+        "enabled": true,
+        "companyName": "Northwind Labs"
+    }
+}
