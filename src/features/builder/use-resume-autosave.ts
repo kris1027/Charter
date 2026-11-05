@@ -39,6 +39,24 @@ export const useResumeAutosave = (form: FormWithValues) => {
         return () => clearInterval(interval);
     }, []);
 
+    // Closing or hiding the tab saves the last edits too; leaving /builder through an in app link
+    // fires neither event, so the unmount runs the same check. It only writes: no state updates
+    // on an unmounting component (spec 0009, AC-3)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') autosaveTick();
+        };
+        window.addEventListener('pagehide', autosaveTick);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            window.removeEventListener('pagehide', autosaveTick);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            const values = form.state.values;
+            if (JSON.stringify(values) === lastSavedJsonRef.current) return;
+            lastSavedJsonRef.current = saveResume(values).json;
+        };
+    }, [form]);
+
     // Keeps the backup; the last saved JSON, error and autosaved flag stay as they were
     const clear = () => {
         clearResume();
