@@ -17,7 +17,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { EMPTY_RESUME, loadStoredResume } from '@/features/resume/stored-resume';
 import { usePdfImport } from '@/features/builder/use-pdf-import';
 import { useResumeAutosave } from '@/features/builder/use-resume-autosave';
-import { calculateProgress } from '@/features/builder/calculate-progress';
+import { canOpenPreview } from '@/features/builder/calculate-progress';
 import { FormProgress } from '@/features/builder/form-progress';
 import { BuilderToolbar } from '@/features/builder/toolbar/builder-toolbar';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
@@ -169,13 +169,12 @@ const BuilderPage = () => {
                                 <form.Subscribe
                                     selector={(state) =>
                                         [
-                                            state.canSubmit,
+                                            canOpenPreview(state),
                                             state.isSubmitting,
                                             state.isValid,
-                                            calculateProgress(state.values),
                                         ] as const
                                     }
-                                    children={([canSubmit, isSubmitting, isValid, progress]) => (
+                                    children={([canOpen, isSubmitting, isValid]) => (
                                         <>
                                             <div className='text-sm'>
                                                 {!isValid && (
@@ -186,7 +185,7 @@ const BuilderPage = () => {
                                             </div>
                                             <Button
                                                 type='submit'
-                                                disabled={!canSubmit || progress < 30}
+                                                disabled={!canOpen}
                                                 size='lg'
                                                 className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl'
                                             >

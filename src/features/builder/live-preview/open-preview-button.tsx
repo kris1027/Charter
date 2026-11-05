@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { calculateProgress } from '@/features/builder/calculate-progress';
+import { canOpenPreview } from '@/features/builder/calculate-progress';
 import { resumeFormOptions, withForm } from '@/features/builder/resume-form';
 import { useTranslation } from 'react-i18next';
 
@@ -10,14 +10,12 @@ export const OpenPreviewButton = withForm({
         const { t } = useTranslation();
 
         return (
-            <form.Subscribe
-                selector={(state) => [state.canSubmit, calculateProgress(state.values)] as const}
-            >
-                {([canSubmit, progress]) => (
+            <form.Subscribe selector={canOpenPreview}>
+                {(canOpen) => (
                     <Button
                         type='button'
                         size='sm'
-                        disabled={!canSubmit || progress < 30}
+                        disabled={!canOpen}
                         onClick={() => form.handleSubmit()}
                     >
                         {t('builder.livePreview.openPreviewPage')}

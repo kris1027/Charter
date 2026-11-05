@@ -1,6 +1,6 @@
 import type { ResumeFormValues } from '@/features/resume/form-types';
 
-// Percent of the resume filled in; Preview unlocks at 30 (the three required fields)
+// Percent of the resume filled in; Preview unlocks at PREVIEW_UNLOCK_PROGRESS
 export const calculateProgress = (values: ResumeFormValues) => {
     let progress = 0;
 
@@ -17,3 +17,10 @@ export const calculateProgress = (values: ResumeFormValues) => {
 
     return Math.min(progress, 100);
 };
+
+// The three required fields are worth 30 together
+export const PREVIEW_UNLOCK_PROGRESS = 30;
+
+// Gate for Preview CV and the live preview's Open preview button
+export const canOpenPreview = (state: { canSubmit: boolean; values: ResumeFormValues }) =>
+    state.canSubmit && calculateProgress(state.values) >= PREVIEW_UNLOCK_PROGRESS;
