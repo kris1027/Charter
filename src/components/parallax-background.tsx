@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { GeometricShapes } from '@/components/geometric-shapes';
 import { useParallax } from '@/hooks/use-parallax';
 
@@ -11,7 +11,7 @@ export const ParallaxBackground = () => {
     return (
         <>
             {/* Background gradient mesh */}
-            <motion.div
+            <m.div
                 ref={gradientRef}
                 style={{ y: gradientY }}
                 className='animate-gradient-shift from-accent via-background to-brand-via/5 dark:from-background dark:via-card dark:to-brand-from/10 pointer-events-none absolute inset-0 bg-gradient-to-br'
@@ -19,7 +19,7 @@ export const ParallaxBackground = () => {
             />
 
             {/* Dot grid pattern */}
-            <motion.div
+            <m.div
                 ref={dotsRef}
                 style={{
                     y: dotsY,
@@ -31,13 +31,13 @@ export const ParallaxBackground = () => {
             />
 
             {/* Geometric shapes */}
-            <motion.div
+            <m.div
                 ref={shapesRef}
                 style={{ y: shapesY }}
                 className='pointer-events-none absolute inset-0'
             >
                 <GeometricShapes />
-            </motion.div>
+            </m.div>
         </>
     );
 };

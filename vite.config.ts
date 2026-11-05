@@ -109,12 +109,6 @@ export default defineConfig(({ command }) => ({
             output: {
                 manualChunks(id) {
                     if (
-                        id.includes('node_modules/motion') ||
-                        id.includes('node_modules/framer-motion')
-                    ) {
-                        return 'motion';
-                    }
-                    if (
                         id.includes('node_modules/@radix-ui') ||
                         id.includes('node_modules/radix-ui')
                     ) {

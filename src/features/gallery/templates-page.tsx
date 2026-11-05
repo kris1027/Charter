@@ -26,7 +26,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ParallaxBackground } from '@/components/parallax-background';
 import { fadeInUp } from '@/lib/animation-variants';
 import { safeStorage } from '@/lib/storage';
@@ -141,10 +141,7 @@ export const TemplatesPage = () => {
 
                 {/* Saved Data Info */}
                 {hasSavedData && (
-                    <motion.div
-                        className='mx-auto mb-10 max-w-3xl'
-                        {...fadeInUp(0, shouldReduceMotion)}
-                    >
+                    <m.div className='mx-auto mb-10 max-w-3xl' {...fadeInUp(0, shouldReduceMotion)}>
                         <div className='rounded-2xl border border-white/20 bg-white/60 p-4 backdrop-blur-sm dark:border-white/5 dark:bg-white/[0.03]'>
                             <div className='flex items-center justify-between'>
                                 <div className='flex items-center gap-3'>
@@ -204,13 +201,13 @@ export const TemplatesPage = () => {
                                 </AlertDialog>
                             </div>
                         </div>
-                    </motion.div>
+                    </m.div>
                 )}
 
                 {/* Template Cards Grid */}
                 <div className='mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
                     {templates.map((template, index) => (
-                        <motion.div
+                        <m.div
                             key={template.id}
                             className='group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200/60 hover:shadow-lg hover:shadow-indigo-500/10 dark:border-white/5 dark:bg-white/[0.03] dark:hover:border-indigo-500/20 dark:hover:shadow-indigo-500/5'
                             {...fadeInUp(index * 0.1, shouldReduceMotion)}
@@ -316,7 +313,7 @@ export const TemplatesPage = () => {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </m.div>
                     ))}
                 </div>
             </div>

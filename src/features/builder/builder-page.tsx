@@ -10,7 +10,7 @@ import { resumeFormOptions, useAppForm } from '@/features/builder/resume-form';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ParallaxBackground } from '@/components/parallax-background';
 import { fadeInUp } from '@/lib/animation-variants';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
@@ -102,42 +102,42 @@ const BuilderPage = () => {
                         className='space-y-8'
                     >
                         {/* Personal Information Section */}
-                        <motion.div {...fadeInUp(0, shouldReduceMotion)}>
+                        <m.div {...fadeInUp(0, shouldReduceMotion)}>
                             <PersonalInfoSection form={form} />
-                        </motion.div>
+                        </m.div>
 
                         {/* Work Experience Section */}
-                        <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
                             <ExperienceSection form={form} />
-                        </motion.div>
+                        </m.div>
 
                         {/* Education Section */}
-                        <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
                             <EducationSection form={form} />
-                        </motion.div>
+                        </m.div>
 
                         {/* Skills Section */}
-                        <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
                             <SkillsSection form={form} />
-                        </motion.div>
+                        </m.div>
 
                         {/* Languages Section */}
-                        <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
                             <LanguagesSection form={form} />
-                        </motion.div>
+                        </m.div>
 
                         {/* Interests Section */}
-                        <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
                             <InterestsSection form={form} />
-                        </motion.div>
+                        </m.div>
 
                         {/* GDPR Consent Section */}
-                        <motion.div {...fadeInUp(0.05, shouldReduceMotion)}>
+                        <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
                             <GdprConsentSection form={form} />
-                        </motion.div>
+                        </m.div>
 
                         {/* Submit Button */}
-                        <motion.div
+                        <m.div
                             className='flex items-center justify-between pt-6'
                             {...fadeInUp(0.05, shouldReduceMotion)}
                         >
@@ -172,7 +172,7 @@ const BuilderPage = () => {
                                     </>
                                 )}
                             />
-                        </motion.div>
+                        </m.div>
                     </form>
                 </ErrorBoundary>
             </div>

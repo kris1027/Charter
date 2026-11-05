@@ -6,6 +6,7 @@ import { PrivacyNotice } from '@/app/privacy-notice';
 import { PwaReloadPrompt } from '@/app/pwa-reload-prompt';
 import { PwaInstallPrompt } from '@/app/pwa-install-prompt';
 import { OfflineIndicator } from '@/app/offline-indicator';
+import { MotionProvider } from '@/app/motion-provider';
 import { useTranslation } from 'react-i18next';
 
 export const RootLayout = () => {
@@ -24,7 +25,9 @@ export const RootLayout = () => {
                 <div className='bg-background text-foreground min-h-screen transition-colors'>
                     <main id='main-content' className='flex-1'>
                         <ErrorBoundary>
-                            <Outlet />
+                            <MotionProvider>
+                                <Outlet />
+                            </MotionProvider>
                         </ErrorBoundary>
                     </main>
                 </div>
