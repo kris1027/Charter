@@ -2,7 +2,9 @@
 
 _Steps derived from spec 0009 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones._
 
-_Run 2026-11-05 against `vite preview` of a fresh build, offline only: in Chromium through Playwright (context offline switch) and in Safari 27.0.1 through `safaridriver` (server stopped, since Safari has no scriptable offline switch), with the long fixture at 1440 by 900. Both passed: the service worker cache held `preview-worker-*.js` after one online visit, the offline reload drew all 4 pages in about a second, and typing into first name redrew them in about 1.5 seconds with no notice. The other steps are still to run._
+_Run 2026-11-05 against `vite preview` of a fresh build, offline only: in Chromium through Playwright (context offline switch) and in Safari 27.0.1 through `safaridriver` (server stopped, since Safari has no scriptable offline switch), with the long fixture at 1440 by 900. Both passed: the service worker cache held `preview-worker-*.js` after one online visit, the offline reload drew all 4 pages in about a second, and typing into first name redrew them in about 1.5 seconds with no notice. The other browser steps are still to run._
+
+_Run 2026-11-05 of every step under Commands except the Zod one (it is the rationale.md Baseline figure): all passed. `pnpm perf:size` after a fresh build: `/builder` 253.7 KiB of 262, every route within budget, `lazyEngines` unchanged from `main`. The import grep printed nothing._
 
 Setup for the browser steps: `pnpm build && pnpm preview`, then put `src/test/fixtures/long-resume.json` into `localStorage.resumeData` and open `/builder?templateId=developer`.
 
@@ -28,17 +30,17 @@ Setup for the browser steps: `pnpm build && pnpm preview`, then put `src/test/fi
 - [ ] Make a render fail (for example DevTools, block `fonts/` requests after the first render, then type) → the last pages stay and "Preview could not update" shows; unblock and type again → the notice goes → AC-12
 - [x] Offline: after one online visit to `/builder` that started the preview, DevTools offline, reload, type → the panel still draws and updates. Run in Chrome (done once in Chromium through Playwright) and in Safari (done once in Safari 27.0.1 through `safaridriver`, server stopped) → AC-14
 - [ ] Type into experience 3, then close the tab within 30 seconds; reopen `/builder` → the edit is there. Repeat by switching tabs (hidden), and by leaving through "Back to templates" → AC-3
-- [ ] DevTools Performance, 4x CPU slowdown, panel open, type 20 characters into experience 3's description → no main thread task over 50ms from a keystroke or a preview update (see rationale.md Baseline) → AC-5
+- [ ] Chrome Performance trace (DevTools or CDP), 4x CPU slowdown, panel open, type 20 characters into experience 3's description → no main thread task over 50ms from a keystroke or a preview update (see rationale.md Baseline) → AC-5
 
 ## Commands
 
-- [ ] `pnpm vitest run src/features/builder/builder-render-counts.test.tsx` → typing in experience, education and language card 3 renders no other card or section card → AC-1
-- [ ] `pnpm vitest run src/features/builder/builder-page.test.tsx` → the spec 0005 suite plus the same length import case pass → AC-2
-- [ ] `pnpm vitest run src/features/builder/use-resume-autosave.test.ts` → pagehide, hidden, visible, typing only and unmount cases pass → AC-3
-- [ ] `pnpm vitest run src/features/pdf/live-preview src/features/builder/live-preview` → client, hook, pages and layout tests pass → AC-6, AC-8, AC-10, AC-11, AC-12, AC-13, AC-15
-- [ ] `pnpm vitest run --project pdf src/features/pdf/live-preview` → long and empty resumes render for all three templates → AC-6, AC-9
-- [ ] `pnpm build && pnpm perf:size` → `/builder` within 262 KB, `lazyEngines` unchanged and passing → AC-7
-- [ ] `grep -rnE "renderResumePdf|template-pdf|template-viewer|@react-pdf" src/features/builder --include='*.ts' --include='*.tsx' | grep -v test` → no output → AC-7
+- [x] `pnpm vitest run src/features/builder/builder-render-counts.test.tsx` → typing in experience, education and language card 3 renders no other card or section card → AC-1
+- [x] `pnpm vitest run src/features/builder/builder-page.test.tsx` → the spec 0005 suite plus the same length import case pass → AC-2
+- [x] `pnpm vitest run src/features/builder/use-resume-autosave.test.ts` → pagehide, hidden, visible, typing only and unmount cases pass → AC-3
+- [x] `pnpm vitest run src/features/pdf/live-preview src/features/builder/live-preview` → client, hook, pages and layout tests pass → AC-6, AC-8, AC-10, AC-11, AC-12, AC-13, AC-15
+- [x] `pnpm vitest run --project pdf src/features/pdf/live-preview` → long and empty resumes render for all three templates → AC-6, AC-9
+- [x] `pnpm build && pnpm perf:size` → `/builder` within 262 KB, `lazyEngines` unchanged and passing → AC-7
+- [x] `grep -rnE "renderResumePdf|template-pdf|template-viewer|@react-pdf" src/features/builder --include='*.ts' --include='*.tsx' | grep -v test` → no output → AC-7
 - [x] `ls -l dist/assets/preview-worker-*.js` and `grep preview-worker dist/sw.js` → each worker file under 3 MB and listed in the precache → AC-14
 - [ ] Zod time per parse of the long fixture at 4x stays under 2ms (rationale.md Baseline, 0.07ms) → AC-4
 
