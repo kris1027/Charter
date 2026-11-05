@@ -88,6 +88,7 @@ export const BuilderToolbar = ({
                             size='sm'
                             aria-pressed={previewOpen}
                             onClick={onTogglePreview}
+                            // xl matches WIDE_PREVIEW_QUERY, where the panel can show
                             className='hidden xl:inline-flex'
                         >
                             <PanelRight className='mr-2 h-4 w-4' />

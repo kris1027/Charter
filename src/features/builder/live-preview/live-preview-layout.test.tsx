@@ -1,6 +1,7 @@
 import { act } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BuilderPage from '@/features/builder/builder-page';
+import { WIDE_PREVIEW_QUERY } from '@/features/builder/live-preview/live-preview-panel';
 import {
     createPreviewClient,
     type PreviewClient,
@@ -27,7 +28,7 @@ const fakeClient = (): PreviewClient => ({
 const setWidth = (wide: boolean) => {
     window.matchMedia = (query: string) =>
         ({
-            matches: wide && query === '(min-width: 1280px)',
+            matches: wide && query === WIDE_PREVIEW_QUERY,
             media: query,
             onchange: null,
             addEventListener: () => {},

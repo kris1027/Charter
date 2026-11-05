@@ -25,7 +25,10 @@ import { normalizeLang } from '@/lib/app-lang';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useLivePreview } from '@/features/builder/live-preview/use-live-preview';
 import { usePreviewOpen } from '@/features/builder/live-preview/use-preview-open';
-import { LivePreviewPanel } from '@/features/builder/live-preview/live-preview-panel';
+import {
+    LivePreviewPanel,
+    WIDE_PREVIEW_QUERY,
+} from '@/features/builder/live-preview/live-preview-panel';
 import { LivePreviewSheet } from '@/features/builder/live-preview/live-preview-sheet';
 import { OpenPreviewButton } from '@/features/builder/live-preview/open-preview-button';
 
@@ -72,10 +75,10 @@ const BuilderPage = () => {
     const pdfImport = usePdfImport({ form, activeTemplateId });
 
     // Live preview (spec 0009): a side panel from 1280px, a sheet below that
-    const isWide = useMediaQuery('(min-width: 1280px)');
-    const previewOpen = usePreviewOpen();
+    const isWide = useMediaQuery(WIDE_PREVIEW_QUERY);
+    const previewPanel = usePreviewOpen();
     const [sheetOpen, setSheetOpen] = useState(false);
-    const showPanel = isWide && previewOpen.open;
+    const showPanel = isWide && previewPanel.open;
     const livePreview = useLivePreview({
         form,
         templateId: activeTemplateId,
@@ -106,8 +109,8 @@ const BuilderPage = () => {
                 autosave={autosave}
                 onSave={handleManualSave}
                 onReset={handleReset}
-                previewOpen={previewOpen.open}
-                onTogglePreview={previewOpen.toggle}
+                previewOpen={previewPanel.open}
+                onTogglePreview={previewPanel.toggle}
             />
 
             <div

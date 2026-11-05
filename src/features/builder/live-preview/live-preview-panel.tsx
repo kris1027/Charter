@@ -6,6 +6,9 @@ import {
     LivePreviewTitle,
 } from '@/features/builder/live-preview/live-preview-body';
 
+// The panel shows from Tailwind's `xl` (1280px); the toolbar toggle's `xl:` class must match
+export const WIDE_PREVIEW_QUERY = '(min-width: 1280px)';
+
 type LivePreviewPanelProps = {
     preview: LivePreview;
     unavailableAction: ReactNode;

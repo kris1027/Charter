@@ -11,6 +11,9 @@ import type { TemplateId } from '@/lib/template-ids';
 
 export const LIVE_PREVIEW_DEBOUNCE_MS = 700;
 
+// What a finished render depends on beyond the form values
+const renderKey = (templateId: TemplateId, lang: AppLang) => `${templateId}:${lang}`;
+
 // The slice of the form store the preview reads, so tests can pass a plain store
 export type PreviewFormStore = {
     store: {
@@ -47,7 +50,7 @@ export const useLivePreview = ({
     const clientRef = useRef<PreviewClient | null>(null);
     const disposeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-    const keyRef = useRef(`${templateId}:${lang}`);
+    const keyRef = useRef(renderKey(templateId, lang));
     const [status, setStatus] = useState<PreviewClientStatus>('starting');
     const [pdf, setPdf] = useState<ArrayBuffer | null>(null);
     const [failed, setFailed] = useState(false);
@@ -97,7 +100,7 @@ export const useLivePreview = ({
     }, [active, form]);
 
     useEffect(() => {
-        const key = `${templateId}:${lang}`;
+        const key = renderKey(templateId, lang);
         if (keyRef.current === key) return;
         keyRef.current = key;
         if (active) requestLater();
