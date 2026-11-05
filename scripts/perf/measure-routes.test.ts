@@ -105,7 +105,7 @@ describe('checkBudgets', () => {
     const buildSizes = measureRoutes(manifest, sizeOf);
 
     it('should pass with a row per route plus the largest chunk when all is within budget', () => {
-        const result = checkBudgets(buildSizes, budgets(), manifest);
+        const result = checkBudgets(buildSizes, budgets());
 
         expect(result.ok).toBe(true);
         expect(result.problems).toEqual([]);
@@ -119,7 +119,6 @@ describe('checkBudgets', () => {
         const result = checkBudgets(
             buildSizes,
             budgets({ routes: { '/builder': { maxKb: 30, reason: 'test' } } }),
-            manifest,
         );
 
         expect(result.ok).toBe(false);
@@ -130,7 +129,6 @@ describe('checkBudgets', () => {
         const result = checkBudgets(
             buildSizes,
             budgets({ chunkCap: { maxKb: 100, reason: 'test' } }),
-            manifest,
         );
 
         expect(result.ok).toBe(false);
@@ -140,7 +138,7 @@ describe('checkBudgets', () => {
     });
 
     it('should fail with the path and size when a route has no budget', () => {
-        const result = checkBudgets(buildSizes, budgets({ routes: {} }), manifest);
+        const result = checkBudgets(buildSizes, budgets({ routes: {} }));
 
         expect(result.ok).toBe(false);
         expect(result.problems).toEqual([
@@ -157,7 +155,6 @@ describe('checkBudgets', () => {
                     '/gone': { maxKb: 40, reason: 'test' },
                 },
             }),
-            manifest,
         );
 
         expect(result.problems).toEqual(['/gone: budget matches no route chunk (stale budget)']);
@@ -170,7 +167,6 @@ describe('checkBudgets', () => {
                 routes: { '/builder': { maxKb: 40, reason: ' ' } },
                 chunkCap: { maxKb: 400 },
             }),
-            manifest,
         );
 
         expect(result.problems).toEqual([
@@ -180,7 +176,7 @@ describe('checkBudgets', () => {
     });
 
     it('should fail when compression is not brotli', () => {
-        const result = checkBudgets(buildSizes, budgets({ compression: 'gzip' }), manifest);
+        const result = checkBudgets(buildSizes, budgets({ compression: 'gzip' }));
 
         expect(result.problems).toEqual(['compression must be "brotli", got "gzip"']);
     });
@@ -252,7 +248,6 @@ describe('checkEngines', () => {
                     '/builder': { maxKb: 400, reason: 'test' },
                 },
             }),
-            leaky,
         );
 
         expect(result.ok).toBe(false);

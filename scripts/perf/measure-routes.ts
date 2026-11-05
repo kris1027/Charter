@@ -12,7 +12,8 @@ export type Manifest = Record<string, ManifestChunk>;
 
 export type MeasuredRoute = { path: string; files: string[]; bytes: number };
 export type MeasuredChunk = { file: string; bytes: number };
-export type BuildSizes = { routes: MeasuredRoute[]; chunks: MeasuredChunk[] };
+// Carries the manifest it was measured from, so the engine check reads the same build
+export type BuildSizes = { manifest: Manifest; routes: MeasuredRoute[]; chunks: MeasuredChunk[] };
 
 export type Budget = { maxKb: number; reason?: string };
 export type LazyEngine = { match: string; reason?: string };
@@ -106,7 +107,7 @@ export const measureRoutes = (manifest: Manifest, sizeOf: (file: string) => numb
     const chunks = [...jsFiles].map((file) => ({ file, bytes: cachedSize(file) }));
 
     routes.sort((a, b) => a.path.localeCompare(b.path));
-    return { routes, chunks };
+    return { manifest, routes, chunks };
 };
 
 const hasReason = (budget: Budget) =>
@@ -229,18 +230,14 @@ export const checkEngines = (
     return problems;
 };
 
-export const checkBudgets = (
-    buildSizes: BuildSizes,
-    budgets: Budgets,
-    manifest: Manifest,
-): BudgetResult => {
+export const checkBudgets = (buildSizes: BuildSizes, budgets: Budgets): BudgetResult => {
     const compressionProblems =
         budgets.compression === 'brotli'
             ? []
             : [`compression must be "brotli", got "${budgets.compression}"`];
     const routes = checkRoutes(buildSizes.routes, budgets.routes);
     const chunkCap = checkChunkCap(buildSizes.chunks, budgets.chunkCap);
-    const engines = checkEngines(manifest, buildSizes.routes, budgets.lazyEngines);
+    const engines = checkEngines(buildSizes.manifest, buildSizes.routes, budgets.lazyEngines);
 
     const problems = [...compressionProblems, ...routes.problems, ...chunkCap.problems, ...engines];
     return { ok: problems.length === 0, rows: [...routes.rows, ...chunkCap.rows], problems };

@@ -63,9 +63,8 @@ if (!existsSync(manifestPath)) {
 }
 
 try {
-    const manifest = readJson<Manifest>(manifestPath);
-    const buildSizes = measureRoutes(manifest, sizeOf);
-    const result = checkBudgets(buildSizes, readJson<Budgets>(budgetsPath), manifest);
+    const buildSizes = measureRoutes(readJson<Manifest>(manifestPath), sizeOf);
+    const result = checkBudgets(buildSizes, readJson<Budgets>(budgetsPath));
     printTable(result);
     writeJobSummary(markdown(result));
     process.exitCode = result.ok ? 0 : 1;
