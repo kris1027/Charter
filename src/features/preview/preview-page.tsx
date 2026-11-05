@@ -141,7 +141,9 @@ export const PreviewPage = () => {
     const activeScale = useCompact && typeof optimalScale === 'number' ? optimalScale : 0;
     const previewPlaceholder = (
         <div className='flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950'>
-            <p className='text-sm text-gray-500 dark:text-gray-400'>{t('preview.title')}...</p>
+            <p className='text-sm text-gray-500 dark:text-gray-400'>
+                {t('preview.loadingPreview')}
+            </p>
         </div>
     );
     // Hide toggle entirely when content can't fit even at max compaction
