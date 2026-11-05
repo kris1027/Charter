@@ -115,4 +115,26 @@ describe('useResumeAutosave on hide (spec 0009, AC-3)', () => {
 
         expect(setItem).not.toHaveBeenCalled();
     });
+
+    it('should write nothing when the builder unmounts right after loading the stored resume', () => {
+        localStorage.setItem('resumeData', JSON.stringify(withName('Ada')));
+        const form = { state: { values: withName('Ada') } };
+        const hook = renderHook(() => useResumeAutosave(form));
+        const setItem = vi.spyOn(Storage.prototype, 'setItem');
+
+        hook.unmount();
+
+        expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('should write the values when they differ from storage at mount and the page hides', () => {
+        localStorage.setItem('resumeData', JSON.stringify(withName('Ada')));
+        const values: ResumeFormValues = { ...withName('Ada'), templateId: 'veterinary' };
+        const form = { state: { values } };
+        renderHook(() => useResumeAutosave(form));
+
+        window.dispatchEvent(new Event('pagehide'));
+
+        expect(stored().templateId).toBe('veterinary');
+    });
 });
