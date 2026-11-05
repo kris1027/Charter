@@ -23,7 +23,7 @@ pnpm build            # tsc -b plus vite build (the only typecheck)
 pnpm test             # Vitest once; pnpm test:coverage enforces a 50% floor
 pnpm lint             # ESLint only
 pnpm format           # Prettier; CI runs format:check, templates:previews --check, lint, test, build, perf:size
-pnpm perf:size        # Per route JS (brotli) against perf/budgets.json; needs a fresh dist
+pnpm perf:size        # Per route JS (brotli) against perf/budgets.json, fails a first load holding a `lazyEngines` chunk; needs a fresh dist
 pnpm templates:previews  # Regenerate gallery images after a template change; --check, --baseline, --diff
 pnpm perf:lighthouse  # Build, then Lighthouse CI on vite preview (local only, not in pre-commit)
 pnpm pre-commit       # format, previews check, lint, test, build, perf:size (not Lighthouse); run before pushing
@@ -45,6 +45,7 @@ Stored in `docs/specs/`. Format: one folder per spec, `docs/specs/NNNN-title/` w
 - GDPR clause, when enabled, renders at the bottom of every template: `cv.gdprConsent` with a company name, `cv.gdprConsentGeneric` without.
 - React Compiler: compiles every component and memoizes for you, so skip new `useMemo`/`useCallback`/`memo` written only for speed. If a component misbehaves under it, opt that one out with `'use no memo'` plus a comment naming the reason; never turn the compiler off globally. The `react-hooks` lint rules (v7 `flat.recommended`) flag code it cannot compile.
 - Animations: respect `prefers-reduced-motion`, parallax only on decorative layers (never text), `viewport: { once: true }` on every `whileInView` (shared variants in `src/lib/animation-variants.ts`).
+- Motion loads lazily: pages render `m.*` inside `LazyMotion` (`src/app/motion-provider.tsx`, `strict`), never full `motion` components (lint enforced, spec 0008). Entrance variants carry `data-entrance` so `index.css` shows them if the engine fails or stalls.
 - Storage: always go through `safeStorage` (`src/lib/storage.ts`, falls back to memory). Keys: `resumeData`, `resumeData_backup` (manual save, survives reset), `resumeData_lastSaved`, plus `theme`, `language`, `privacyNoticeAccepted`, `pwaInstallDismissed`. Breaking the saved shape is allowed this pass.
 - Resume storage keys (`resumeData`, `resumeData_backup`, `resumeData_lastSaved`) are written or removed only by `saveResume`, `writeResume` and `clearResume` in `src/features/resume/stored-resume.ts`.
 - Template choice travels as `?templateId=` on `/builder` and `/preview`; the gallery detail page uses the path `/templates/$templateId`.
