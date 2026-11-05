@@ -28,9 +28,9 @@ export const LivePreviewBody = ({ preview, unavailableAction }: LivePreviewBodyP
     return <PreviewPages pdf={preview.pdf} renderFailed={preview.failed} />;
 };
 
-type LivePreviewHeaderProps = { preview: LivePreview; titleId?: string };
+type LivePreviewTitleProps = { preview: LivePreview; titleId?: string };
 
-export const LivePreviewTitle = ({ preview, titleId }: LivePreviewHeaderProps) => {
+export const LivePreviewTitle = ({ preview, titleId }: LivePreviewTitleProps) => {
     const { t } = useTranslation();
 
     return (
