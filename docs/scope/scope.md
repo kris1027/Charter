@@ -39,7 +39,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 9   | PDF import parser restructure   | Slice 1    | done     |
 | 10  | Lazy load heavy engines         | Slice 2    | done     |
 | 11  | Builder responsiveness          | Slice 2    | done     |
-| 12  | Landing page refresh            | Slice 3    | planned  |
+| 12  | Landing page refresh            | Slice 3    | done     |
 | 13  | Template gallery refresh        | Slice 3    | planned  |
 | 14  | Builder UI refresh              | Slice 3    | planned  |
 | 15  | Preview & export UI refresh     | Slice 3    | planned  |
@@ -264,12 +264,19 @@ spec [0009](../specs/0009-builder-responsiveness/index.md) · code in `src/featu
 
 ## Slice 3: Refresh the UI
 
-### 12. Landing page refresh · needs a decision
+### 12. Landing page refresh · done
 
 Rebuild the home page on the new design system, keeping parallax on decorative layers only.
 **Done when:** the page uses the new tokens and components, reads well at phone width, and keeps its SEO metadata.
+spec [0010](../specs/0010-landing-page-refresh/index.md) · code in `src/features/landing/`
 
-- [ ] Design it (spec): `/architect landing page refresh`
+- [x] Design it (spec): `/architect landing page refresh`
+- [x] Build it: `/develop landing page refresh`
+    - [x] Tokens, font, and the hero end to end (AC-1, AC-2, AC-3, AC-4, AC-5, AC-10, AC-11, AC-12, AC-13, AC-15)
+    - [x] Statement, features, and how it works (AC-1, AC-6, AC-7, AC-12, AC-13, AC-15)
+    - [x] Stats, closing section, footer, and removed strings (AC-8, AC-9, AC-15)
+    - [x] Lint guard, cleanup, and `DESIGN.md` (AC-10, AC-17)
+    - [x] SEO, motion failure, phone width, and performance checks (AC-14, AC-16, AC-18)
 
 ### 13. Template gallery refresh · needs a decision
 
@@ -305,6 +312,7 @@ Out of scope for this pass, kept so the plan stays honest.
 
 - **Template visual refresh**: new look for the three resume templates (web and PDF) · needs a decision
 - **More templates**: a fourth template once the shared model (feature 8) makes it cheap · needs a decision
+- **Global landing look**: decide at the template gallery refresh whether the landing tokens become the app's design system or stay on the home page · from spec 0010 · needs a decision
 
 ## Legend
 

@@ -54,6 +54,26 @@ Other tokens:
 - **Browser theme color**: `theme-provider.tsx` sets `<meta name='theme-color'>` to `#ffffff` in light and `#020617` (slate 950) in dark, matching `background`.
 - **`color-scheme`**: `light` on `:root`, `dark` on `.dark`, so native controls and scrollbars follow the theme.
 
+## Landing tokens
+
+These are for the landing page only (`src/features/landing/`, [spec 0010](docs/specs/0010-landing-page-refresh/index.md)). No other page may use them. Whether they become the app's design system is decided at the template gallery refresh. They live in `src/index.css` next to the tokens above, and their contrast pairs are in `src/lib/design-tokens.test.ts`.
+
+| Token                                                                         | Light / dark                   | Use                                      |
+| ----------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------- |
+| `landing-bg`, `landing-bg-2`                                                  | near white / black, near black | page; stats and footer                   |
+| `landing-fg`                                                                  | near black / near white        | text                                     |
+| `landing-fg-2`                                                                | grey / lighter grey            | secondary and small text, inactive steps |
+| `landing-muted`                                                               | mid grey in both               | large headline text only (3:1)           |
+| `landing-link`, `landing-eyebrow`                                             | darker / lighter per theme     | links and step numbers; the hero label   |
+| `landing-line`, `landing-track`                                               | per theme                      | borders; the progress track              |
+| `landing-accent`, `landing-accent-hover`, `landing-accent-fg`                 | same in both                   | buttons and progress; white text on them |
+| `landing-showcase-*` (`bg`, `card`, `fg`, `muted`, `line`, `chip`)            | `bg` differs in dark           | the always dark features section         |
+| `landing-blue`, `purple`, `orange`, `green`, `yellow`, `pink`                 | same in both                   | feature card labels, in that order       |
+| `landing-paper`, `landing-paper-*` (`ink`, `sub`, `line`, `filled`, `avatar`) | same in both                   | drawn CV sheets, white in both themes    |
+
+- **Shadows**: `shadow-landing-hero` (center card, steps card) and `shadow-landing-side` (side cards), the same in both themes.
+- **Font**: `font-landing` is Space Grotesk, self hosted from `public/fonts/` as a variable font (weights 300 to 700). Only the landing page uses it.
+
 ## Brand gradient
 
 Two utilities built from the three brand stops: `text-gradient-brand` (gradient text clipped to the glyphs) and `bg-gradient-brand`.
@@ -102,7 +122,7 @@ One rule in `@layer base` covers every control:
 
 - In classes: `duration-(--duration-fast)`, `ease-standard`, `data-[state=closed]:ease-exit`. These also drive the tw-animate-css `animate-in` and `animate-out` classes.
 - In `motion` code: import from `@/lib/motion-tokens` (as `src/lib/animation-variants.ts` does). The parity test fails if the CSS and TS values drift apart, so change both together.
-- Loop periods of decorative keyframes (`float` 6s, `float-reverse` 5s, `gradient-shift` 8s, `pulse-glow` 2.5s) are not tokens.
+- Loop periods of decorative keyframes (`float` 6s, `float-reverse` 5s, `gradient-shift` 8s) are not tokens.
 - **Reduced motion**: one global rule under `prefers-reduced-motion: reduce` sets `animation-duration` and `transition-duration` to `0.01ms !important` on every element and pseudo element. It is near zero rather than `none`, so Radix still sees `animationend` and unmounts closed popovers. Motion variants return `{}` when reduced motion is on.
 - Parallax only on decorative layers, never text; `viewport: { once: true }` on every `whileInView` (see `AGENTS.md`).
 
@@ -151,7 +171,7 @@ The four shell notices (`src/app/`) are toasts: privacy (Accept only, no close, 
 
 ## Lint rule
 
-In `src/components/**`, `src/app/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
+In `src/components/**`, `src/app/**`, `src/features/landing/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
 
 - raw palette classes such as `indigo-600` or `slate-400`
 - `white` or `black` color classes such as `bg-white` or `text-black`
