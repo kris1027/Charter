@@ -57,6 +57,7 @@ const PAIRS: Pair[] = [
         'landing-showcase-chip',
     ),
     ...text('landing-showcase-muted', 'landing-showcase-card'),
+    ...text('landing-paper-ink', 'landing-showcase-fg'),
     ...LANDING_LABELS.flatMap((name) => text(name, 'landing-showcase-card')),
     // Both only ever appear as large headline text
     ...nonText('landing-muted', 'landing-bg'),

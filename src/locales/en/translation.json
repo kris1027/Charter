@@ -53,6 +53,9 @@
         "howItWorks": {
             "title": "How it works",
             "subtitle": "Three simple steps.",
+            "step1Number": "01",
+            "step2Number": "02",
+            "step3Number": "03",
             "step1Title": "Choose a template",
             "step1Desc": "Select from our collection of professional designs",
             "step2Title": "Fill in your details",

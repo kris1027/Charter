@@ -53,6 +53,9 @@
         "howItWorks": {
             "title": "Jak to działa",
             "subtitle": "Trzy proste kroki.",
+            "step1Number": "01",
+            "step2Number": "02",
+            "step3Number": "03",
             "step1Title": "Wybierz szablon",
             "step1Desc": "Wybierz spośród naszych profesjonalnych wzorów",
             "step2Title": "Uzupełnij dane",

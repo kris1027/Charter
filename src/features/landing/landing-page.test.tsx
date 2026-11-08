@@ -23,6 +23,26 @@ describe('IndexPage', () => {
         ]);
     });
 
+    it('should render every section in order when the page loads', async () => {
+        await renderLanding();
+        const heading = (name: string) => screen.getByRole('heading', { name });
+
+        const sections = [
+            screen.getByRole('heading', { level: 1 }),
+            screen.getByText('Professional tools to create standout resumes.'),
+            heading('Built for every step of the search.'),
+            heading('Three simple steps.'),
+            screen.getByText('Templates'),
+            heading('Ready to build your CV?'),
+            screen.getByText('Resume Builder · Your data never leaves your browser.'),
+        ];
+
+        sections.slice(1).forEach((section, i) => {
+            const position = sections[i].compareDocumentPosition(section);
+            expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        });
+    });
+
     it('should list six feature cards and three steps as h3 when the page loads', async () => {
         await renderLanding();
 
@@ -94,7 +114,7 @@ describe('IndexPage', () => {
 
         fireEvent.error(center);
 
-        expect(center).toHaveClass('invisible');
+        expect(center).not.toBeVisible();
     });
 
     it('should show the template count and no time claim when the stats render', async () => {
@@ -106,16 +126,13 @@ describe('IndexPage', () => {
     });
 
     it('should mark every step active and show the pill when scroll effects are off', async () => {
-        const { container } = await renderLanding();
+        await renderLanding();
 
-        expect(container.querySelector('[aria-current="step"]')).toBeNull();
-        expect(screen.getByRole('heading', { name: 'Choose a template' })).toHaveClass(
-            'text-landing-fg',
-        );
-        expect(screen.getByRole('heading', { name: 'Download your CV' })).toHaveClass(
-            'text-landing-fg',
-        );
-        expect(screen.getByText('Download PDF')).toHaveClass('opacity-100');
+        expect(screen.queryAllByRole('listitem', { current: 'step' })).toHaveLength(0);
+        for (const name of ['Choose a template', 'Fill in your details', 'Download your CV']) {
+            expect(screen.getByRole('heading', { name })).toHaveAttribute('data-state', 'active');
+        }
+        expect(screen.getByText('Download PDF')).toHaveAttribute('data-state', 'visible');
     });
 
     it('should show the site name and privacy line when the footer renders', async () => {

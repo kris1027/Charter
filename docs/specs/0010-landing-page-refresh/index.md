@@ -21,9 +21,9 @@ This spec rebuilds the home page from your Claude Design file ([design-source.ht
 - **AC-2**: The hero shows the site name, headline on two lines (second line muted), subtitle, one primary button to `/templates`, a text link with a chevron that jumps to `#how`, and the three trust items (no sign up, free, export to PDF). The hero has no entrance animation.
 - **AC-3**: The hero's three fanned cards are real previews for the current language: `default` in the center, `developer` left (rotated -8deg), `veterinary` right (rotated 8deg). Changing language swaps them. The center image loads eagerly with `fetchPriority='high'`; side images use `loading='lazy'` and `fetchPriority='low'`, and are hidden below `lg` by CSS alone (`hidden lg:block`), so phones never request them. Each `img` has `alt=''` and `PREVIEW_WIDTH` and `PREVIEW_HEIGHT`, so nothing shifts while loading. Each card has a white background, so a failed or offline image shows a blank white sheet with no broken icon.
 - **AC-4**: At the `lg` breakpoint and up, with motion allowed, the hero is 200vh tall with a sticky 100vh stage (`min-height` 640px). Over the section's scroll, the stage moves up 260px and scales to 1.25, side cards rise 35vh and the center card 12vh.
-- **AC-5**: Hero text changes only in opacity, from 1 to 0 over the first 45.45% of hero scroll, and never translates or scales. When focus enters the hero text and `window.scrollY` is past the hero's top, the page calls `window.scrollTo({ top: heroTop, behavior: 'instant' })`, where `heroTop` is the section's `getBoundingClientRect().top + window.scrollY`, so the focused link is visible. All other text on the page has no scroll linked motion; it enters once through `fadeInUp` or `fadeInScale` with `viewport: { once: true }` and does not replay.
+- **AC-5**: Hero text changes only in opacity, from 1 to 0 over the first 45.45% of hero scroll, and never translates or scales. While scroll effects are on, when focus enters the hero text and `window.scrollY` is past the hero's top, the page calls `window.scrollTo({ top: heroTop, behavior: 'instant' })`, where `heroTop` is the section's `getBoundingClientRect().top + window.scrollY`, so the focused link is visible. All other text on the page has no scroll linked motion; it enters once through `fadeInUp` or `fadeInScale` with `viewport: { once: true }` and does not replay.
 - **AC-6**: Features: a statement block, then a heading on two lines, then six cards in this order: templates, dark mode, PDF, bilingual, autosave, privacy, in an auto fitting grid (minimum column 320px, or full width below that). Each card has its colored `h3` label, description and decorative visual from the design. Visuals are `aria-hidden`. Only the non text visuals of the templates and dark mode cards use parallax, through `useParallax`.
-- **AC-7**: At `lg` and up with motion allowed, how it works is 300vh with a sticky stage (`min-height` 560px), and `id='how'` sits on the outer section at every width, so the hero link lands on step 1. Scroll progress below 0.34 activates step 1, below 0.67 step 2, otherwise step 3. The active step has full color and `aria-current='step'`; inactive steps use `--landing-fg-2` (never reduced opacity). A progress bar follows scroll. The drawn white card fills per _Steps card behavior_, rotates and moves per _Scroll effects_, and is `aria-hidden`.
+- **AC-7**: At `lg` and up with motion allowed, how it works is 300vh with a sticky stage (`min-height` 560px), and `id='how'` sits on the outer section at every width, so the hero link lands on step 1. Scroll progress below 0.34 activates step 1, below 0.67 step 2, otherwise step 3. The active step has full color and `aria-current='step'`; inactive steps use `--landing-fg-2` (never reduced opacity). A progress bar follows scroll. The drawn white card fills per _Steps card behavior_, rotates and moves per _Scroll effects_, and is `aria-hidden`. The download pill is text, so it sits outside the moving card and does not move with scroll.
 - **AC-8**: Stats show, in order: the template count from `TEMPLATE_IDS.length` with its label, `100%` with its label, `PL/EN` with its label. Numbers do not move with scroll. The `5 min` stat and its strings are gone.
 - **AC-9**: The closing section has its heading, subtitle and one button to `/templates`. The footer shows `SEO_DEFAULTS.siteName` and the privacy line.
 - **AC-10**: Every color on the page comes from the tokens in _Landing tokens_, defined in `:root` and `.dark` and exposed through `@theme inline`. `src/features/landing/**` is in `TOKEN_ONLY_FILES`. Every pair in _Contrast pairs_ is added to `src/lib/design-tokens.test.ts` and passes. `DESIGN.md` documents the tokens and says that they are for the landing page only.
@@ -70,11 +70,14 @@ Reasoning and options: see [rationale.md](rationale.md).
 | `5 min, Average time`                       | Template count                                   | Unmeasured claim                        |
 | `Folio CV Builder`, `CV Builder`            | `SEO_DEFAULTS.siteName`                          | One product name                        |
 | Google Fonts link                           | Self hosted                                      | CSP, privacy message                    |
+| Hero text `max-width: 900px`                | `1000px`                                         | At 900px the EN headline takes 3 lines  |
+| PL chip text `#86868b`                      | `--landing-showcase-fg`                          | `#86868b` on the chip is only 3.85:1    |
+| Download pill moves with the card           | Static, outside the card                         | Text parallax rule                      |
 | Custom scroll listener and DOM queries      | `useScroll`, `useTransform`, CSS `sticky`        | Project motion pattern                  |
 
 ### File layout
 
-All in `src/features/landing/`: `landing-page.tsx` (order only), `hero-section.tsx`, `statement-section.tsx`, `features-section.tsx`, `feature-visuals.tsx`, `how-it-works-section.tsx`, `steps-card.tsx`, `stats-section.tsx`, `closing-section.tsx`, `landing-footer.tsx`, `use-scroll-effects.ts`. Components that use a motion value are small `m.*` components, each with its own hook call.
+All in `src/features/landing/`: `landing-page.tsx` (order only), `hero-section.tsx`, `statement-section.tsx`, `features-section.tsx`, `feature-visuals.tsx`, `how-it-works-section.tsx`, `steps-card.tsx`, `stats-section.tsx`, `closing-section.tsx`, `landing-cta-link.tsx`, `landing-footer.tsx`, `use-scroll-effects.ts`. Components that use a motion value are small `m.*` components, each with its own hook call.
 
 ### Sizes and imports
 
@@ -134,6 +137,7 @@ Text pairs need 4.5:1 unless marked. Ratios were computed from the design's hex 
 | Both  | The six card label colors                       | `landing-showcase-card`                      | at least 5.13  |
 | Both  | `landing-showcase-fg`                           | `landing-showcase-bg`                        | at least 18.07 |
 | Both  | `landing-showcase-fg`                           | `landing-showcase-chip`                      | about 12.8     |
+| Both  | `landing-paper-ink`                             | `landing-showcase-fg`                        | about 15       |
 | Both  | `landing-muted`                                 | `landing-bg` (3:1, large text only)          | 3.51 light     |
 | Both  | `landing-showcase-muted`                        | `landing-showcase-bg` (3:1, large text only) | at least 5.43  |
 
@@ -194,6 +198,9 @@ Add or change these keys. Punctuation in the Polish column is final, subject to 
 | `home.features.autosave.visual`   | Saved just now                                 | Zapisano przed chwilą                                       |
 | `home.features.privacy.visual`    | 0 bytes uploaded                               | Wysłano 0 bajtów                                            |
 | `home.howItWorks.subtitle`        | Three simple steps.                            | Trzy proste kroki.                                          |
+| `home.howItWorks.step1Number`     | 01                                             | 01                                                          |
+| `home.howItWorks.step2Number`     | 02                                             | 02                                                          |
+| `home.howItWorks.step3Number`     | 03                                             | 03                                                          |
 | `home.howItWorks.downloadPill`    | Download PDF                                   | Pobierz PDF                                                 |
 | `home.stats.templatesLabel`       | Templates                                      | Szablony                                                    |
 | `home.footer.privacy`             | Your data never leaves your browser.           | Twoje dane nigdy nie opuszczają przeglądarki.               |

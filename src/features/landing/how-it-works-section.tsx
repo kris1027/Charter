@@ -7,9 +7,9 @@ import { useScrollEffects } from '@/features/landing/use-scroll-effects';
 import { fadeInUp } from '@/lib/animation-variants';
 
 const STEPS = [
-    { number: '01', titleKey: 'step1Title', descKey: 'step1Desc' },
-    { number: '02', titleKey: 'step2Title', descKey: 'step2Desc' },
-    { number: '03', titleKey: 'step3Title', descKey: 'step3Desc' },
+    { numberKey: 'step1Number', titleKey: 'step1Title', descKey: 'step1Desc' },
+    { numberKey: 'step2Number', titleKey: 'step2Title', descKey: 'step2Desc' },
+    { numberKey: 'step3Number', titleKey: 'step3Title', descKey: 'step3Desc' },
 ] as const;
 
 const LAST_STEP = STEPS.length - 1;
@@ -34,7 +34,7 @@ const StepsProgress = ({ progress }: StepsProgressProps) => (
 
 export const HowItWorksSection = () => {
     const { t } = useTranslation();
-    const effects = useScrollEffects();
+    const hasScrollEffects = useScrollEffects();
     const shouldReduceMotion = useReducedMotion();
     const sectionRef = useRef<HTMLElement>(null);
     const { scrollYProgress } = useScroll({
@@ -43,6 +43,7 @@ export const HowItWorksSection = () => {
     });
     const [scrollStep, setScrollStep] = useState(0);
     const [scrollFills, setScrollFills] = useState(0);
+    const cardStep = hasScrollEffects ? scrollStep : LAST_STEP;
 
     // React skips the render when the rounded value is unchanged
     useMotionValueEvent(scrollYProgress, 'change', (progress) => {
@@ -66,21 +67,24 @@ export const HowItWorksSection = () => {
                             {t('home.howItWorks.subtitle')}
                         </h2>
                         <ol className='flex flex-col gap-[18px]'>
-                            {STEPS.map(({ number, titleKey, descKey }, i) => {
-                                const isActive = !effects || i === scrollStep;
+                            {STEPS.map(({ numberKey, titleKey, descKey }, i) => {
+                                const isActive = !hasScrollEffects || i === scrollStep;
                                 return (
                                     <li
-                                        key={number}
+                                        key={numberKey}
                                         className='flex gap-5'
-                                        aria-current={effects && isActive ? 'step' : undefined}
+                                        aria-current={
+                                            hasScrollEffects && isActive ? 'step' : undefined
+                                        }
                                     >
                                         <span
                                             className={`min-w-6 text-[17px] font-semibold transition-colors duration-(--duration-slow) ${isActive ? 'text-landing-link' : 'text-landing-fg-2'}`}
                                         >
-                                            {number}
+                                            {t(`home.howItWorks.${numberKey}`)}
                                         </span>
                                         <div>
                                             <h3
+                                                data-state={isActive ? 'active' : 'inactive'}
                                                 className={`text-2xl font-semibold tracking-[-0.02em] transition-colors duration-(--duration-slow) ${isActive ? 'text-landing-fg' : 'text-landing-fg-2'}`}
                                             >
                                                 {t(`home.howItWorks.${titleKey}`)}
@@ -93,14 +97,15 @@ export const HowItWorksSection = () => {
                                 );
                             })}
                         </ol>
-                        {effects && <StepsProgress progress={scrollYProgress} />}
+                        {hasScrollEffects && <StepsProgress progress={scrollYProgress} />}
                     </m.div>
                     <div className='flex justify-center'>
                         <StepsCard
                             progress={scrollYProgress}
-                            effects={effects}
-                            step={effects ? scrollStep : LAST_STEP}
-                            fills={effects ? scrollFills : TOTAL_FILLS}
+                            hasScrollEffects={hasScrollEffects}
+                            step={cardStep}
+                            fills={hasScrollEffects ? scrollFills : TOTAL_FILLS}
+                            showPill={cardStep === LAST_STEP}
                         />
                     </div>
                 </div>

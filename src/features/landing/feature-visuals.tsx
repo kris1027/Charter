@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { m } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import { useScrollEffects } from '@/features/landing/use-scroll-effects';
-import { useParallax } from '@/hooks/use-parallax';
+import { useLandingParallax } from '@/features/landing/use-scroll-effects';
 
 type ParallaxSheetProps = {
     yRange: number;
@@ -12,13 +11,12 @@ type ParallaxSheetProps = {
 };
 
 const ParallaxSheet = ({ yRange, rotate = 0, className, children }: ParallaxSheetProps) => {
-    const effects = useScrollEffects();
-    const { ref, y } = useParallax({ yRange });
+    const { ref, y } = useLandingParallax(yRange);
     return (
         <m.div
             ref={ref}
             className={`absolute aspect-[0.72] w-[34%] rounded-[10px] ${className}`}
-            style={{ rotate, y: effects ? y : 0 }}
+            style={{ rotate, y }}
         >
             {children}
         </m.div>
@@ -49,14 +47,13 @@ export const TemplatesVisual = () => (
 );
 
 export const DarkModeVisual = () => {
-    const effects = useScrollEffects();
-    const { ref, y } = useParallax({ yRange: -50 });
+    const { ref, y } = useLandingParallax(-50);
     return (
         <div className='flex justify-center pb-2.5' aria-hidden='true'>
             <m.div
                 ref={ref}
                 className='from-landing-showcase-fg to-landing-showcase-chip ring-landing-showcase-line h-[150px] w-[150px] rounded-full bg-linear-to-r from-50% to-50% ring-1'
-                style={{ y: effects ? y : 0 }}
+                style={{ y }}
             />
         </div>
     );
@@ -81,7 +78,7 @@ export const I18nVisual = () => {
             <div className='bg-landing-showcase-fg text-landing-paper-ink rounded-full px-[22px] py-2.5'>
                 {t('home.features.i18n.visualEn')}
             </div>
-            <div className='bg-landing-showcase-chip text-landing-showcase-muted rounded-full px-[22px] py-2.5'>
+            <div className='bg-landing-showcase-chip text-landing-showcase-fg rounded-full px-[22px] py-2.5'>
                 {t('home.features.i18n.visualPl')}
             </div>
         </div>

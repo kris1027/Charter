@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router';
 import { m, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { LandingCtaLink } from '@/features/landing/landing-cta-link';
 import { fadeInUp } from '@/lib/animation-variants';
 
 export const ClosingSection = () => {
@@ -17,12 +17,7 @@ export const ClosingSection = () => {
                     {t('home.cta.subtitle')}
                 </p>
                 <div className='mt-9 flex justify-center'>
-                    <Link
-                        to='/templates'
-                        className='bg-landing-accent text-landing-accent-fg hover:bg-landing-accent-hover rounded-full px-7 py-3.5 text-[17px] transition-colors duration-(--duration-fast)'
-                    >
-                        {t('home.cta.button')}
-                    </Link>
+                    <LandingCtaLink className='px-7 py-3.5'>{t('home.cta.button')}</LandingCtaLink>
                 </div>
             </m.div>
         </section>
