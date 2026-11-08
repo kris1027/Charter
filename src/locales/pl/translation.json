@@ -6,61 +6,63 @@
     },
     "home": {
         "hero": {
-            "title": "Stwórz idealne CV w",
-            "titleHighlight": "kilka minut",
+            "title": "Stwórz idealne CV",
+            "titleHighlight": "w kilka minut.",
             "subtitle": "Twórz profesjonalne CV z naszym kreatorem. Wyróżnij się i zdobądź wymarzoną pracę.",
             "cta": "Zacznij tworzyć CV",
-            "ctaSecondary": "Przeglądaj szablony"
+            "seeHow": "Zobacz, jak to działa"
         },
         "features": {
             "noSignup": "Bez rejestracji",
             "free": "100% za darmo",
             "exportPdf": "Eksport do PDF",
-            "title": "Wszystko czego potrzebujesz",
-            "subtitle": "Profesjonalne narzędzia do tworzenia wyróżniających się CV",
+            "title": "Wszystko, czego potrzebujesz.",
+            "subtitle": "Profesjonalne narzędzia do tworzenia wyróżniających się CV.",
+            "showcaseTitle": "Stworzone na każdy",
+            "showcaseHighlight": "etap szukania pracy.",
             "templates": {
                 "title": "Profesjonalne szablony",
-                "desc": "Wybierz spośród starannie zaprojektowanych wzorów dla każdej branży"
+                "desc": "Wybierz spośród starannie zaprojektowanych wzorów dla każdej branży."
             },
             "darkMode": {
                 "title": "Tryb ciemny",
-                "desc": "Pracuj komfortowo dniem i nocą z pełnym wsparciem motywów"
+                "desc": "Pracuj komfortowo dniem i nocą z pełnym wsparciem motywów."
             },
             "pdf": {
                 "title": "Eksport PDF",
-                "desc": "Pobierz CV jako perfekcyjny PDF gotowy do wysłania"
+                "desc": "Pobierz CV jako perfekcyjny PDF gotowy do wysłania.",
+                "visual": ".pdf"
             },
             "i18n": {
                 "title": "Wsparcie dwujęzyczne",
-                "desc": "Twórz CV po angielsku lub polsku jednym kliknięciem"
+                "desc": "Twórz CV po angielsku lub polsku jednym kliknięciem.",
+                "visualEn": "EN",
+                "visualPl": "PL"
             },
             "autosave": {
                 "title": "Autozapis",
-                "desc": "Twój postęp jest automatycznie zapisywany — nigdy nie stracisz pracy"
+                "desc": "Twój postęp jest automatycznie zapisywany — nigdy nie stracisz pracy.",
+                "visual": "Zapisano przed chwilą"
             },
             "privacy": {
                 "title": "Prywatność przede wszystkim",
-                "desc": "Wszystkie dane zostają w Twojej przeglądarce — nic nie jest wysyłane na serwer"
+                "desc": "Wszystkie dane zostają w Twojej przeglądarce — nic nie jest wysyłane na serwer.",
+                "visual": "Wysłano 0 bajtów"
             }
         },
         "howItWorks": {
             "title": "Jak to działa",
-            "subtitle": "Stwórz profesjonalne CV w trzech prostych krokach",
+            "subtitle": "Trzy proste kroki.",
             "step1Title": "Wybierz szablon",
             "step1Desc": "Wybierz spośród naszych profesjonalnych wzorów",
             "step2Title": "Uzupełnij dane",
             "step2Desc": "Dodaj informacje za pomocą prostego formularza",
             "step3Title": "Pobierz CV",
-            "step3Desc": "Eksportuj jako PDF i zacznij aplikować"
-        },
-        "templateShowcase": {
-            "title": "Wybierz swój styl",
-            "subtitle": "Trzy profesjonalnie zaprojektowane szablony dla różnych branż",
-            "cta": "Zobacz wszystkie szablony"
+            "step3Desc": "Eksportuj jako PDF i zacznij aplikować",
+            "downloadPill": "Pobierz PDF"
         },
         "stats": {
-            "avgTime": "5 min",
-            "avgTimeLabel": "Średni czas",
+            "templatesLabel": "Szablony",
             "freeForever": "100%",
             "freeForeverLabel": "Zawsze za darmo",
             "languages": "PL/EN",
@@ -70,6 +72,9 @@
             "title": "Gotowy na stworzenie CV?",
             "subtitle": "Stwórz profesjonalne CV w kilka minut — całkowicie za darmo, bez rejestracji.",
             "button": "Zacznij za darmo"
+        },
+        "footer": {
+            "privacy": "Twoje dane nigdy nie opuszczają przeglądarki."
         }
     },
     "templates": {

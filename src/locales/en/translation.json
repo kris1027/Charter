@@ -6,61 +6,63 @@
     },
     "home": {
         "hero": {
-            "title": "Build Your Perfect CV in",
-            "titleHighlight": "Minutes",
+            "title": "Build your perfect CV",
+            "titleHighlight": "in minutes.",
             "subtitle": "Create professional resumes with our CV builder. Stand out from the crowd and land your dream job.",
             "cta": "Start Building Your CV",
-            "ctaSecondary": "Browse Templates"
+            "seeHow": "See how it works"
         },
         "features": {
             "noSignup": "No sign-up required",
             "free": "100% Free",
             "exportPdf": "Export to PDF",
-            "title": "Everything you need",
-            "subtitle": "Professional tools to create standout resumes",
+            "title": "Everything you need.",
+            "subtitle": "Professional tools to create standout resumes.",
+            "showcaseTitle": "Built for every",
+            "showcaseHighlight": "step of the search.",
             "templates": {
                 "title": "Professional Templates",
-                "desc": "Choose from carefully crafted designs for every industry"
+                "desc": "Choose from carefully crafted designs for every industry."
             },
             "darkMode": {
                 "title": "Dark Mode",
-                "desc": "Work comfortably day or night with full theme support"
+                "desc": "Work comfortably day or night with full theme support."
             },
             "pdf": {
                 "title": "PDF Export",
-                "desc": "Download your CV as a pixel-perfect PDF ready to send"
+                "desc": "Download your CV as a pixel-perfect PDF ready to send.",
+                "visual": ".pdf"
             },
             "i18n": {
                 "title": "Bilingual Support",
-                "desc": "Create your CV in English or Polish with one click"
+                "desc": "Create your CV in English or Polish with one click.",
+                "visualEn": "EN",
+                "visualPl": "PL"
             },
             "autosave": {
                 "title": "Auto-Save",
-                "desc": "Your progress is automatically saved — never lose your work"
+                "desc": "Your progress is automatically saved — never lose your work.",
+                "visual": "Saved just now"
             },
             "privacy": {
                 "title": "Privacy First",
-                "desc": "All data stays in your browser — nothing is sent to any server"
+                "desc": "All data stays in your browser — nothing is sent to any server.",
+                "visual": "0 bytes uploaded"
             }
         },
         "howItWorks": {
             "title": "How it works",
-            "subtitle": "Create your professional CV in three simple steps",
+            "subtitle": "Three simple steps.",
             "step1Title": "Choose a template",
             "step1Desc": "Select from our collection of professional designs",
             "step2Title": "Fill in your details",
             "step2Desc": "Add your information using our simple form",
             "step3Title": "Download your CV",
-            "step3Desc": "Export as PDF and start applying to jobs"
-        },
-        "templateShowcase": {
-            "title": "Choose Your Style",
-            "subtitle": "Three professionally designed templates for different industries",
-            "cta": "View All Templates"
+            "step3Desc": "Export as PDF and start applying to jobs",
+            "downloadPill": "Download PDF"
         },
         "stats": {
-            "avgTime": "5 min",
-            "avgTimeLabel": "Average time",
+            "templatesLabel": "Templates",
             "freeForever": "100%",
             "freeForeverLabel": "Free forever",
             "languages": "PL/EN",
@@ -70,6 +72,9 @@
             "title": "Ready to build your CV?",
             "subtitle": "Create a professional resume in minutes — completely free, no sign-up required.",
             "button": "Get Started — It's Free"
+        },
+        "footer": {
+            "privacy": "Your data never leaves your browser."
         }
     },
     "templates": {

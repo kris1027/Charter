@@ -1,0 +1,30 @@
+import { Link } from '@tanstack/react-router';
+import { m, useReducedMotion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
+import { fadeInUp } from '@/lib/animation-variants';
+
+export const ClosingSection = () => {
+    const { t } = useTranslation();
+    const shouldReduceMotion = useReducedMotion();
+
+    return (
+        <section className='bg-landing-bg px-6 pt-[180px] pb-[200px] text-center'>
+            <m.div {...fadeInUp(0, shouldReduceMotion)}>
+                <h2 className='text-[clamp(44px,6.5vw,80px)] leading-[1.03] font-bold tracking-[-0.045em] text-balance'>
+                    {t('home.cta.title')}
+                </h2>
+                <p className='text-landing-fg-2 mx-auto mt-5 max-w-[560px] text-[21px] leading-[1.4]'>
+                    {t('home.cta.subtitle')}
+                </p>
+                <div className='mt-9 flex justify-center'>
+                    <Link
+                        to='/templates'
+                        className='bg-landing-accent text-landing-accent-fg hover:bg-landing-accent-hover rounded-full px-7 py-3.5 text-[17px] transition-colors duration-(--duration-fast)'
+                    >
+                        {t('home.cta.button')}
+                    </Link>
+                </div>
+            </m.div>
+        </section>
+    );
+};
