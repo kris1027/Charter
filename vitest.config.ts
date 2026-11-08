@@ -25,6 +25,8 @@ export default defineConfig({
                 test: {
                     name: 'unit',
                     environment: 'jsdom',
+                    // src/lib/seo.ts throws on load without it, so tests never rely on a local .env
+                    env: { VITE_SITE_URL: 'http://localhost:5173' },
                     include: [
                         'src/**/*.test.{ts,tsx}',
                         'scripts/**/*.test.ts',
