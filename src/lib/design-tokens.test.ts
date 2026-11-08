@@ -19,6 +19,14 @@ const nonText = (fg: string, ...bgs: string[]): Pair[] =>
 
 const SEMANTIC = ['destructive', 'success', 'warning', 'info'];
 const BRAND = ['brand-from', 'brand-via', 'brand-to'];
+const LANDING_LABELS = [
+    'landing-blue',
+    'landing-purple',
+    'landing-orange',
+    'landing-green',
+    'landing-yellow',
+    'landing-pink',
+];
 
 const PAIRS: Pair[] = [
     ...text('foreground', 'background'),
@@ -36,6 +44,23 @@ const PAIRS: Pair[] = [
     ...nonText('ring', 'background', 'card'),
     // Brand stops only ever appear as large decorative text, so the large text ratio applies
     ...BRAND.flatMap((name) => nonText(name, 'background')),
+    // Landing page only (spec 0010)
+    ...text('landing-fg', 'landing-bg', 'landing-bg-2'),
+    ...text('landing-fg-2', 'landing-bg', 'landing-bg-2'),
+    ...text('landing-link', 'landing-bg'),
+    ...text('landing-eyebrow', 'landing-bg'),
+    ...text('landing-accent-fg', 'landing-accent', 'landing-accent-hover'),
+    ...text(
+        'landing-showcase-fg',
+        'landing-showcase-card',
+        'landing-showcase-bg',
+        'landing-showcase-chip',
+    ),
+    ...text('landing-showcase-muted', 'landing-showcase-card'),
+    ...LANDING_LABELS.flatMap((name) => text(name, 'landing-showcase-card')),
+    // Both only ever appear as large headline text
+    ...nonText('landing-muted', 'landing-bg'),
+    ...nonText('landing-showcase-muted', 'landing-showcase-bg'),
 ];
 
 const readBlock = (selector: string): Record<string, string> => {

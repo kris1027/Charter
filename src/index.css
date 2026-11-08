@@ -814,6 +814,29 @@
         U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Space Grotesk (landing page only, spec 0010) */
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url('/fonts/space-grotesk-variable-ext.woff2') format('woff2');
+    unicode-range:
+        U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+        U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+        U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url('/fonts/space-grotesk-variable.woff2') format('woff2');
+    unicode-range:
+        U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+        U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -824,6 +847,7 @@
 @theme {
     --font-sans: 'Atkinson Hyperlegible', system-ui, -apple-system, sans-serif;
     --font-display: 'Syne', sans-serif;
+    --font-landing: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
     --ease-standard: cubic-bezier(0.2, 0, 0, 1);
     --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 }
@@ -867,6 +891,39 @@
     --shadow-surface: var(--elevation-surface);
     --shadow-raised: var(--elevation-raised);
     --shadow-overlay: var(--elevation-overlay);
+    /* Landing page only (spec 0010) */
+    --color-landing-bg: var(--landing-bg);
+    --color-landing-bg-2: var(--landing-bg-2);
+    --color-landing-fg: var(--landing-fg);
+    --color-landing-fg-2: var(--landing-fg-2);
+    --color-landing-muted: var(--landing-muted);
+    --color-landing-link: var(--landing-link);
+    --color-landing-eyebrow: var(--landing-eyebrow);
+    --color-landing-line: var(--landing-line);
+    --color-landing-track: var(--landing-track);
+    --color-landing-accent: var(--landing-accent);
+    --color-landing-accent-hover: var(--landing-accent-hover);
+    --color-landing-accent-fg: var(--landing-accent-fg);
+    --color-landing-showcase-bg: var(--landing-showcase-bg);
+    --color-landing-showcase-card: var(--landing-showcase-card);
+    --color-landing-showcase-fg: var(--landing-showcase-fg);
+    --color-landing-showcase-muted: var(--landing-showcase-muted);
+    --color-landing-showcase-line: var(--landing-showcase-line);
+    --color-landing-showcase-chip: var(--landing-showcase-chip);
+    --color-landing-blue: var(--landing-blue);
+    --color-landing-purple: var(--landing-purple);
+    --color-landing-orange: var(--landing-orange);
+    --color-landing-green: var(--landing-green);
+    --color-landing-yellow: var(--landing-yellow);
+    --color-landing-pink: var(--landing-pink);
+    --color-landing-paper: var(--landing-paper);
+    --color-landing-paper-ink: var(--landing-paper-ink);
+    --color-landing-paper-sub: var(--landing-paper-sub);
+    --color-landing-paper-line: var(--landing-paper-line);
+    --color-landing-paper-filled: var(--landing-paper-filled);
+    --color-landing-paper-avatar: var(--landing-paper-avatar);
+    --shadow-landing-hero: var(--landing-shadow-hero);
+    --shadow-landing-side: var(--landing-shadow-side);
 }
 
 :root {
@@ -913,6 +970,39 @@
     --duration-fast: 150ms;
     --duration-base: 250ms;
     --duration-slow: 400ms;
+    /* Landing page only (spec 0010) */
+    --landing-bg: oklch(0.989 0.003 286.4);
+    --landing-bg-2: oklch(0.971 0.003 286.4);
+    --landing-fg: oklch(0.232 0.004 286.1);
+    --landing-fg-2: oklch(0.54 0.008 286.1);
+    --landing-muted: oklch(0.622 0.007 286.2);
+    --landing-link: oklch(0.522 0.177 255.8);
+    --landing-eyebrow: oklch(0.557 0.166 42.5);
+    --landing-line: oklch(0 0 0 / 0.08);
+    --landing-track: oklch(0.932 0.007 286.3);
+    --landing-accent: oklch(0.563 0.193 256.2);
+    --landing-accent-hover: oklch(0.53 0.181 256);
+    --landing-accent-fg: oklch(1 0 0);
+    --landing-showcase-bg: oklch(0 0 0);
+    --landing-showcase-card: oklch(0.201 0.002 286.2);
+    --landing-showcase-fg: oklch(0.971 0.003 286.4);
+    --landing-showcase-muted: oklch(0.622 0.007 286.2);
+    --landing-showcase-line: oklch(0.322 0.005 286.1);
+    --landing-showcase-chip: oklch(0.294 0.004 286.2);
+    --landing-blue: oklch(0.669 0.181 251.8);
+    --landing-purple: oklch(0.656 0.227 312.4);
+    --landing-orange: oklch(0.705 0.191 37.5);
+    --landing-green: oklch(0.756 0.208 147);
+    --landing-yellow: oklch(0.885 0.181 94.8);
+    --landing-pink: oklch(0.658 0.232 16);
+    --landing-paper: oklch(1 0 0);
+    --landing-paper-ink: oklch(0.232 0.004 286.1);
+    --landing-paper-sub: oklch(0.865 0.007 286.3);
+    --landing-paper-line: oklch(0.944 0.005 286.3);
+    --landing-paper-filled: oklch(0.831 0.007 286.2);
+    --landing-paper-avatar: oklch(0.932 0.007 286.3);
+    --landing-shadow-hero: 0 50px 100px rgb(0 0 0 / 0.14), 0 4px 12px rgb(0 0 0 / 0.05);
+    --landing-shadow-side: 0 30px 60px rgb(0 0 0 / 0.08), 0 2px 6px rgb(0 0 0 / 0.04);
 }
 
 .dark {
@@ -950,6 +1040,16 @@
     --elevation-surface: none;
     --elevation-raised: 0 4px 12px -2px oklch(0 0 0 / 0.4), 0 2px 4px -2px oklch(0 0 0 / 0.4);
     --elevation-overlay: 0 12px 32px -8px oklch(0 0 0 / 0.5), 0 4px 8px -4px oklch(0 0 0 / 0.5);
+    /* Landing page only (spec 0010) */
+    --landing-bg: oklch(0 0 0);
+    --landing-bg-2: oklch(0.174 0.004 286);
+    --landing-fg: oklch(0.971 0.003 286.4);
+    --landing-fg-2: oklch(0.711 0.007 286.2);
+    --landing-link: oklch(0.669 0.181 251.8);
+    --landing-eyebrow: oklch(0.705 0.191 37.5);
+    --landing-line: oklch(1 0 0 / 0.12);
+    --landing-track: oklch(0.294 0.004 286.2);
+    --landing-showcase-bg: oklch(0.15 0.002 286.1);
 }
 
 /* Decorative only: display headings or the brand mark at 24px and up, never body text */
@@ -1040,25 +1140,6 @@
     }
 }
 
-@keyframes pulse-glow {
-    0%,
-    100% {
-        box-shadow: 0 0 20px oklch(0.65 0.25 265 / 0.15);
-    }
-    50% {
-        box-shadow: 0 0 40px oklch(0.65 0.25 265 / 0.3);
-    }
-}
-
-@keyframes draw-line {
-    from {
-        transform: scaleX(0);
-    }
-    to {
-        transform: scaleX(1);
-    }
-}
-
 @keyframes gradient-shift {
     0% {
         background-position: 0% 50%;
@@ -1089,44 +1170,9 @@
     animation: float-reverse 5s ease-in-out infinite;
 }
 
-.animate-pulse-glow {
-    animation: pulse-glow 2.5s ease-in-out infinite;
-}
-
-.animate-draw-line {
-    animation: draw-line 0.8s ease-out both;
-    transform-origin: left;
-}
-
 .animate-gradient-shift {
     background-size: 200% 200%;
     animation: gradient-shift 8s ease infinite;
-}
-
-.delay-6 {
-    animation-delay: 600ms;
-}
-.delay-7 {
-    animation-delay: 700ms;
-}
-.delay-8 {
-    animation-delay: 800ms;
-}
-
-.delay-1 {
-    animation-delay: 100ms;
-}
-.delay-2 {
-    animation-delay: 200ms;
-}
-.delay-3 {
-    animation-delay: 300ms;
-}
-.delay-4 {
-    animation-delay: 400ms;
-}
-.delay-5 {
-    animation-delay: 500ms;
 }
 
 /* ===== Reduced Motion ===== */
