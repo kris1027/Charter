@@ -81,13 +81,12 @@
         }
     },
     "templates": {
-        "title": "CV Templates",
-        "badge": "Gallery",
         "pageTitle": "Choose Your CV Template",
         "pageSubtitle": "Select a template that best represents your professional style",
         "preview": "Preview",
         "useTemplate": "Use Template",
-        "previewAlt": "{{name}} template preview with sample resume",
+        "previewAlt": "{{name}} preview with sample resume",
+        "pdfTitle": "{{name}}, sample PDF",
         "developer": {
             "name": "Developer Template",
             "description": "Tech-focused design with monospace font and developer-friendly styling"
@@ -106,12 +105,7 @@
         "title": "You have saved CV data",
         "lastSaved": "Last saved {{time}}",
         "justNow": "just now",
-        "minuteAgo": "{{count}} minute ago",
-        "minutesAgo": "{{count}} minutes ago",
-        "hourAgo": "{{count}} hour ago",
-        "hoursAgo": "{{count}} hours ago",
-        "dayAgo": "{{count}} day ago",
-        "daysAgo": "{{count}} days ago"
+        "continue": "Continue editing"
     },
     "builder": {
         "title": "Build Your CV",
