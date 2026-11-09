@@ -49,6 +49,7 @@ Not tested on purpose: `border` (decorative) and see through tints such as the t
 
 Other tokens:
 
+- **Paper**: `paper` (white in both themes, `bg-paper`) is the printed page behind gallery sheets (spec 0011). It stays white in dark mode and carries no text, so it has no contrast pair.
 - **Radius**: `--radius: 0.625rem`, with `rounded-sm`, `rounded-md`, `rounded-lg` and `rounded-xl` derived from it.
 - **Fonts**: `font-sans` is Atkinson Hyperlegible (the default for everything), `font-display` is Syne (headings). Both live in `@theme`.
 - **Browser theme color**: `theme-provider.tsx` sets `<meta name='theme-color'>` to `#ffffff` in light and `#020617` (slate 950) in dark, matching `background`.
@@ -56,7 +57,7 @@ Other tokens:
 
 ## Landing tokens
 
-These are for the landing page only (`src/features/landing/`, [spec 0010](docs/specs/0010-landing-page-refresh/index.md)). No other page may use them. Whether they become the app's design system is decided at the template gallery refresh. They live in `src/index.css` next to the tokens above, and their contrast pairs are in `src/lib/design-tokens.test.ts`.
+These are for the landing page only (`src/features/landing/`, [spec 0010](docs/specs/0010-landing-page-refresh/index.md)). No other page may use them. [Spec 0011](docs/specs/0011-template-gallery-refresh/index.md) kept them on the home page: the gallery follows the landing composition (a tight headline, white sheets, pill buttons, open spacing) on the app tokens above. They live in `src/index.css` next to the tokens above, and their contrast pairs are in `src/lib/design-tokens.test.ts`.
 
 | Token                                                                         | Light / dark                   | Use                                      |
 | ----------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------- |
@@ -171,7 +172,7 @@ The four shell notices (`src/app/`) are toasts: privacy (Accept only, no close, 
 
 ## Lint rule
 
-In `src/components/**`, `src/app/**`, `src/features/landing/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
+In `src/components/**`, `src/app/**`, `src/features/landing/**`, `src/features/gallery/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
 
 - raw palette classes such as `indigo-600` or `slate-400`
 - `white` or `black` color classes such as `bg-white` or `text-black`
