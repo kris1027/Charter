@@ -89,6 +89,16 @@ describe('BuilderPage', () => {
         expect(storedResume().templateId).toBe('veterinary');
     });
 
+    // Spec 0011, AC-10: the saved resume notice links here with no templateId
+    it('should show the stored template when the URL has no templateId', async () => {
+        storeResume(resume({ templateId: 'veterinary' }));
+
+        await renderWithRouter(BuilderPage);
+
+        expect(screen.getByText('Veterinary Template')).toBeInTheDocument();
+        expect(screen.queryByText('Developer Template')).not.toBeInTheDocument();
+    });
+
     it('should add an experience first when Add Experience is clicked', async () => {
         const user = userEvent.setup();
         storeResume(resume({ experiences: [experience('Acme')] }));
@@ -415,7 +425,7 @@ describe('BuilderPage', () => {
             initialEntry: '/builder?templateId=nope',
         });
 
-        expect(screen.getByText('Developer Template')).toBeInTheDocument();
+        expect(screen.getByText('Default Template')).toBeInTheDocument();
         expect(router.state.location.search).toEqual({});
         await user.click(screen.getByRole('button', { name: 'Save' }));
         expect(storedResume().templateId).toBe('default');
