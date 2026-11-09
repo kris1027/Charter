@@ -43,13 +43,13 @@ All values are OKLCH. The Tailwind palette name in brackets is for reading only;
 | `border`                    | slate 200                            | white at 10%                         | decorative dividers and card edges                                     | none (decorative, no contrast duty)                             |
 | `input`                     | slate 500                            | slate 500                            | borders that identify a control (input, select, checkbox, date picker) | on `background`, `card` (3:1)                                   |
 | `ring`                      | indigo 600                           | indigo 400                           | focus outline                                                          | on `background`, `card` (3:1)                                   |
+| `paper`                     | white                                | white                                | the printed page behind gallery sheets (spec 0011)                     | none (stays white, carries no text)                             |
 | `brand-from` / `via` / `to` | indigo 600 / violet 600 / purple 600 | indigo 400 / violet 400 / purple 400 | the decorative gradient                                                | each on `background` (3:1, large text only)                     |
 
-Not tested on purpose: `border` (decorative) and see through tints such as the toast icon chip (`bg-info/15`), because the text next to them carries the meaning. When a token is not redefined in `.dark`, the test uses its light value for the dark check.
+Not tested on purpose: `border` (decorative), `paper` (carries no text) and see through tints such as the toast icon chip (`bg-info/15`), because the text next to them carries the meaning. When a token is not redefined in `.dark`, the test uses its light value for the dark check.
 
 Other tokens:
 
-- **Paper**: `paper` (white in both themes, `bg-paper`) is the printed page behind gallery sheets (spec 0011). It stays white in dark mode and carries no text, so it has no contrast pair.
 - **Radius**: `--radius: 0.625rem`, with `rounded-sm`, `rounded-md`, `rounded-lg` and `rounded-xl` derived from it.
 - **Fonts**: `font-sans` is Atkinson Hyperlegible (the default for everything), `font-display` is Syne (headings). Both live in `@theme`.
 - **Browser theme color**: `theme-provider.tsx` sets `<meta name='theme-color'>` to `#ffffff` in light and `#020617` (slate 950) in dark, matching `background`.
