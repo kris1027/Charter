@@ -36,6 +36,10 @@
             "reason": "on screen PDF viewer, reached only through React.lazy (spec 0008)"
         },
         {
+            "match": "src/features/templates/pdf/gallery-pdf-viewer.tsx",
+            "reason": "gallery detail PDF viewer, reached only through React.lazy from lg up (spec 0011)"
+        },
+        {
             "match": "src/features/templates/pdf/template-pdf.tsx",
             "reason": "template renderers and PDF font registration (spec 0008)"
         },

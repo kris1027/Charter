@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatCVDate, formatCVDateShort, formatCVYear, getMonthNames } from './date-format';
+import {
+    formatCVDate,
+    formatCVDateShort,
+    formatCVYear,
+    formatTimeAgo,
+    getMonthNames,
+} from './date-format';
 
 // Pinned against the date-fns 4.1.0 output these helpers replaced ('LLLL yyyy', 'LLL yyyy',
 // 'LLLL', 'LLL' with the enUS and pl locales); all 48 strings checked on Node 24, 2026-10-21
@@ -74,5 +80,41 @@ describe('date-format', () => {
 
     it('should return the year when given a year and month', () => {
         expect(formatCVYear('2024-05')).toBe('2024');
+    });
+});
+
+describe('formatTimeAgo', () => {
+    const now = new Date('2026-11-09T12:00:00Z');
+    const ago = (ms: number) => new Date(now.getTime() - ms);
+    const MINUTE = 60_000;
+    const HOUR = 60 * MINUTE;
+    const DAY = 24 * HOUR;
+
+    it('should return null when the date is under a minute old', () => {
+        expect(formatTimeAgo(ago(30_000), 'en', now)).toBeNull();
+    });
+
+    it('should return null when the date is in the future', () => {
+        expect(formatTimeAgo(ago(-HOUR), 'en', now)).toBeNull();
+    });
+
+    it('should use the singular when one minute has passed in English', () => {
+        expect(formatTimeAgo(ago(MINUTE), 'en', now)).toBe('1 minute ago');
+    });
+
+    it('should use the right Polish plural when two minutes have passed', () => {
+        expect(formatTimeAgo(ago(2 * MINUTE), 'pl', now)).toBe('2 minuty temu');
+    });
+
+    it('should count hours when the date is under a day old', () => {
+        expect(formatTimeAgo(ago(3 * HOUR), 'en', now)).toBe('3 hours ago');
+    });
+
+    it('should count days when the date is under a week old', () => {
+        expect(formatTimeAgo(ago(6 * DAY), 'en', now)).toBe('6 days ago');
+    });
+
+    it('should use a medium date when the date is a week old', () => {
+        expect(formatTimeAgo(ago(7 * DAY), 'en', now)).toBe('Nov 2, 2026');
     });
 });

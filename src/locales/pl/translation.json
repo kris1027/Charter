@@ -81,13 +81,12 @@
         }
     },
     "templates": {
-        "title": "Szablony CV",
-        "badge": "Galeria",
         "pageTitle": "Wybierz szablon CV",
         "pageSubtitle": "Wybierz szablon, który najlepiej reprezentuje Twój profesjonalny styl",
         "preview": "Podgląd",
         "useTemplate": "Użyj szablonu",
-        "previewAlt": "Podgląd szablonu {{name}} z przykładowym CV",
+        "previewAlt": "{{name}}, podgląd z przykładowym CV",
+        "pdfTitle": "{{name}}, przykładowy PDF",
         "developer": {
             "name": "Szablon dla programistów",
             "description": "Techniczny design z fontem monospace i stylem przyjaznym dla programistów"
@@ -106,12 +105,7 @@
         "title": "Masz zapisane dane CV",
         "lastSaved": "Ostatnio zapisano {{time}}",
         "justNow": "przed chwilą",
-        "minuteAgo": "{{count}} minutę temu",
-        "minutesAgo": "{{count}} minut temu",
-        "hourAgo": "{{count}} godzinę temu",
-        "hoursAgo": "{{count}} godzin temu",
-        "dayAgo": "{{count}} dzień temu",
-        "daysAgo": "{{count}} dni temu"
+        "continue": "Kontynuuj edycję"
     },
     "builder": {
         "title": "Stwórz swoje CV",

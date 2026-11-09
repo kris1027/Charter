@@ -40,16 +40,16 @@ const BuilderPage = () => {
     const search = useSearch({ from: '/builder' });
     const shouldReduceMotion = useReducedMotion();
 
-    // The route drops an unknown templateId, so this is always a real template
-    const activeTemplateId: TemplateId = search.templateId ?? 'developer';
+    // Read once per mount
+    const [stored] = useState(loadStoredResume);
+    const storedTemplateId = isTemplateId(stored?.templateId) ? stored.templateId : undefined;
 
-    // Read once per mount: stored resume if any, the URL template winning over the stored one
-    const [initialValues] = useState(() => {
-        const stored = loadStoredResume();
-        if (!stored) return emptyResumeFor(activeTemplateId);
-        const storedTemplateId = isTemplateId(stored.templateId) ? stored.templateId : undefined;
-        return { ...stored, templateId: search.templateId ?? storedTemplateId ?? activeTemplateId };
-    });
+    // The route drops an unknown templateId, so the URL template, when set, is a real one
+    const activeTemplateId: TemplateId = search.templateId ?? storedTemplateId ?? 'developer';
+
+    const [initialValues] = useState(() =>
+        stored ? { ...stored, templateId: activeTemplateId } : emptyResumeFor(activeTemplateId),
+    );
 
     const form = useAppForm({
         ...resumeFormOptions,

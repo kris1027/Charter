@@ -43,9 +43,10 @@ All values are OKLCH. The Tailwind palette name in brackets is for reading only;
 | `border`                    | slate 200                            | white at 10%                         | decorative dividers and card edges                                     | none (decorative, no contrast duty)                             |
 | `input`                     | slate 500                            | slate 500                            | borders that identify a control (input, select, checkbox, date picker) | on `background`, `card` (3:1)                                   |
 | `ring`                      | indigo 600                           | indigo 400                           | focus outline                                                          | on `background`, `card` (3:1)                                   |
+| `paper`                     | white                                | white                                | the printed page behind gallery sheets (spec 0011)                     | none (stays white, carries no text)                             |
 | `brand-from` / `via` / `to` | indigo 600 / violet 600 / purple 600 | indigo 400 / violet 400 / purple 400 | the decorative gradient                                                | each on `background` (3:1, large text only)                     |
 
-Not tested on purpose: `border` (decorative) and see through tints such as the toast icon chip (`bg-info/15`), because the text next to them carries the meaning. When a token is not redefined in `.dark`, the test uses its light value for the dark check.
+Not tested on purpose: `border` (decorative), `paper` (carries no text) and see through tints such as the toast icon chip (`bg-info/15`), because the text next to them carries the meaning. When a token is not redefined in `.dark`, the test uses its light value for the dark check.
 
 Other tokens:
 
@@ -56,7 +57,7 @@ Other tokens:
 
 ## Landing tokens
 
-These are for the landing page only (`src/features/landing/`, [spec 0010](docs/specs/0010-landing-page-refresh/index.md)). No other page may use them. Whether they become the app's design system is decided at the template gallery refresh. They live in `src/index.css` next to the tokens above, and their contrast pairs are in `src/lib/design-tokens.test.ts`.
+These are for the landing page only (`src/features/landing/`, [spec 0010](docs/specs/0010-landing-page-refresh/index.md)). No other page may use them. [Spec 0011](docs/specs/0011-template-gallery-refresh/index.md) kept them on the home page: the gallery follows the landing composition (a tight headline, white sheets, pill buttons, open spacing) on the app tokens above. They live in `src/index.css` next to the tokens above, and their contrast pairs are in `src/lib/design-tokens.test.ts`.
 
 | Token                                                                         | Light / dark                   | Use                                      |
 | ----------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------- |
@@ -171,7 +172,7 @@ The four shell notices (`src/app/`) are toasts: privacy (Accept only, no close, 
 
 ## Lint rule
 
-In `src/components/**`, `src/app/**`, `src/features/landing/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
+In `src/components/**`, `src/app/**`, `src/features/landing/**`, `src/features/gallery/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
 
 - raw palette classes such as `indigo-600` or `slate-400`
 - `white` or `black` color classes such as `bg-white` or `text-black`

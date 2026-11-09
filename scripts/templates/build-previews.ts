@@ -1,5 +1,6 @@
 // pnpm templates:previews: gallery images rendered from the real PDF templates (spec 0006).
-//   (no flag)   write src/features/templates/previews/<id>-<lang>.webp plus manifest.json
+//   (no flag)   write src/features/templates/previews/<id>-<lang>.webp, the smaller
+//               <id>-<lang>-card.webp (spec 0011), plus manifest.json
 //   --check     exit 1 when the committed images are stale (inputs hash differs, a file is missing)
 //   --baseline  render every fixture into .cache/template-baselines/ (pixels, text, links, info)
 //   --diff      render again and fail on any difference from the baseline
@@ -8,6 +9,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { join, relative, resolve, sep } from 'node:path';
 import { createServer } from 'vite';
 import { compareBaseline, readBaselineJson, type RenderSnapshot } from './baseline.ts';
+import { PREVIEW_CARD_WIDTH as CARD_WIDTH } from '../../src/features/templates/previews/preview-sizes.ts';
 
 const root = resolve(import.meta.dirname, '../..');
 const srcDir = join(root, 'src');
@@ -19,6 +21,8 @@ const baselineDir = join(root, '.cache/template-baselines');
 // 2x A4 (595 x 842 pt), so the cards stay sharp on high density screens.
 const RASTER_SCALE = 2;
 const WEBP_QUALITY = 82;
+// The gallery card height: the 2x A4 page scaled down to CARD_WIDTH, keeping its ratio.
+const CARD_HEIGHT = 1019;
 const SCALES = [0, 1] as const;
 const VERSIONED_PACKAGES = ['@react-pdf/renderer', 'pdfjs-dist', '@napi-rs/canvas'];
 
@@ -84,7 +88,9 @@ try {
         '/src/features/templates/fixtures/preview-fixtures.ts',
     );
     const inputsHash = hashInputs();
-    const files = TEMPLATE_IDS.flatMap((id) => APP_LANGS.map((lang) => `${id}-${lang}.webp`));
+    const files = TEMPLATE_IDS.flatMap((id) =>
+        APP_LANGS.flatMap((lang) => [`${id}-${lang}.webp`, `${id}-${lang}-card.webp`]),
+    );
 
     if (mode === 'check') {
         process.exitCode = checkManifest(inputsHash, files) ? 0 : 1;
@@ -137,12 +143,24 @@ try {
             for (const templateId of TEMPLATE_IDS) {
                 for (const lang of APP_LANGS) {
                     const data = SAMPLE_RESUMES[templateId][lang];
-                    const image = await withPdf(templateId, data, lang, 0, async (pdf) =>
-                        (await renderPage(pdf, 1)).encode('webp', WEBP_QUALITY),
-                    );
-                    const file = `${templateId}-${lang}.webp`;
-                    writeFileSync(join(previewsDir, file), image);
-                    console.log(`wrote ${relative(root, join(previewsDir, file))}`);
+                    const images = await withPdf(templateId, data, lang, 0, async (pdf) => {
+                        const page = await renderPage(pdf, 1);
+                        const card = createCanvas(CARD_WIDTH, CARD_HEIGHT);
+                        const context = card.getContext('2d');
+                        context.imageSmoothingQuality = 'high';
+                        context.drawImage(page, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+                        return {
+                            [`${templateId}-${lang}.webp`]: await page.encode('webp', WEBP_QUALITY),
+                            [`${templateId}-${lang}-card.webp`]: await card.encode(
+                                'webp',
+                                WEBP_QUALITY,
+                            ),
+                        };
+                    });
+                    for (const [file, image] of Object.entries(images)) {
+                        writeFileSync(join(previewsDir, file), image);
+                        console.log(`wrote ${relative(root, join(previewsDir, file))}`);
+                    }
                 }
             }
             const manifest: Manifest = { inputsHash, files };

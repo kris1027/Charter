@@ -40,7 +40,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 10  | Lazy load heavy engines         | Slice 2    | done     |
 | 11  | Builder responsiveness          | Slice 2    | done     |
 | 12  | Landing page refresh            | Slice 3    | done     |
-| 13  | Template gallery refresh        | Slice 3    | planned  |
+| 13  | Template gallery refresh        | Slice 3    | done     |
 | 14  | Builder UI refresh              | Slice 3    | planned  |
 | 15  | Preview & export UI refresh     | Slice 3    | planned  |
 | 16  | Accessibility & Lighthouse pass | Slice 3    | planned  |
@@ -278,12 +278,19 @@ spec [0010](../specs/0010-landing-page-refresh/index.md) · code in `src/feature
     - [x] Lint guard, cleanup, and `DESIGN.md` (AC-10, AC-17)
     - [x] SEO, motion failure, phone width, and performance checks (AC-14, AC-16, AC-18)
 
-### 13. Template gallery refresh · needs a decision
+### 13. Template gallery refresh · done
 
 Gallery and template detail pages on the new design system, with previews that load fast.
 **Done when:** both pages use the new components, previews render without layout shift, and choosing a template still sets `?templateId=`.
+spec [0011](../specs/0011-template-gallery-refresh/index.md) · code in `src/features/gallery/`
 
-- [ ] Design it (spec): `/architect template gallery refresh`
+- [x] Design it (spec): `/architect template gallery refresh`
+- [x] Build it: `/develop template gallery refresh`
+    - [x] Gallery page end to end: nav, header, full sheet cards (AC-1, AC-3, AC-4, AC-5, AC-8, AC-9, AC-22)
+    - [x] Saved resume notice and relative time (AC-10, AC-11, AC-18)
+    - [x] Smaller card images through `srcset` (AC-6, AC-7, AC-20)
+    - [x] Detail page: instant image, desktop PDF, phone image only (AC-12 to AC-17, AC-20, AC-22)
+    - [x] Cleanup, lint guard, `DESIGN.md`, performance checks (AC-2, AC-18, AC-19, AC-21, AC-23)
 
 ### 14. Builder UI refresh · needs a decision
 
@@ -312,7 +319,8 @@ Out of scope for this pass, kept so the plan stays honest.
 
 - **Template visual refresh**: new look for the three resume templates (web and PDF) · needs a decision
 - **More templates**: a fourth template once the shared model (feature 8) makes it cheap · needs a decision
-- **Global landing look**: decide at the template gallery refresh whether the landing tokens become the app's design system or stay on the home page · from spec 0010 · needs a decision
+- **Smaller landing hero images**: use the card size images for the hero side cards · from spec 0011
+- **One PDF viewer**: decide at the preview UI refresh whether `/preview` moves to the gallery PDF viewer · from spec 0011
 
 ## Legend
 

@@ -1,11 +1,17 @@
 {
-    "inputsHash": "7fdcf4371400e5d702a20795d4de3e53e83aa0d827aa0748d67c35b0d12a438e",
+    "inputsHash": "ba71750f5398efcbdb53edd19ea6dae9e338c928930edb2b290f67fb1a636b03",
     "files": [
         "developer-en.webp",
+        "developer-en-card.webp",
         "developer-pl.webp",
+        "developer-pl-card.webp",
         "default-en.webp",
+        "default-en-card.webp",
         "default-pl.webp",
+        "default-pl-card.webp",
         "veterinary-en.webp",
-        "veterinary-pl.webp"
+        "veterinary-en-card.webp",
+        "veterinary-pl.webp",
+        "veterinary-pl-card.webp"
     ]
 }

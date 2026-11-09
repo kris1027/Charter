@@ -5,6 +5,7 @@ import {
     EMPTY_PERSONAL_INFO,
     EMPTY_RESUME,
     loadStoredResume,
+    readLastSaved,
     saveResume,
     writeResume,
 } from './stored-resume';
@@ -96,5 +97,27 @@ describe('clearResume', () => {
         expect(localStorage.getItem('resumeData')).toBeNull();
         expect(localStorage.getItem('resumeData_lastSaved')).toBeNull();
         expect(localStorage.getItem('resumeData_backup')).not.toBeNull();
+    });
+});
+
+describe('readLastSaved', () => {
+    beforeEach(() => {
+        localStorage.clear();
+    });
+
+    it('should return null when nothing is stored', () => {
+        expect(readLastSaved()).toBeNull();
+    });
+
+    it('should return null when the stored value is not a date', () => {
+        localStorage.setItem('resumeData_lastSaved', 'garbage');
+
+        expect(readLastSaved()).toBeNull();
+    });
+
+    it('should return the date when the stored value is valid', () => {
+        localStorage.setItem('resumeData_lastSaved', '2026-11-09T12:00:00.000Z');
+
+        expect(readLastSaved()?.toISOString()).toBe('2026-11-09T12:00:00.000Z');
     });
 });

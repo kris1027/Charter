@@ -12,6 +12,7 @@ const dateFormats = {
     monthYearShort: { month: 'short', year: 'numeric' },
     monthLong: { month: 'long' },
     monthShort: { month: 'short' },
+    dateMedium: { dateStyle: 'medium' },
 } satisfies Record<string, Intl.DateTimeFormatOptions>;
 
 type DateFormat = keyof typeof dateFormats;
@@ -50,4 +51,21 @@ export const formatCVYear = (dateString: string): string => {
 export const getMonthNames = (style: MonthStyle, lang: AppLang): string[] => {
     const formatter = getFormatter(lang, style === 'long' ? 'monthLong' : 'monthShort');
     return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2024, i)));
+};
+
+const MINUTE_MS = 60_000;
+const HOUR_MS = 60 * MINUTE_MS;
+const DAY_MS = 24 * HOUR_MS;
+const WEEK_MS = 7 * DAY_MS;
+
+// Null means "just now" (under a minute, or a clock that ran ahead), so the caller picks the copy
+export const formatTimeAgo = (date: Date, lang: AppLang, now = new Date()): string | null => {
+    const elapsed = now.getTime() - date.getTime();
+    if (elapsed < MINUTE_MS) return null;
+    if (elapsed >= WEEK_MS) return getFormatter(lang, 'dateMedium').format(date);
+
+    const relative = new Intl.RelativeTimeFormat(localeTags[lang], { numeric: 'always' });
+    if (elapsed < HOUR_MS) return relative.format(-Math.floor(elapsed / MINUTE_MS), 'minute');
+    if (elapsed < DAY_MS) return relative.format(-Math.floor(elapsed / HOUR_MS), 'hour');
+    return relative.format(-Math.floor(elapsed / DAY_MS), 'day');
 };

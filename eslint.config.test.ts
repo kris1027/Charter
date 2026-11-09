@@ -51,10 +51,19 @@ describe('raw color lint rule', () => {
         expect(errors).toHaveLength(1);
     });
 
-    it('should ignore raw colors when outside the covered folders', async () => {
+    it('should error on a palette class when in the gallery folder', async () => {
         const errors = await rawColorErrors(
             "export const a = 'text-slate-500';\n",
             'src/features/gallery/fixture.ts',
+        );
+
+        expect(errors).toHaveLength(1);
+    });
+
+    it('should ignore raw colors when outside the covered folders', async () => {
+        const errors = await rawColorErrors(
+            "export const a = 'text-slate-500';\n",
+            'src/features/preview/fixture.ts',
         );
 
         expect(errors).toHaveLength(0);
