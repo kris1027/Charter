@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { PillButton } from '@/features/gallery/pill-button';
 import { TemplateSheet } from '@/features/gallery/template-sheet';
 import type { TemplateId } from '@/lib/template-ids';
 
@@ -39,7 +39,7 @@ export const TemplateCard = ({ templateId, isPriority }: TemplateCardProps) => {
             </p>
             {/* mt-auto lines the buttons up across a row, whatever the description length */}
             <div className='mt-auto flex flex-wrap justify-center gap-3'>
-                <Button asChild variant='outline' className='rounded-full'>
+                <PillButton asChild variant='outline'>
                     <Link
                         to='/templates/$templateId'
                         params={{ templateId }}
@@ -47,12 +47,12 @@ export const TemplateCard = ({ templateId, isPriority }: TemplateCardProps) => {
                     >
                         {t('templates.preview')}
                     </Link>
-                </Button>
-                <Button asChild className='rounded-full'>
+                </PillButton>
+                <PillButton asChild>
                     <Link to='/builder' search={{ templateId }} aria-describedby={nameId}>
                         {t('templates.useTemplate')}
                     </Link>
-                </Button>
+                </PillButton>
             </div>
         </article>
     );

@@ -1,8 +1,8 @@
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { PillButton } from '@/features/gallery/pill-button';
 import { loadStoredResume, readLastSaved } from '@/features/resume/stored-resume';
 import { normalizeLang } from '@/lib/app-lang';
 import { formatTimeAgo } from '@/lib/date-format';
@@ -31,9 +31,9 @@ export const SavedResumeNotice = () => {
                 )}
             </div>
             {/* No templateId: the builder keeps the stored template */}
-            <Button asChild className='shrink-0 self-start rounded-full sm:self-auto'>
+            <PillButton asChild className='shrink-0 self-start sm:self-auto'>
                 <Link to='/builder'>{t('savedData.continue')}</Link>
-            </Button>
+            </PillButton>
         </Card>
     );
 };

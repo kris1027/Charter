@@ -1,9 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import GalleryPdfViewer from '@/features/templates/pdf/gallery-pdf-viewer';
 import type { ResumeData } from '@/features/resume/form-types';
+import { render, screen } from '@/test/test-utils';
 
 type BlobState = { url: string | null; error: Error | null };
 
@@ -43,7 +44,7 @@ describe('GalleryPdfViewer', () => {
         expect(screen.queryByTitle('Sample PDF')).not.toBeInTheDocument();
     });
 
-    it('should keep the placeholder and hide the frame until the frame has loaded', () => {
+    it('should keep the placeholder and hide the frame when the frame has not loaded', () => {
         mocks.state = { url: 'blob:one', error: null };
         render(viewer());
 

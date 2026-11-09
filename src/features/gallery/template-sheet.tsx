@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PREVIEW_CARD_IMAGES, PREVIEW_IMAGES } from '@/features/templates/previews/preview-images';
 import {
-    PREVIEW_CARD_IMAGES,
     PREVIEW_CARD_WIDTH,
     PREVIEW_HEIGHT,
-    PREVIEW_IMAGES,
     PREVIEW_WIDTH,
-} from '@/features/templates/previews/preview-images';
+} from '@/features/templates/previews/preview-sizes';
 import { normalizeLang } from '@/lib/app-lang';
 import type { TemplateId } from '@/lib/template-ids';
 import { cn } from '@/lib/utils';
@@ -31,11 +30,16 @@ export const TemplateSheet = ({
     const fullSrc = PREVIEW_IMAGES[templateId][lang];
     const cardSrc = PREVIEW_CARD_IMAGES[templateId][lang];
     const src = sizes ? cardSrc : fullSrc;
+    const alt = t('templates.previewAlt', { name: t(`templates.${templateId}.name`) });
+    const hasFailed = failedSrc === src;
 
     return (
+        // A hidden image names nothing, so the sheet takes over its name when the image fails
         <div
+            role={hasFailed ? 'img' : undefined}
+            aria-label={hasFailed ? alt : undefined}
             className={cn(
-                'bg-paper shadow-raised overflow-hidden rounded-xl transition-shadow',
+                'bg-paper shadow-raised overflow-hidden rounded-xl transition-shadow duration-(--duration-fast)',
                 className,
             )}
             style={{ aspectRatio: `${PREVIEW_WIDTH} / ${PREVIEW_HEIGHT}` }}
@@ -54,9 +58,9 @@ export const TemplateSheet = ({
                 loading={isPriority ? 'eager' : 'lazy'}
                 fetchPriority={isPriority ? 'high' : undefined}
                 decoding='async'
-                alt={t('templates.previewAlt', { name: t(`templates.${templateId}.name`) })}
+                alt={alt}
                 onError={() => setFailedSrc(src)}
-                hidden={failedSrc === src}
+                hidden={hasFailed}
                 className='h-full w-full object-contain'
             />
         </div>

@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { TemplateSheet } from '@/features/gallery/template-sheet';
 import i18n from '@/test/i18n-test';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 
 const SIZES = '(min-width: 1024px) 340px, 80vw';
 
@@ -68,6 +68,16 @@ describe('TemplateSheet', () => {
 
         await i18n.changeLanguage('pl');
 
-        expect(await screen.findByRole('img')).not.toHaveAttribute('hidden');
+        await waitFor(() => expect(image).not.toHaveAttribute('hidden'));
+    });
+
+    it('should keep the sheet named when the image fails', () => {
+        const { container } = render(<TemplateSheet templateId='default' />);
+
+        fireEvent.error(screen.getByRole('img'));
+
+        expect(
+            screen.getByRole('img', { name: 'Default Template preview with sample resume' }),
+        ).toBe(container.firstElementChild);
     });
 });

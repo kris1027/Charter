@@ -7,11 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { LandingCtaLink } from '@/features/landing/landing-cta-link';
 import { useScrollEffects } from '@/features/landing/use-scroll-effects';
 import type { ScrollDrivenProps } from '@/features/landing/use-scroll-effects';
-import {
-    PREVIEW_HEIGHT,
-    PREVIEW_IMAGES,
-    PREVIEW_WIDTH,
-} from '@/features/templates/previews/preview-images';
+import { PREVIEW_IMAGES } from '@/features/templates/previews/preview-images';
+import { PREVIEW_HEIGHT, PREVIEW_WIDTH } from '@/features/templates/previews/preview-sizes';
 import { normalizeLang } from '@/lib/app-lang';
 import { SEO_DEFAULTS } from '@/lib/seo';
 import type { TemplateId } from '@/lib/template-ids';

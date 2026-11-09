@@ -11,27 +11,11 @@ type GalleryPdfViewerProps = TemplatePdfInput & {
 // The gallery detail panel: the placeholder stays until the PDF has loaded once. BlobProvider,
 // not PDFViewer, since PDFViewer gives no signal that its PDF is ready (spec 0011). Load it
 // through LazyGalleryPdfViewer so the @react-pdf engine stays out of the page's first load.
-const GalleryPdfViewer = ({
-    templateId,
-    data,
-    compactScale,
-    lang,
-    title,
-    placeholder,
-}: GalleryPdfViewerProps) => {
+const GalleryPdfViewer = ({ title, placeholder, ...pdfInput }: GalleryPdfViewerProps) => {
     const [hasLoaded, setHasLoaded] = useState(false);
 
     return (
-        <BlobProvider
-            document={
-                <TemplatePDF
-                    templateId={templateId}
-                    data={data}
-                    compactScale={compactScale}
-                    lang={lang}
-                />
-            }
-        >
+        <BlobProvider document={<TemplatePDF {...pdfInput} />}>
             {({ url, error }) => (
                 <div className='relative h-full w-full'>
                     {(error || !hasLoaded) && placeholder}

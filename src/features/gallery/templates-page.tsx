@@ -1,4 +1,9 @@
 import { useTranslation } from 'react-i18next';
+import {
+    GALLERY_CONTAINER_CLASS,
+    GALLERY_HEADLINE_CLASS,
+    GALLERY_PAGE_CLASS,
+} from '@/features/gallery/gallery-classes';
 import { GalleryNav } from '@/features/gallery/gallery-nav';
 import { SavedResumeNotice } from '@/features/gallery/saved-resume-notice';
 import { TemplateCard } from '@/features/gallery/template-card';
@@ -8,11 +13,11 @@ export const TemplatesPage = () => {
     const { t } = useTranslation();
 
     return (
-        <div className='bg-background text-foreground min-h-dvh overflow-x-clip'>
+        <div className={GALLERY_PAGE_CLASS}>
             <GalleryNav backTo='/' backLabel={t('nav.backToHome')} />
-            <div className='mx-auto max-w-[1100px] px-6 pt-16 pb-24'>
+            <div className={`${GALLERY_CONTAINER_CLASS} pt-16 pb-24`}>
                 <header className='mx-auto mb-14 max-w-2xl text-center'>
-                    <h1 className='font-display text-[clamp(36px,5vw,56px)] leading-[1.05] font-bold tracking-[-0.04em] text-balance'>
+                    <h1 className={`${GALLERY_HEADLINE_CLASS} text-[clamp(36px,5vw,56px)]`}>
                         {t('templates.pageTitle')}
                     </h1>
                     <p className='text-muted-foreground mt-4 text-lg'>

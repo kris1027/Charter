@@ -9,6 +9,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { join, relative, resolve, sep } from 'node:path';
 import { createServer } from 'vite';
 import { compareBaseline, readBaselineJson, type RenderSnapshot } from './baseline.ts';
+import { PREVIEW_CARD_WIDTH as CARD_WIDTH } from '../../src/features/templates/previews/preview-sizes.ts';
 
 const root = resolve(import.meta.dirname, '../..');
 const srcDir = join(root, 'src');
@@ -20,8 +21,7 @@ const baselineDir = join(root, '.cache/template-baselines');
 // 2x A4 (595 x 842 pt), so the cards stay sharp on high density screens.
 const RASTER_SCALE = 2;
 const WEBP_QUALITY = 82;
-// The gallery card size: the 2x A4 page scaled down, keeping its ratio.
-const CARD_WIDTH = 720;
+// The gallery card height: the 2x A4 page scaled down to CARD_WIDTH, keeping its ratio.
 const CARD_HEIGHT = 1019;
 const SCALES = [0, 1] as const;
 const VERSIONED_PACKAGES = ['@react-pdf/renderer', 'pdfjs-dist', '@napi-rs/canvas'];
