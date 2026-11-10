@@ -78,7 +78,7 @@ describe('isSectionComplete', () => {
         ).toBe(true);
     });
 
-    it('should never check GDPR', () => {
+    it('should never check GDPR when its clause is enabled', () => {
         expect(
             isSectionComplete('gdprConsent', {
                 ...EMPTY_RESUME,

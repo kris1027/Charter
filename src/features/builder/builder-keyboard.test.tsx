@@ -66,7 +66,7 @@ describe('builder keyboard and screen reader use', () => {
         expect(trigger).toHaveFocus();
     });
 
-    it('should announce the import in the save status while the PDF loads', async () => {
+    it('should announce the import in the save status when a PDF is loading', async () => {
         const user = userEvent.setup();
         let finish: (value: ResumeFormValues) => void = () => {};
         vi.mocked(loadResumeFromPDF).mockReturnValue(
@@ -149,7 +149,7 @@ describe('builder keyboard and screen reader use', () => {
         await waitFor(() => expect(screen.getByLabelText('Company')).toHaveFocus());
     });
 
-    it('should move a card, keep focus with it and announce the position', async () => {
+    it('should keep focus on the card and announce its position when it moves up', async () => {
         const user = userEvent.setup();
         storeResume(resume({ experiences: [experience('A'), experience('B'), experience('C')] }));
         await renderWithRouter(BuilderPage);
@@ -179,7 +179,7 @@ describe('builder keyboard and screen reader use', () => {
         expect(sectionStatus('Work Experience')).toHaveTextContent('Removed Experience 1');
     });
 
-    it('should move a chip through its menu and keep focus on its menu button', async () => {
+    it('should keep focus on its menu button when a chip moves through that menu', async () => {
         const user = userEvent.setup();
         storeResume(resume({ skills: [{ name: 'A' }, { name: 'B' }] }));
         await renderWithRouter(BuilderPage);
