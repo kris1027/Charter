@@ -209,7 +209,9 @@
         "skill": "Wpisz umiejętność",
         "interest": "Wpisz zainteresowanie",
         "language": "Język",
-        "selectProficiency": "Wybierz poziom"
+        "selectProficiency": "Wybierz poziom",
+        "selectYear": "Wybierz rok",
+        "educationDescription": "Średnia, ważne przedmioty, osiągnięcia..."
     },
     "sections": {
         "personalInfo": {

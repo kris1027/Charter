@@ -207,7 +207,9 @@
         "skill": "Enter a skill",
         "interest": "Enter an interest",
         "language": "Language",
-        "selectProficiency": "Select proficiency"
+        "selectProficiency": "Select proficiency",
+        "selectYear": "Select year",
+        "educationDescription": "GPA, relevant coursework, achievements..."
     },
     "sections": {
         "personalInfo": {

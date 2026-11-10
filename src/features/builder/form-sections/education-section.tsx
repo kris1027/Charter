@@ -54,7 +54,7 @@ const EducationItem = withForm({
                                 <field.DateField
                                     label={t('form.startDate')}
                                     yearOnly
-                                    placeholder='Select year'
+                                    placeholder={t('placeholders.selectYear')}
                                 />
                             )}
                         </form.AppField>
@@ -63,7 +63,7 @@ const EducationItem = withForm({
                                 <field.DateField
                                     label={t('form.endDate')}
                                     yearOnly
-                                    placeholder='Select year'
+                                    placeholder={t('placeholders.selectYear')}
                                 />
                             )}
                         </form.AppField>
@@ -74,7 +74,7 @@ const EducationItem = withForm({
                     {(field) => (
                         <field.TextareaField
                             label={t('form.description')}
-                            placeholder='GPA, relevant coursework, achievements...'
+                            placeholder={t('placeholders.educationDescription')}
                             className='min-h-[100px] resize-none'
                         />
                     )}
