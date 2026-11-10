@@ -46,7 +46,7 @@ export const GdprConsentSection = withForm({
                                 <form.Field name='gdprConsent.companyName'>
                                     {(field) => {
                                         const { errors, isTouched } = field.state.meta;
-                                        const { ariaProps } = fieldA11y(
+                                        const { errorId, ariaProps } = fieldA11y(
                                             COMPANY_ID,
                                             field.state.meta,
                                             COMPANY_HINT_ID,
@@ -70,7 +70,7 @@ export const GdprConsentSection = withForm({
                                                     {...ariaProps}
                                                 />
                                                 <FieldError
-                                                    id={`${COMPANY_ID}-error`}
+                                                    id={errorId}
                                                     errors={errors}
                                                     isTouched={isTouched}
                                                 />
