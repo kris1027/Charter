@@ -1,4 +1,4 @@
-# Contributing to Resume Builder
+# Contributing to Charter
 
 ## Prerequisites
 
@@ -9,8 +9,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/Kris1027/resume-builder.git
-cd resume-builder
+git clone https://github.com/Kris1027/Charter.git
+cd Charter
 
 # Install dependencies
 pnpm install

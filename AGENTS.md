@@ -1,4 +1,4 @@
-# Resume Builder
+# Charter
 
 Free, no sign up resume builder (EN/PL). The user fills a form, picks one of three templates, and exports or imports a PDF. Client only SPA, no backend; everything lives in the browser.
 

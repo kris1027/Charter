@@ -47,8 +47,8 @@ export default defineConfig(({ command }) => ({
                 'apple-touch-icon.png',
             ],
             manifest: {
-                name: 'Resume Builder - Create Professional Resumes',
-                short_name: 'Resume Builder',
+                name: 'Charter - Create Professional Resumes',
+                short_name: 'Charter',
                 description: 'Create professional resumes with multiple templates and PDF export',
                 theme_color: '#a7f3d0',
                 background_color: '#ffffff',

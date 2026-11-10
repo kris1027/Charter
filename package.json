@@ -1,5 +1,5 @@
 {
-    "name": "resume-builder",
+    "name": "charter",
     "private": true,
     "version": "0.0.0",
     "description": "A modern resume builder with multiple templates, dark mode, i18n, and PDF export",
@@ -7,11 +7,11 @@
     "license": "SEE LICENSE IN LICENSE",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Kris1027/resume-builder.git"
+        "url": "https://github.com/Kris1027/Charter.git"
     },
-    "homepage": "https://github.com/Kris1027/resume-builder",
+    "homepage": "https://github.com/Kris1027/Charter",
     "bugs": {
-        "url": "https://github.com/Kris1027/resume-builder/issues"
+        "url": "https://github.com/Kris1027/Charter/issues"
     },
     "keywords": [
         "cv",

@@ -340,7 +340,7 @@ describe('BuilderPage', () => {
     });
 
     it.each([
-        ['unrecognized', 'does not look like a resume made with Resume Builder'],
+        ['unrecognized', 'does not look like a resume made with Charter'],
         ['password', 'is password protected'],
         ['invalid', 'could not be opened as a PDF'],
     ] as const)(

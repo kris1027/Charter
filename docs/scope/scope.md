@@ -1,4 +1,4 @@
-# Scope: Resume Builder
+# Scope: Charter
 
 A free, no sign up resume builder for job seekers (EN/PL): fill a form, pick one of three print clean templates, export or import a PDF. This pass checks the stack, refactors toward modern practice, makes the app faster, and refreshes the app UI. The resume templates keep their current look.
 

@@ -263,9 +263,9 @@
         "pdfError": {
             "title": "Unable to Load PDF",
             "ok": "OK",
-            "invalid": "This file could not be opened as a PDF. Pick a PDF exported from Resume Builder, or fill out the form manually.",
+            "invalid": "This file could not be opened as a PDF. Pick a PDF exported from Charter, or fill out the form manually.",
             "password": "This PDF is password protected. Remove the password and try again, or fill out the form manually.",
-            "unrecognized": "This PDF does not look like a resume made with Resume Builder. Only PDFs exported from this application can be loaded. You can fill out the form manually instead.",
+            "unrecognized": "This PDF does not look like a resume made with Charter. Only PDFs exported from this application can be loaded. You can fill out the form manually instead.",
             "unexpected": "An unexpected error occurred while loading the PDF."
         }
     },
@@ -376,7 +376,7 @@
         "close": "Close",
         "install": "Install app",
         "installButton": "Install",
-        "installDescription": "Install Resume Builder for quick access and offline use",
+        "installDescription": "Install Charter for quick access and offline use",
         "offline": "You're offline — all features still work"
     },
     "toast": {

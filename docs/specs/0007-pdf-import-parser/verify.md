@@ -8,7 +8,7 @@ _Steps derived from spec 0007 acceptance criteria. `/check verify` runs these; `
 - [ ] Print an exported developer, default and veterinary PDF (EN and PL) to a new PDF ("Save as PDF"), import each → the template, language dependent dates (`Obecnie`, Polish months), `Ojczysty` levels and the GDPR company come back → AC-1, AC-7, AC-8
 - [ ] Import a password protected PDF → dialog shows the translated "password protected" message; the form keeps its values → AC-10
 - [ ] Import a renamed `.txt` file as `.pdf` → "could not be opened as a PDF"; form unchanged → AC-2, AC-10
-- [ ] Import a PDF from another tool (no known headers) → "does not look like a resume made with Resume Builder"; form unchanged → AC-4, AC-10
+- [ ] Import a PDF from another tool (no known headers) → "does not look like a resume made with Charter"; form unchanged → AC-4, AC-10
 - [ ] Switch the UI to Polish and repeat one failure → the message is in Polish → AC-10
 
 ## Commands

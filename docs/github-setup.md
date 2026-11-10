@@ -1,6 +1,6 @@
 # GitHub repository setup
 
-The repository uses the [Resume Builder project](https://github.com/users/kris1027/projects/3) to track issues and pull requests. GitHub settings are applied directly to the repository and project; this file records the intended configuration alongside the versioned templates.
+The repository uses the [Charter project](https://github.com/users/kris1027/projects/3) to track issues and pull requests. GitHub settings are applied directly to the repository and project; this file records the intended configuration alongside the versioned templates.
 
 ## Issue forms and labels
 

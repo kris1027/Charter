@@ -1,6 +1,6 @@
 <div align="center">
 
-# Resume Builder
+# Charter
 
 A modern, intuitive resume builder with multiple templates, dark mode, i18n, and PDF export.
 
@@ -97,8 +97,8 @@ These sample resumes show the Default and Developer templates with fictional dat
 ### Installation
 
 ```bash
-git clone https://github.com/Kris1027/resume-builder.git
-cd resume-builder
+git clone https://github.com/Kris1027/Charter.git
+cd Charter
 pnpm install
 pnpm dev
 ```
@@ -176,7 +176,7 @@ This project is provided for viewing and reference purposes only. No permission 
 
 ## Support
 
-For issues, questions, or suggestions, please [open an issue on GitHub](https://github.com/Kris1027/resume-builder/issues).
+For issues, questions, or suggestions, please [open an issue on GitHub](https://github.com/Kris1027/Charter/issues).
 
 <!-- Tech Badges -->
 
