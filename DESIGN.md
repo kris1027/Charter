@@ -123,7 +123,7 @@ One rule in `@layer base` covers every control:
 
 - In classes: `duration-(--duration-fast)`, `ease-standard`, `data-[state=closed]:ease-exit`. These also drive the tw-animate-css `animate-in` and `animate-out` classes.
 - In `motion` code: import from `@/lib/motion-tokens` (as `src/lib/animation-variants.ts` does). The parity test fails if the CSS and TS values drift apart, so change both together.
-- Loop periods of decorative keyframes (`float` 6s, `float-reverse` 5s, `gradient-shift` 8s) are not tokens.
+- Loop periods of decorative keyframes (`gradient-shift` 8s) are not tokens.
 - **Reduced motion**: one global rule under `prefers-reduced-motion: reduce` sets `animation-duration` and `transition-duration` to `0.01ms !important` on every element and pseudo element. It is near zero rather than `none`, so Radix still sees `animationend` and unmounts closed popovers. Motion variants return `{}` when reduced motion is on.
 - Parallax only on decorative layers, never text; `viewport: { once: true }` on every `whileInView` (see `AGENTS.md`).
 
@@ -148,7 +148,7 @@ All in `src/components/ui/`. They use tokens only, so they follow dark mode on t
 | `SegmentedControl`             | `SegmentedControl` (requires `aria-label`) plus `SegmentedControlItem`; sizes `sm` 32px and `default` 36px                 | switching between two to four views; a radio group, arrows move focus, Space or Enter selects, clicking the selected item keeps it     |
 | `Toaster`, `notify`, `dismiss` | variants `info`, `success`, `warning`, `destructive`                                                                       | short notices; see below                                                                                                               |
 
-Shell pieces in `src/components/`: `ThemeToggle` and `LanguageToggle` (outline icon buttons with a dropdown), and the decorative `GeometricShapes` and `ParallaxBackground`, which use the brand tokens.
+Shell pieces in `src/components/`: `ThemeToggle` and `LanguageToggle` (outline icon buttons with a dropdown).
 
 ## Toasts
 
@@ -172,7 +172,7 @@ The four shell notices (`src/app/`) are toasts: privacy (Accept only, no close, 
 
 ## Lint rule
 
-In `src/components/**`, `src/app/**`, `src/features/landing/**`, `src/features/gallery/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
+In `src/components/**`, `src/app/**`, `src/features/landing/**`, `src/features/gallery/**`, `src/features/builder/**` and `src/lib/button-variants.ts` (test files excluded), ESLint fails on:
 
 - raw palette classes such as `indigo-600` or `slate-400`
 - `white` or `black` color classes such as `bg-white` or `text-black`

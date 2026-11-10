@@ -53,6 +53,7 @@ const TOKEN_ONLY_FILES = [
     'src/lib/button-variants.ts',
     'src/features/landing/**/*.{ts,tsx}',
     'src/features/gallery/**/*.{ts,tsx}',
+    'src/features/builder/**/*.{ts,tsx}',
 ];
 const tokenOnly = {
     files: TOKEN_ONLY_FILES,
