@@ -1,7 +1,7 @@
 # 0012. Builder UI refresh: solid tokens, a section strip with progress, and a form that works without a mouse
 
 **Date**: 2026-11-09
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
