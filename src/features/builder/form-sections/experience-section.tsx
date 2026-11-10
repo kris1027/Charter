@@ -1,15 +1,10 @@
-import { Button } from '@/components/ui/button';
+import { CardListSection } from '@/features/builder/form-sections/card-list-section';
 import { focusField } from '@/features/builder/form-sections/focus-field';
-import { FormSectionCard } from '@/features/builder/form-sections/form-section-card';
-import { ListEmptyState } from '@/features/builder/form-sections/list-empty-state';
 import { NO_MOVE_CONTROLS } from '@/features/builder/form-sections/sortable-ids';
 import { SortableCard } from '@/features/builder/form-sections/sortable-item';
-import { SortableList } from '@/features/builder/form-sections/sortable-list';
-import { useListAnnouncer } from '@/features/builder/form-sections/use-list-announcer';
 import { resumeFormOptions, withForm } from '@/features/builder/resume-form';
 import { EMPTY_EXPERIENCE } from '@/features/resume/stored-resume';
-import { Plus, Briefcase } from 'lucide-react';
-import { useRef } from 'react';
+import { Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const ExperienceItem = withForm({
@@ -87,90 +82,41 @@ const ExperienceItem = withForm({
 export const ExperienceSection = withForm({
     ...resumeFormOptions,
     render: function Render({ form }) {
-        const { t } = useTranslation();
-        const addButtonRef = useRef<HTMLButtonElement>(null);
-        const announcer = useListAnnouncer();
-        const itemTitle = (index: number) => t('sections.experience.item', { number: index + 1 });
-
         return (
             <form.Field name='experiences' mode='array'>
-                {(field) => {
-                    // New experience goes first, and focus moves into it (spec 0012, AC-27)
-                    const handleAdd = () => {
-                        field.insertValue(0, { ...EMPTY_EXPERIENCE });
-                        focusField('experiences[0].company');
-                    };
-
-                    // Focus goes to Add, which stays mounted when the list empties (AC-28)
-                    const handleRemove = (index: number) => {
-                        field.removeValue(index);
-                        announcer.announce(
-                            t('builder.reorder.removed', { item: itemTitle(index) }),
-                        );
-                        addButtonRef.current?.focus();
-                    };
-
-                    return (
-                        <FormSectionCard
-                            sectionId='experiences'
-                            icon={Briefcase}
-                            title={t('sections.experience.title')}
-                            description={t('sections.experience.description')}
-                            headerAction={
-                                <Button
-                                    ref={addButtonRef}
-                                    type='button'
-                                    variant='outline'
-                                    onClick={handleAdd}
-                                >
-                                    <Plus aria-hidden='true' />
-                                    {t('sections.experience.add')}
-                                </Button>
-                            }
-                        >
-                            {/* Only the length: a card reads its own fields, so typing redraws one
-                                field. Array mode rerenders only on its helpers; this also catches
-                                form.reset */}
-                            <form.Subscribe selector={(state) => state.values.experiences.length}>
-                                {(count) => (
-                                    <div className='space-y-4'>
-                                        {count === 0 && (
-                                            <ListEmptyState
-                                                icon={Briefcase}
-                                                title={t('sections.experience.empty')}
-                                                hint={t('sections.experience.emptyHint')}
-                                            />
-                                        )}
-                                        {count > 0 && (
-                                            <SortableList
-                                                count={count}
-                                                idPrefix='experience'
-                                                strategy='vertical'
-                                                onMove={field.moveValue}
-                                                onAnnounce={announcer.announce}
-                                                className='space-y-4'
-                                            >
-                                                {(index, id, controls) => (
-                                                    <ExperienceItem
-                                                        key={id}
-                                                        form={form}
-                                                        id={id}
-                                                        index={index}
-                                                        controls={controls}
-                                                        onRemove={() => handleRemove(index)}
-                                                    />
-                                                )}
-                                            </SortableList>
-                                        )}
-                                    </div>
+                {(field) => (
+                    // Only the length: a card reads its own fields, so typing redraws one field.
+                    // Array mode rerenders only on its helpers; this also catches form.reset
+                    <form.Subscribe selector={(state) => state.values.experiences.length}>
+                        {(count) => (
+                            <CardListSection
+                                sectionId='experiences'
+                                copyKey='experience'
+                                icon={Briefcase}
+                                idPrefix='experience'
+                                count={count}
+                                onAdd={() => {
+                                    // Goes first, and focus moves into it (spec 0012, AC-27)
+                                    field.insertValue(0, { ...EMPTY_EXPERIENCE });
+                                    focusField('experiences[0].company');
+                                }}
+                                onMove={field.moveValue}
+                                onRemove={field.removeValue}
+                            >
+                                {(index, id, controls, onRemove) => (
+                                    <ExperienceItem
+                                        key={id}
+                                        form={form}
+                                        id={id}
+                                        index={index}
+                                        controls={controls}
+                                        onRemove={onRemove}
+                                    />
                                 )}
-                            </form.Subscribe>
-                            <div role='status' className='sr-only'>
-                                {announcer.message}
-                            </div>
-                        </FormSectionCard>
-                    );
-                }}
+                            </CardListSection>
+                        )}
+                    </form.Subscribe>
+                )}
             </form.Field>
         );
     },
