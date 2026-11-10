@@ -17,7 +17,7 @@ export const LivePreviewBody = ({ preview, unavailableAction }: LivePreviewBodyP
         return (
             <div
                 role='status'
-                className='space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300'
+                className='bg-muted text-foreground space-y-3 rounded-md border p-4 text-sm'
             >
                 <p>{t('builder.livePreview.unavailable')}</p>
                 {unavailableAction}
@@ -35,14 +35,11 @@ export const LivePreviewTitle = ({ preview, titleId }: LivePreviewTitleProps) =>
 
     return (
         <div className='flex items-baseline gap-3'>
-            <h2
-                id={titleId}
-                className='font-display text-lg font-semibold text-slate-900 dark:text-slate-100'
-            >
+            <h2 id={titleId} className='font-display text-lg font-semibold'>
                 {t('builder.livePreview.title')}
             </h2>
             {preview.status === 'updating' && (
-                <span className='text-xs text-slate-500 dark:text-slate-400'>
+                <span className='text-muted-foreground text-xs'>
                     {t('builder.livePreview.updating')}
                 </span>
             )}

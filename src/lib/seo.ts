@@ -10,7 +10,7 @@ if (!import.meta.env.VITE_SITE_URL) {
 export const SITE_URL = import.meta.env.VITE_SITE_URL;
 
 export const SEO_DEFAULTS = {
-    siteName: 'Resume Builder',
+    siteName: 'Charter',
     description:
         'Create professional resumes with our free resume builder. Choose from multiple templates, customize your layout, and export to PDF in minutes.',
     keywords:

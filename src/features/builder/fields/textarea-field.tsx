@@ -1,6 +1,7 @@
 import { Textarea } from '@/components/ui/textarea';
 import { FieldError } from '@/components/ui/field-error';
 import { useFieldContext } from '@/features/builder/form-context';
+import { fieldA11y } from '@/features/builder/fields/field-a11y';
 import { FieldLabel } from '@/features/builder/fields/field-label';
 
 type TextareaFieldProps = {
@@ -11,6 +12,8 @@ type TextareaFieldProps = {
 
 export const TextareaField = ({ label, placeholder, className }: TextareaFieldProps) => {
     const field = useFieldContext<string>();
+    const { errors, isTouched } = field.state.meta;
+    const { errorId, ariaProps } = fieldA11y(field.name, field.state.meta);
 
     return (
         <div className='space-y-2'>
@@ -23,8 +26,9 @@ export const TextareaField = ({ label, placeholder, className }: TextareaFieldPr
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder={placeholder}
                 className={className}
+                {...ariaProps}
             />
-            <FieldError errors={field.state.meta.errors} isTouched={field.state.meta.isTouched} />
+            <FieldError id={errorId} errors={errors} isTouched={isTouched} />
         </div>
     );
 };

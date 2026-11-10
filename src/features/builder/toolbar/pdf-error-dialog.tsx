@@ -23,8 +23,11 @@ export const PdfErrorDialog = ({ error, onClose }: PdfErrorDialogProps) => {
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <div className='flex items-center gap-3'>
-                        <div className='flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30'>
-                            <FileWarning className='h-5 w-5 text-orange-600 dark:text-orange-400' />
+                        <div
+                            className='bg-warning/10 text-warning flex size-10 shrink-0 items-center justify-center rounded-full'
+                            aria-hidden='true'
+                        >
+                            <FileWarning className='size-5' />
                         </div>
                         <AlertDialogTitle>{t('dialogs.pdfError.title')}</AlertDialogTitle>
                     </div>

@@ -38,7 +38,7 @@ describe('PwaInstallPrompt', () => {
 
         expect(await screen.findByText(TITLE)).toBeInTheDocument();
         expect(
-            screen.getByText('Install Resume Builder for quick access and offline use'),
+            screen.getByText('Install Charter for quick access and offline use'),
         ).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Install' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();

@@ -1,17 +1,16 @@
-import { Button } from '@/components/ui/button';
-import { FormSectionCard } from '@/features/builder/form-sections/form-section-card';
-import { ListEmptyState } from '@/features/builder/form-sections/list-empty-state';
+import { CardListSection } from '@/features/builder/form-sections/card-list-section';
+import { focusField } from '@/features/builder/form-sections/focus-field';
+import { NO_MOVE_CONTROLS } from '@/features/builder/form-sections/sortable-ids';
 import { SortableCard } from '@/features/builder/form-sections/sortable-item';
-import { SortableList } from '@/features/builder/form-sections/sortable-list';
 import { resumeFormOptions, withForm } from '@/features/builder/resume-form';
 import { EMPTY_EDUCATION } from '@/features/resume/stored-resume';
-import { Plus, GraduationCap } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const EducationItem = withForm({
     ...resumeFormOptions,
-    props: { id: '', index: 0, onRemove: () => {} },
-    render: function Render({ form, id, index, onRemove }) {
+    props: { id: '', index: 0, onRemove: () => {}, controls: NO_MOVE_CONTROLS },
+    render: function Render({ form, id, index, onRemove, controls }) {
         const { t } = useTranslation();
 
         return (
@@ -20,6 +19,7 @@ const EducationItem = withForm({
                 title={t('sections.education.item', { number: index + 1 })}
                 removeLabel={t('accessibility.removeEducation')}
                 onRemove={onRemove}
+                controls={controls}
                 className='space-y-4'
             >
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -54,7 +54,7 @@ const EducationItem = withForm({
                                 <field.DateField
                                     label={t('form.startDate')}
                                     yearOnly
-                                    placeholder='Select year'
+                                    placeholder={t('placeholders.selectYear')}
                                 />
                             )}
                         </form.AppField>
@@ -63,7 +63,7 @@ const EducationItem = withForm({
                                 <field.DateField
                                     label={t('form.endDate')}
                                     yearOnly
-                                    placeholder='Select year'
+                                    placeholder={t('placeholders.selectYear')}
                                 />
                             )}
                         </form.AppField>
@@ -74,7 +74,7 @@ const EducationItem = withForm({
                     {(field) => (
                         <field.TextareaField
                             label={t('form.description')}
-                            placeholder='GPA, relevant coursework, achievements...'
+                            placeholder={t('placeholders.educationDescription')}
                             className='min-h-[100px] resize-none'
                         />
                     )}
@@ -87,63 +87,40 @@ const EducationItem = withForm({
 export const EducationSection = withForm({
     ...resumeFormOptions,
     render: function Render({ form }) {
-        const { t } = useTranslation();
-
         return (
             <form.Field name='education' mode='array'>
                 {(field) => (
-                    <FormSectionCard
-                        icon={GraduationCap}
-                        iconGradient='from-violet-500 to-purple-600'
-                        title={t('sections.education.title')}
-                        description={t('sections.education.description')}
-                        headerAction={
-                            <Button
-                                type='button'
-                                onClick={() => field.pushValue({ ...EMPTY_EDUCATION })}
-                                className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-lg'
+                    // Only the length: a card reads its own fields, so typing redraws one field.
+                    // Array mode rerenders only on its helpers; this also catches form.reset
+                    <form.Subscribe selector={(state) => state.values.education.length}>
+                        {(count) => (
+                            <CardListSection
+                                sectionId='education'
+                                copyKey='education'
+                                icon={GraduationCap}
+                                idPrefix='education'
+                                count={count}
+                                onAdd={() => {
+                                    // Goes last, and focus moves into it (spec 0012, AC-27)
+                                    field.pushValue({ ...EMPTY_EDUCATION });
+                                    focusField(`education[${count}].institution`);
+                                }}
+                                onMove={field.moveValue}
+                                onRemove={field.removeValue}
                             >
-                                <Plus className='mr-2 h-4 w-4' />
-                                {t('sections.education.add')}
-                            </Button>
-                        }
-                    >
-                        {/* Only the length: a card reads its own fields, so typing redraws one field. Array
-                            mode rerenders only on its helpers; this also catches form.reset */}
-                        <form.Subscribe selector={(state) => state.values.education.length}>
-                            {(count) => (
-                                <div className='space-y-6'>
-                                    {count === 0 && (
-                                        <ListEmptyState
-                                            icon={GraduationCap}
-                                            iconGradient='from-violet-500 to-purple-600'
-                                            title={t('sections.education.empty')}
-                                            hint={t('sections.education.emptyHint')}
-                                        />
-                                    )}
-                                    {count > 0 && (
-                                        <SortableList
-                                            count={count}
-                                            idPrefix='education'
-                                            strategy='vertical'
-                                            onMove={field.moveValue}
-                                            className='space-y-6'
-                                        >
-                                            {(index, id) => (
-                                                <EducationItem
-                                                    key={id}
-                                                    form={form}
-                                                    id={id}
-                                                    index={index}
-                                                    onRemove={() => field.removeValue(index)}
-                                                />
-                                            )}
-                                        </SortableList>
-                                    )}
-                                </div>
-                            )}
-                        </form.Subscribe>
-                    </FormSectionCard>
+                                {(index, id, controls, onRemove) => (
+                                    <EducationItem
+                                        key={id}
+                                        form={form}
+                                        id={id}
+                                        index={index}
+                                        controls={controls}
+                                        onRemove={onRemove}
+                                    />
+                                )}
+                            </CardListSection>
+                        )}
+                    </form.Subscribe>
                 )}
             </form.Field>
         );

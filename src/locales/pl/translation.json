@@ -109,7 +109,6 @@
     },
     "builder": {
         "title": "Stwórz swoje CV",
-        "template": "Szablon",
         "loadPdf": "Wczytaj PDF",
         "loading": "Wczytywanie...",
         "save": "Zapisz",
@@ -119,14 +118,12 @@
         "saveFailed": "Zapis nie powiódł się — pamięć może być pełna",
         "reset": "Resetuj",
         "previewCv": "Podgląd CV",
-        "processing": "Przetwarzanie...",
         "progress": {
-            "title": "Postęp formularza",
-            "complete": "Świetnie! Twoje CV jest kompletne. Kliknij 'Podgląd CV', aby zobaczyć wynik.",
-            "incomplete": "Uzupełnij wszystkie sekcje, aby zmaksymalizować potencjał CV."
+            "title": "Postęp formularza"
         },
         "validation": {
-            "fixErrors": "Proszę naprawić błędy powyżej przed kontynuowaniem."
+            "fixErrors": "Proszę naprawić błędy powyżej przed kontynuowaniem.",
+            "fixErrorsUnknown": "Coś w Twoim CV wymaga poprawy przed podglądem."
         },
         "pdfTooLarge": "Plik PDF jest zbyt duży. Maksymalny rozmiar to 10MB.",
         "livePreview": {
@@ -146,6 +143,26 @@
             "pageCount_few": "{{count}} strony",
             "pageCount_many": "{{count}} stron",
             "pageCount_other": "{{count}} strony"
+        },
+        "changeTemplate": "Zmień szablon, obecny: {{name}}",
+        "actions": {
+            "label": "Więcej działań"
+        },
+        "sectionNav": {
+            "label": "Sekcje CV",
+            "completed": "Ukończono",
+            "personalInfo": "Dane",
+            "experiences": "Doświadczenie",
+            "education": "Wykształcenie",
+            "skills": "Umiejętności",
+            "languages": "Języki",
+            "interests": "Zainteresowania",
+            "gdprConsent": "RODO"
+        },
+        "reorder": {
+            "moved": "Przeniesiono na pozycję {{position}} z {{total}}",
+            "added": "Dodano: {{item}}",
+            "removed": "Usunięto: {{item}}"
         }
     },
     "form": {
@@ -192,7 +209,9 @@
         "skill": "Wpisz umiejętność",
         "interest": "Wpisz zainteresowanie",
         "language": "Język",
-        "selectProficiency": "Wybierz poziom"
+        "selectProficiency": "Wybierz poziom",
+        "selectYear": "Wybierz rok",
+        "educationDescription": "Średnia, ważne przedmioty, osiągnięcia..."
     },
     "sections": {
         "personalInfo": {
@@ -265,9 +284,9 @@
         "pdfError": {
             "title": "Nie można wczytać PDF",
             "ok": "OK",
-            "invalid": "Nie można otworzyć tego pliku jako PDF. Wybierz plik PDF wyeksportowany z Resume Builder albo wypełnij formularz ręcznie.",
+            "invalid": "Nie można otworzyć tego pliku jako PDF. Wybierz plik PDF wyeksportowany z Charter albo wypełnij formularz ręcznie.",
             "password": "Ten plik PDF jest chroniony hasłem. Usuń hasło i spróbuj ponownie albo wypełnij formularz ręcznie.",
-            "unrecognized": "Ten plik PDF nie wygląda na CV utworzone w Resume Builder. Można wczytać jedynie pliki PDF wyeksportowane z tej aplikacji. Możesz zamiast tego wypełnić formularz ręcznie.",
+            "unrecognized": "Ten plik PDF nie wygląda na CV utworzone w Charter. Można wczytać jedynie pliki PDF wyeksportowane z tej aplikacji. Możesz zamiast tego wypełnić formularz ręcznie.",
             "unexpected": "Wystąpił nieoczekiwany błąd podczas wczytywania pliku PDF."
         }
     },
@@ -358,7 +377,17 @@
         "removeLanguage": "Usuń język",
         "removeSkill": "Usuń umiejętność",
         "removeInterest": "Usuń zainteresowanie",
-        "skipToContent": "Przejdź do treści głównej"
+        "skipToContent": "Przejdź do treści głównej",
+        "moveUp": "Przesuń {{item}} w górę",
+        "moveDown": "Przesuń {{item}} w dół",
+        "moveLeft": "Przesuń w lewo",
+        "moveRight": "Przesuń w prawo",
+        "itemActions": "Działania: {{item}}",
+        "dragInstructions": "Naciśnij spację lub Enter, aby chwycić. Przesuwaj strzałkami, upuść spacją lub Enterem, Escape anuluje.",
+        "dragPickedUp": "Chwycono element na pozycji {{position}}",
+        "dragOver": "Nad pozycją {{position}}",
+        "dragDropped": "Upuszczono na pozycji {{position}}",
+        "dragCancelled": "Anulowano przenoszenie"
     },
     "errorBoundary": {
         "title": "Coś poszło nie tak",
@@ -378,7 +407,7 @@
         "close": "Zamknij",
         "install": "Zainstaluj aplikację",
         "installButton": "Zainstaluj",
-        "installDescription": "Zainstaluj Resume Builder, aby mieć szybki dostęp i możliwość pracy offline",
+        "installDescription": "Zainstaluj Charter, aby mieć szybki dostęp i możliwość pracy offline",
         "offline": "Jesteś offline — wszystkie funkcje nadal działają"
     },
     "toast": {

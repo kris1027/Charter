@@ -14,6 +14,8 @@ type LivePreviewSheetProps = {
     onOpenChange: (open: boolean) => void;
     preview: LivePreview;
     unavailableAction: ReactNode;
+    // Lets the page keep focus on an invalid field after a failed submit (spec 0012, AC-24)
+    onCloseAutoFocus?: (event: Event) => void;
 };
 
 // Below 1280px: a floating Preview button and a full screen sheet with the same pages (spec 0009)
@@ -22,6 +24,7 @@ export const LivePreviewSheet = ({
     onOpenChange,
     preview,
     unavailableAction,
+    onCloseAutoFocus,
 }: LivePreviewSheetProps) => {
     const { t } = useTranslation();
 
@@ -31,14 +34,18 @@ export const LivePreviewSheet = ({
                 <Button
                     type='button'
                     size='lg'
-                    className='fixed right-6 bottom-6 z-20 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg hover:from-indigo-700 hover:to-violet-700'
+                    variant='secondary'
+                    className='shadow-overlay fixed right-6 bottom-6 z-20 rounded-full'
                 >
-                    <Eye className='mr-2 h-4 w-4' />
+                    <Eye aria-hidden='true' />
                     {t('builder.livePreview.open')}
                 </Button>
             </SheetTrigger>
-            <SheetContent closeLabel={t('builder.livePreview.close')}>
-                <div className='border-b border-slate-200 px-4 py-3 pr-14 dark:border-white/10'>
+            <SheetContent
+                closeLabel={t('builder.livePreview.close')}
+                onCloseAutoFocus={onCloseAutoFocus}
+            >
+                <div className='border-b px-4 py-3 pr-14'>
                     <SheetTitle asChild>
                         <div>
                             <LivePreviewTitle preview={preview} />

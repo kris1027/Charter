@@ -1,6 +1,7 @@
 import { Textarea } from '@/components/ui/textarea';
 import { FieldError } from '@/components/ui/field-error';
 import { useFieldContext } from '@/features/builder/form-context';
+import { fieldA11y } from '@/features/builder/fields/field-a11y';
 import { FieldLabel } from '@/features/builder/fields/field-label';
 
 type BulletTextareaFieldProps = {
@@ -12,6 +13,9 @@ type BulletTextareaFieldProps = {
 // A textarea that keeps every line a bullet point
 export const BulletTextareaField = ({ label, placeholder, hint }: BulletTextareaFieldProps) => {
     const field = useFieldContext<string>();
+    const { errors, isTouched } = field.state.meta;
+    const hintId = `${field.name}-hint`;
+    const { errorId, ariaProps } = fieldA11y(field.name, field.state.meta, hintId);
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         let value = e.target.value;
@@ -59,9 +63,12 @@ export const BulletTextareaField = ({ label, placeholder, hint }: BulletTextarea
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
                 className='min-h-[120px] resize-none'
+                {...ariaProps}
             />
-            <FieldError errors={field.state.meta.errors} isTouched={field.state.meta.isTouched} />
-            <p className='text-xs text-slate-500'>{hint}</p>
+            <FieldError id={errorId} errors={errors} isTouched={isTouched} />
+            <p id={hintId} className='text-muted-foreground text-xs'>
+                {hint}
+            </p>
         </div>
     );
 };

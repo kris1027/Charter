@@ -1090,6 +1090,17 @@
         @apply bg-background text-foreground;
     }
 
+    /* Builder only (spec 0012, AC-16): focused fields and section jumps land clear of the sticky
+       toolbar (and, from md, the section strip) and of the floating Preview button */
+    html:has([data-builder-page]) {
+        scroll-padding-top: 4.5rem;
+        scroll-padding-bottom: 5.5rem;
+
+        @media (width >= 48rem) {
+            scroll-padding-top: 7.25rem;
+        }
+    }
+
     /* One focus indicator for every control; primitives never add outline-none */
     :focus-visible {
         outline: 2px solid var(--ring);
@@ -1110,26 +1121,6 @@
     }
 }
 
-@keyframes float {
-    0%,
-    100% {
-        transform: translateY(0) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-16px) rotate(2deg);
-    }
-}
-
-@keyframes float-reverse {
-    0%,
-    100% {
-        transform: translateY(0) rotate(0deg);
-    }
-    50% {
-        transform: translateY(12px) rotate(-1.5deg);
-    }
-}
-
 @keyframes gradient-shift {
     0% {
         background-position: 0% 50%;
@@ -1146,14 +1137,6 @@
 
 .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out both;
-}
-
-.animate-float {
-    animation: float 6s ease-in-out infinite;
-}
-
-.animate-float-reverse {
-    animation: float-reverse 5s ease-in-out infinite;
 }
 
 .animate-gradient-shift {

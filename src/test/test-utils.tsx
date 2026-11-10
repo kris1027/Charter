@@ -64,6 +64,7 @@ const renderWithRouter = async (page: RouteComponent, { initialEntry = '/builder
     await router.load();
     const result = customRender(
         <ThemeProvider>
+            <Toaster />
             <RouterProvider router={router} />
         </ThemeProvider>,
     );

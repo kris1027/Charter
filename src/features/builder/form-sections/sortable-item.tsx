@@ -1,7 +1,24 @@
 import { Button } from '@/components/ui/button';
-import { GripVertical, Trash2, X } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    ArrowDown,
+    ArrowLeft,
+    ArrowRight,
+    ArrowUp,
+    EllipsisVertical,
+    GripVertical,
+    Trash2,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMenuActionFocus } from '@/features/builder/use-menu-action-focus';
+import { focusKey, type ItemMoveControls } from '@/features/builder/form-sections/sortable-ids';
 import {
     useSortableItem,
     type HandleProps,
@@ -12,68 +29,95 @@ type DragHandleProps = {
     size: 'sm' | 'md';
 };
 
-// sm for chips (skills, interests), md for cards
+// sm for chips (skills, interests), md for cards; both at least 24 by 24 (spec 0012, AC-32)
 export const DragHandle = ({ handleProps, size }: DragHandleProps) => {
     const { t } = useTranslation();
 
     return (
         <button
             type='button'
-            className={`cursor-grab touch-none rounded ${size === 'sm' ? 'p-0.5' : 'p-1'} transition-colors hover:bg-slate-100 active:cursor-grabbing dark:hover:bg-white/10`}
+            className={`text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex shrink-0 cursor-grab touch-none items-center justify-center rounded-md transition-colors duration-(--duration-fast) active:cursor-grabbing ${size === 'sm' ? 'size-6' : 'size-8'}`}
             aria-label={t('accessibility.dragToReorder')}
             {...handleProps.attributes}
             {...handleProps.listeners}
         >
-            <GripVertical className={`${size === 'sm' ? 'h-3 w-3' : 'h-5 w-5'} text-slate-400`} />
+            <GripVertical className={size === 'sm' ? 'size-3.5' : 'size-5'} aria-hidden='true' />
         </button>
     );
 };
 
-const DRAGGING_CLASSES = 'shadow-lg ring-2 ring-indigo-500/20';
+const DRAGGING_CLASSES = 'shadow-overlay ring-2 ring-ring';
 
 type SortableCardProps = {
     id: string;
     title: string;
     removeLabel: string;
     onRemove: () => void;
+    controls: ItemMoveControls;
     className?: string;
     children: ReactNode;
 };
 
-// Card for experience, education and languages: drag handle, title, remove button, fields
+// Card for experience, education and languages: drag handle, title, move and remove, fields
 export const SortableCard = ({
     id,
     title,
     removeLabel,
     onRemove,
+    controls,
     className = '',
     children,
 }: SortableCardProps) => {
+    const { t } = useTranslation();
     const { setNodeRef, style, isDragging, handleProps } = useSortableItem(id);
 
     return (
         <div
             ref={setNodeRef}
             style={style}
-            className={`${className} rounded-xl border border-slate-200/60 bg-white/40 p-6 backdrop-blur-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/[0.02] dark:hover:shadow-indigo-500/5 ${isDragging ? DRAGGING_CLASSES : ''}`}
+            className={`${className} bg-background rounded-lg border p-4 sm:p-5 ${isDragging ? DRAGGING_CLASSES : ''}`}
         >
-            <div className='mb-4 flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
+            <div className='mb-4 flex items-center justify-between gap-2'>
+                <div className='flex min-w-0 items-center gap-2'>
                     <DragHandle handleProps={handleProps} size='md' />
-                    <h4 className='font-display text-lg font-semibold text-slate-700 dark:text-slate-300'>
-                        {title}
-                    </h4>
+                    <h3 className='font-display truncate text-base font-semibold'>{title}</h3>
                 </div>
-                <Button
-                    type='button'
-                    variant='ghost'
-                    size='sm'
-                    onClick={onRemove}
-                    className='text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400'
-                    aria-label={removeLabel}
-                >
-                    <Trash2 className='h-4 w-4' />
-                </Button>
+                <div className='flex shrink-0 items-center gap-1'>
+                    <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='size-8'
+                        onClick={controls.moveUp}
+                        disabled={!controls.canMoveUp}
+                        aria-label={t('accessibility.moveUp', { item: title })}
+                        data-focus-key={focusKey(id, 'moveUp')}
+                    >
+                        <ArrowUp aria-hidden='true' />
+                    </Button>
+                    <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='size-8'
+                        onClick={controls.moveDown}
+                        disabled={!controls.canMoveDown}
+                        aria-label={t('accessibility.moveDown', { item: title })}
+                        data-focus-key={focusKey(id, 'moveDown')}
+                    >
+                        <ArrowDown aria-hidden='true' />
+                    </Button>
+                    <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='hover:text-destructive size-8'
+                        onClick={onRemove}
+                        aria-label={removeLabel}
+                    >
+                        <Trash2 aria-hidden='true' />
+                    </Button>
+                </div>
             </div>
             {children}
         </div>
@@ -85,28 +129,63 @@ type SortableChipProps = {
     name: string;
     removeLabel: string;
     onRemove: () => void;
+    controls: ItemMoveControls;
 };
 
-// Chip for skills and interests
-export const SortableChip = ({ id, name, removeLabel, onRemove }: SortableChipProps) => {
+// Chip for skills and interests: drag handle, name, and a menu that moves or removes it, so
+// every action works by touch and keyboard (spec 0012, AC-30)
+export const SortableChip = ({ id, name, removeLabel, onRemove, controls }: SortableChipProps) => {
+    const { t } = useTranslation();
     const { setNodeRef, style, isDragging, handleProps } = useSortableItem(id);
+    // A move or remove places focus itself, so Radix must not send it back to this index's trigger
+    const menuFocus = useMenuActionFocus();
 
     return (
         <div
             ref={setNodeRef}
             style={style}
-            className={`group flex items-center gap-1 rounded-full border border-slate-200/60 bg-white/60 px-3 py-1.5 backdrop-blur-sm transition-all hover:shadow-md dark:border-white/10 dark:bg-white/[0.05] dark:hover:shadow-indigo-500/5 ${isDragging ? DRAGGING_CLASSES : ''}`}
+            className={`bg-background flex items-center gap-1 rounded-full border py-1 pr-1 pl-1.5 ${isDragging ? DRAGGING_CLASSES : ''}`}
         >
             <DragHandle handleProps={handleProps} size='sm' />
-            <span className='text-sm font-medium text-slate-700 dark:text-slate-300'>{name}</span>
-            <button
-                type='button'
-                onClick={onRemove}
-                className='opacity-0 transition-opacity group-hover:opacity-100'
-                aria-label={removeLabel}
-            >
-                <X className='h-3 w-3 text-slate-400 hover:text-red-500' />
-            </button>
+            <span className='px-1 text-sm font-medium'>{name}</span>
+            <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                    <button
+                        type='button'
+                        className='text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex size-6 shrink-0 items-center justify-center rounded-full transition-colors duration-(--duration-fast)'
+                        aria-label={t('accessibility.itemActions', { item: name })}
+                        data-focus-key={focusKey(id, 'menu')}
+                    >
+                        <EllipsisVertical className='size-3.5' aria-hidden='true' />
+                    </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start' onCloseAutoFocus={menuFocus.onCloseAutoFocus}>
+                    <DropdownMenuItem
+                        className='gap-2'
+                        disabled={!controls.canMoveUp}
+                        onSelect={menuFocus.placesFocus(controls.moveUp)}
+                    >
+                        <ArrowLeft className='size-4' aria-hidden='true' />
+                        {t('accessibility.moveLeft')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        className='gap-2'
+                        disabled={!controls.canMoveDown}
+                        onSelect={menuFocus.placesFocus(controls.moveDown)}
+                    >
+                        <ArrowRight className='size-4' aria-hidden='true' />
+                        {t('accessibility.moveRight')}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        className='text-destructive focus:text-destructive gap-2'
+                        onSelect={menuFocus.placesFocus(onRemove)}
+                    >
+                        <Trash2 className='size-4' aria-hidden='true' />
+                        {removeLabel}
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     );
 };

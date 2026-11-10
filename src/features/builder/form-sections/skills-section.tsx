@@ -1,104 +1,34 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { FormSectionCard } from '@/features/builder/form-sections/form-section-card';
-import { ListEmptyState } from '@/features/builder/form-sections/list-empty-state';
-import { SortableChip } from '@/features/builder/form-sections/sortable-item';
-import { SortableList } from '@/features/builder/form-sections/sortable-list';
+import { ChipListSection } from '@/features/builder/form-sections/chip-list-section';
 import { resumeFormOptions, withForm } from '@/features/builder/resume-form';
-import { Plus, Code } from 'lucide-react';
-import { useState } from 'react';
+import { Code } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const SkillsSection = withForm({
     ...resumeFormOptions,
     render: function Render({ form }) {
         const { t } = useTranslation();
-        const [skillInput, setSkillInput] = useState('');
 
         return (
-            <FormSectionCard
-                icon={Code}
-                iconGradient='from-amber-500 to-orange-600'
-                title={t('sections.skills.title')}
-                description={t('sections.skills.description')}
-            >
-                <form.Field name='skills' mode='array'>
-                    {(field) => {
-                        const handleAdd = () => {
-                            const name = skillInput.trim();
-                            if (!name) return;
-                            field.pushValue({ name });
-                            setSkillInput('');
-                        };
-
-                        return (
-                            <div className='space-y-4'>
-                                <div className='flex gap-2'>
-                                    <Input
-                                        placeholder={t('placeholders.skill')}
-                                        value={skillInput}
-                                        onChange={(e) => setSkillInput(e.target.value)}
-                                        onKeyPress={(e) => {
-                                            if (e.key === 'Enter') {
-                                                // Keep Enter from submitting the form
-                                                e.preventDefault();
-                                                handleAdd();
-                                            }
-                                        }}
-                                    />
-                                    <Button
-                                        type='button'
-                                        onClick={handleAdd}
-                                        disabled={!skillInput.trim()}
-                                        className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700'
-                                    >
-                                        <Plus className='mr-2 h-4 w-4' />
-                                        {t('sections.skills.add')}
-                                    </Button>
-                                </div>
-
-                                {/* Array mode rerenders only on its helpers; this also catches form.reset */}
-                                <form.Subscribe selector={(state) => state.values.skills}>
-                                    {(items) => (
-                                        <div>
-                                            {items.length === 0 ? (
-                                                <ListEmptyState
-                                                    icon={Code}
-                                                    iconGradient='from-amber-500 to-orange-600'
-                                                    title={t('sections.skills.empty')}
-                                                    hint={t('sections.skills.emptyHint')}
-                                                />
-                                            ) : (
-                                                <SortableList
-                                                    count={items.length}
-                                                    idPrefix='skill'
-                                                    strategy='horizontal'
-                                                    onMove={field.moveValue}
-                                                    className='flex flex-wrap gap-2'
-                                                >
-                                                    {(index, id) => (
-                                                        <SortableChip
-                                                            key={id}
-                                                            id={id}
-                                                            name={items[index].name}
-                                                            removeLabel={t(
-                                                                'accessibility.removeSkill',
-                                                            )}
-                                                            onRemove={() =>
-                                                                field.removeValue(index)
-                                                            }
-                                                        />
-                                                    )}
-                                                </SortableList>
-                                            )}
-                                        </div>
-                                    )}
-                                </form.Subscribe>
-                            </div>
-                        );
-                    }}
-                </form.Field>
-            </FormSectionCard>
+            <form.Field name='skills' mode='array'>
+                {(field) => (
+                    // Array mode rerenders only on its helpers; this also catches form.reset
+                    <form.Subscribe selector={(state) => state.values.skills}>
+                        {(items) => (
+                            <ChipListSection
+                                sectionId='skills'
+                                icon={Code}
+                                idPrefix='skill'
+                                inputLabel={t('placeholders.skill')}
+                                removeLabel={t('accessibility.removeSkill')}
+                                names={items.map((item) => item.name)}
+                                onAdd={(name) => field.pushValue({ name })}
+                                onMove={field.moveValue}
+                                onRemove={field.removeValue}
+                            />
+                        )}
+                    </form.Subscribe>
+                )}
+            </form.Field>
         );
     },
 });

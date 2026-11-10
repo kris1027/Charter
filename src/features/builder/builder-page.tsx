@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { PersonalInfoSection } from '@/features/builder/form-sections/personal-info-section';
 import { ExperienceSection } from '@/features/builder/form-sections/experience-section';
 import { EducationSection } from '@/features/builder/form-sections/education-section';
@@ -7,18 +6,18 @@ import { LanguagesSection } from '@/features/builder/form-sections/languages-sec
 import { InterestsSection } from '@/features/builder/form-sections/interests-section';
 import { GdprConsentSection } from '@/features/builder/form-sections/gdpr-consent-section';
 import { resumeFormOptions, useAppForm } from '@/features/builder/resume-form';
-import { useState, useEffect } from 'react';
+import { useDeferredValue, useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { m, useReducedMotion } from 'motion/react';
-import { ParallaxBackground } from '@/components/parallax-background';
-import { fadeInUp } from '@/lib/animation-variants';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { notify } from '@/components/ui/toast';
 import { EMPTY_RESUME, loadStoredResume } from '@/features/resume/stored-resume';
 import { usePdfImport } from '@/features/builder/use-pdf-import';
 import { useResumeAutosave } from '@/features/builder/use-resume-autosave';
-import { canOpenPreview } from '@/features/builder/calculate-progress';
-import { FormProgress } from '@/features/builder/form-progress';
+import { focusFirstInvalid } from '@/features/builder/focus-first-invalid';
+import { useRevealFocusedField } from '@/features/builder/use-reveal-focused-field';
+import { PreviewCvButton } from '@/features/builder/preview-cv-button';
+import { SectionNav } from '@/features/builder/section-nav';
 import { BuilderToolbar } from '@/features/builder/toolbar/builder-toolbar';
 import { isTemplateId, type TemplateId } from '@/lib/template-ids';
 import { normalizeLang } from '@/lib/app-lang';
@@ -38,7 +37,6 @@ const BuilderPage = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const search = useSearch({ from: '/builder' });
-    const shouldReduceMotion = useReducedMotion();
 
     // Read once per mount
     const [stored] = useState(loadStoredResume);
@@ -51,9 +49,40 @@ const BuilderPage = () => {
         stored ? { ...stored, templateId: activeTemplateId } : emptyResumeFor(activeTemplateId),
     );
 
+    // Live preview (spec 0009): a side panel from 1280px, a sheet below that
+    const isWide = useMediaQuery(WIDE_PREVIEW_QUERY);
+    const previewPanel = usePreviewOpen();
+    const [sheetOpen, setSheetOpenState] = useState(false);
+    const showPanel = isWide && previewPanel.open;
+
+    // onSubmitInvalid reads these at call time, so it never depends on which options useAppForm
+    // applied last (spec 0012, AC-24)
+    const sheetOpenNow = useRef(false);
+    const setSheetOpen = (open: boolean) => {
+        sheetOpenNow.current = open;
+        setSheetOpenState(open);
+    };
+    const isWideNow = () => window.matchMedia(WIDE_PREVIEW_QUERY).matches;
+
+    // Set when a submit from the sheet fails: the sheet closes first, then focus goes to the field
+    const focusInvalidOnSheetClose = useRef(false);
+
+    // Focuses the first invalid field; with none to focus, says something still needs fixing
+    // (spec 0012, AC-23, AC-25)
+    const revealFirstInvalid = () => {
+        if (focusFirstInvalid()) return;
+        notify({
+            id: 'builder-invalid',
+            variant: 'destructive',
+            title: t('builder.validation.fixErrorsUnknown'),
+        });
+    };
+
     const form = useAppForm({
         ...resumeFormOptions,
         defaultValues: initialValues,
+        // Every attempt validates and reports, not only the first (spec 0012, AC-23)
+        canSubmitWhenInvalid: true,
         onSubmit: async ({ value }) => {
             // Store data in localStorage for persistence, then preview whether or not it worked.
             // autosave is declared below because it needs form; submit only runs after render.
@@ -61,6 +90,15 @@ const BuilderPage = () => {
 
             // Navigate to preview page with templateId
             navigate({ to: '/preview', search: { templateId: value.templateId } });
+        },
+        onSubmitInvalid: () => {
+            if (!isWideNow() && sheetOpenNow.current) {
+                focusInvalidOnSheetClose.current = true;
+                setSheetOpen(false);
+                return;
+            }
+            // One frame, so the errors and their aria-invalid have rendered
+            requestAnimationFrame(revealFirstInvalid);
         },
     });
 
@@ -71,14 +109,11 @@ const BuilderPage = () => {
         }
     }, [search.templateId, form]);
 
+    useRevealFocusedField();
+
     const autosave = useResumeAutosave(form);
     const pdfImport = usePdfImport({ form, activeTemplateId });
 
-    // Live preview (spec 0009): a side panel from 1280px, a sheet below that
-    const isWide = useMediaQuery(WIDE_PREVIEW_QUERY);
-    const previewPanel = usePreviewOpen();
-    const [sheetOpen, setSheetOpen] = useState(false);
-    const showPanel = isWide && previewPanel.open;
     const livePreview = useLivePreview({
         form,
         templateId: activeTemplateId,
@@ -86,6 +121,19 @@ const BuilderPage = () => {
         active: showPanel || (!isWide && sheetOpen),
     });
     const openPreviewButton = <OpenPreviewButton form={form} />;
+
+    // Only once the sheet has let go of focus can the invalid field take it (AC-24)
+    const handleSheetCloseAutoFocus = (event: Event) => {
+        if (!focusInvalidOnSheetClose.current) return;
+        focusInvalidOnSheetClose.current = false;
+        event.preventDefault();
+        revealFirstInvalid();
+    };
+
+    // The first paint holds the bars and personal info; the other sections follow in a deferred
+    // render, which React splits into short tasks, so the page never blocks input for long
+    // (spec 0012, AC-40)
+    const showAllSections = useDeferredValue(true, false);
 
     // Manual save function
     const handleManualSave = () => autosave.save({ backup: true });
@@ -98,11 +146,9 @@ const BuilderPage = () => {
         form.reset(emptyResumeFor(activeTemplateId), { keepDefaultValues: true });
     };
 
+    // No overflow class here or above, so the toolbar, strip and panel can stick (spec 0012, AC-1)
     return (
-        <div className='relative min-h-screen overflow-hidden'>
-            <ParallaxBackground />
-
-            {/* Navigation Bar */}
+        <div data-builder-page className='bg-background min-h-screen pb-24 xl:pb-0'>
             <BuilderToolbar
                 activeTemplateId={activeTemplateId}
                 pdfImport={pdfImport}
@@ -111,95 +157,46 @@ const BuilderPage = () => {
                 onReset={handleReset}
                 previewOpen={previewPanel.open}
                 onTogglePreview={previewPanel.toggle}
+                previewButton={<PreviewCvButton form={form} size='sm' />}
             />
+            <SectionNav form={form} />
 
             <div
-                className={`relative z-[1] container mx-auto px-4 py-8 ${showPanel ? 'grid max-w-[1600px] grid-cols-2 items-start gap-8' : 'max-w-5xl'}`}
+                className={`container mx-auto px-4 py-8 ${showPanel ? 'grid max-w-[1600px] grid-cols-2 items-start gap-8' : 'max-w-5xl'}`}
             >
                 <div className='min-w-0'>
-                    {/* Progress Indicator */}
-                    <FormProgress form={form} />
-
                     <ErrorBoundary>
                         <form
+                            noValidate
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 form.handleSubmit();
                             }}
-                            className='space-y-8'
+                            className='space-y-6'
                         >
-                            {/* Personal Information Section */}
-                            <m.div {...fadeInUp(0, shouldReduceMotion)}>
-                                <PersonalInfoSection form={form} />
-                            </m.div>
+                            <PersonalInfoSection form={form} />
+                            {showAllSections && (
+                                <>
+                                    <ExperienceSection form={form} />
+                                    <EducationSection form={form} />
+                                    <SkillsSection form={form} />
+                                    <LanguagesSection form={form} />
+                                    <InterestsSection form={form} />
+                                    <GdprConsentSection form={form} />
+                                </>
+                            )}
 
-                            {/* Work Experience Section */}
-                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                                <ExperienceSection form={form} />
-                            </m.div>
-
-                            {/* Education Section */}
-                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                                <EducationSection form={form} />
-                            </m.div>
-
-                            {/* Skills Section */}
-                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                                <SkillsSection form={form} />
-                            </m.div>
-
-                            {/* Languages Section */}
-                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                                <LanguagesSection form={form} />
-                            </m.div>
-
-                            {/* Interests Section */}
-                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                                <InterestsSection form={form} />
-                            </m.div>
-
-                            {/* GDPR Consent Section */}
-                            <m.div {...fadeInUp(0.05, shouldReduceMotion)}>
-                                <GdprConsentSection form={form} />
-                            </m.div>
-
-                            {/* Submit Button */}
-                            <m.div
-                                className='flex items-center justify-between pt-6'
-                                {...fadeInUp(0.05, shouldReduceMotion)}
-                            >
-                                <form.Subscribe
-                                    selector={(state) =>
-                                        [
-                                            canOpenPreview(state),
-                                            state.isSubmitting,
-                                            state.isValid,
-                                        ] as const
-                                    }
-                                    children={([canOpen, isSubmitting, isValid]) => (
-                                        <>
-                                            <div className='text-sm'>
-                                                {!isValid && (
-                                                    <span className='font-medium text-red-500'>
-                                                        {t('builder.validation.fixErrors')}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <Button
-                                                type='submit'
-                                                disabled={!canOpen}
-                                                size='lg'
-                                                className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl'
-                                            >
-                                                {isSubmitting
-                                                    ? t('builder.processing')
-                                                    : `${t('builder.previewCv')} →`}
-                                            </Button>
-                                        </>
+                            <div className='flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between'>
+                                <form.Subscribe selector={(state) => state.isValid}>
+                                    {(isValid) => (
+                                        <p className='text-destructive text-sm font-medium'>
+                                            {!isValid && t('builder.validation.fixErrors')}
+                                        </p>
                                     )}
-                                />
-                            </m.div>
+                                </form.Subscribe>
+                                <PreviewCvButton form={form} size='lg' />
+                            </div>
                         </form>
                     </ErrorBoundary>
                 </div>
@@ -215,6 +212,7 @@ const BuilderPage = () => {
                     onOpenChange={setSheetOpen}
                     preview={livePreview}
                     unavailableAction={openPreviewButton}
+                    onCloseAutoFocus={handleSheetCloseAutoFocus}
                 />
             )}
         </div>

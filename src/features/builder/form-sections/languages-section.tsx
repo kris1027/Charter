@@ -1,18 +1,17 @@
-import { Button } from '@/components/ui/button';
-import { FormSectionCard } from '@/features/builder/form-sections/form-section-card';
-import { ListEmptyState } from '@/features/builder/form-sections/list-empty-state';
+import { CardListSection } from '@/features/builder/form-sections/card-list-section';
+import { focusField } from '@/features/builder/form-sections/focus-field';
+import { NO_MOVE_CONTROLS } from '@/features/builder/form-sections/sortable-ids';
 import { SortableCard } from '@/features/builder/form-sections/sortable-item';
-import { SortableList } from '@/features/builder/form-sections/sortable-list';
 import { resumeFormOptions, withForm } from '@/features/builder/resume-form';
 import { getLanguageLevels } from '@/features/resume/language-levels';
 import { EMPTY_LANGUAGE } from '@/features/resume/stored-resume';
-import { Plus, Globe } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const LanguageItem = withForm({
     ...resumeFormOptions,
-    props: { id: '', index: 0, onRemove: () => {} },
-    render: function Render({ form, id, index, onRemove }) {
+    props: { id: '', index: 0, onRemove: () => {}, controls: NO_MOVE_CONTROLS },
+    render: function Render({ form, id, index, onRemove, controls }) {
         const { t } = useTranslation();
 
         return (
@@ -21,6 +20,7 @@ const LanguageItem = withForm({
                 title={t('sections.languages.item', { number: index + 1 })}
                 removeLabel={t('accessibility.removeLanguage')}
                 onRemove={onRemove}
+                controls={controls}
             >
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <form.AppField name={`languages[${index}].language`}>
@@ -49,63 +49,40 @@ const LanguageItem = withForm({
 export const LanguagesSection = withForm({
     ...resumeFormOptions,
     render: function Render({ form }) {
-        const { t } = useTranslation();
-
         return (
             <form.Field name='languages' mode='array'>
                 {(field) => (
-                    <FormSectionCard
-                        icon={Globe}
-                        iconGradient='from-cyan-500 to-blue-600'
-                        title={t('sections.languages.title')}
-                        description={t('sections.languages.description')}
-                        headerAction={
-                            <Button
-                                type='button'
-                                onClick={() => field.pushValue({ ...EMPTY_LANGUAGE })}
-                                className='bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md transition-all hover:from-indigo-700 hover:to-violet-700 hover:shadow-lg'
+                    // Only the length: a card reads its own fields, so typing redraws one field.
+                    // Array mode rerenders only on its helpers; this also catches form.reset
+                    <form.Subscribe selector={(state) => state.values.languages.length}>
+                        {(count) => (
+                            <CardListSection
+                                sectionId='languages'
+                                copyKey='languages'
+                                icon={Globe}
+                                idPrefix='language'
+                                count={count}
+                                onAdd={() => {
+                                    // Goes last, and focus moves into it (spec 0012, AC-27)
+                                    field.pushValue({ ...EMPTY_LANGUAGE });
+                                    focusField(`languages[${count}].language`);
+                                }}
+                                onMove={field.moveValue}
+                                onRemove={field.removeValue}
                             >
-                                <Plus className='mr-2 h-4 w-4' />
-                                {t('sections.languages.add')}
-                            </Button>
-                        }
-                    >
-                        {/* Only the length: a card reads its own fields, so typing redraws one field. Array
-                            mode rerenders only on its helpers; this also catches form.reset */}
-                        <form.Subscribe selector={(state) => state.values.languages.length}>
-                            {(count) => (
-                                <div className='space-y-4'>
-                                    {count === 0 && (
-                                        <ListEmptyState
-                                            icon={Globe}
-                                            iconGradient='from-cyan-500 to-blue-600'
-                                            title={t('sections.languages.empty')}
-                                            hint={t('sections.languages.emptyHint')}
-                                        />
-                                    )}
-                                    {count > 0 && (
-                                        <SortableList
-                                            count={count}
-                                            idPrefix='language'
-                                            strategy='vertical'
-                                            onMove={field.moveValue}
-                                            className='space-y-4'
-                                        >
-                                            {(index, id) => (
-                                                <LanguageItem
-                                                    key={id}
-                                                    form={form}
-                                                    id={id}
-                                                    index={index}
-                                                    onRemove={() => field.removeValue(index)}
-                                                />
-                                            )}
-                                        </SortableList>
-                                    )}
-                                </div>
-                            )}
-                        </form.Subscribe>
-                    </FormSectionCard>
+                                {(index, id, controls, onRemove) => (
+                                    <LanguageItem
+                                        key={id}
+                                        form={form}
+                                        id={id}
+                                        index={index}
+                                        controls={controls}
+                                        onRemove={onRemove}
+                                    />
+                                )}
+                            </CardListSection>
+                        )}
+                    </form.Subscribe>
                 )}
             </form.Field>
         );

@@ -35,3 +35,6 @@ dist-ssr
 
 # Template preview pixel baselines (spec 0006)
 .cache/
+
+# Playwright MCP browser logs and downloads
+.playwright-mcp/

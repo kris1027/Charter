@@ -60,7 +60,7 @@ export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
                 'aria-label',
                 t('builder.livePreview.pageLabel', { page: index + 1, total: canvases.length }),
             );
-            canvas.className = 'block bg-white shadow-md ring-1 ring-slate-900/10';
+            canvas.className = 'block bg-paper shadow-surface ring-1 ring-border';
         });
     };
 
@@ -136,8 +136,8 @@ export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
     return (
         <div className='space-y-3'>
             {pageCount > 0 && (
-                <div className='flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-400'>
-                    <span className='rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-700 dark:bg-white/10 dark:text-slate-200'>
+                <div className='text-muted-foreground flex flex-wrap items-center gap-2 text-xs'>
+                    <span className='bg-muted text-foreground rounded-md px-2 py-0.5 font-medium'>
                         {t('builder.livePreview.pageCount', { count: pageCount })}
                     </span>
                     {pageCount > 1 && <span>{t('builder.livePreview.fullSizeHint')}</span>}
@@ -146,13 +146,13 @@ export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
             {(renderFailed || drawFailed) && (
                 <p
                     role='status'
-                    className='rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200'
+                    className='border-warning/40 bg-warning/10 text-foreground rounded-md border px-3 py-2 text-sm'
                 >
                     {t('builder.livePreview.updateFailed')}
                 </p>
             )}
             {pageCount === 0 && (
-                <p role='status' className='py-12 text-center text-sm text-slate-500'>
+                <p role='status' className='text-muted-foreground py-12 text-center text-sm'>
                     {t('builder.livePreview.preparing')}
                 </p>
             )}

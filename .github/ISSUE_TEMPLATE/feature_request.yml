@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an improvement to the resume builder.
+description: Suggest an improvement to Charter.
 labels: [enhancement]
 body:
     - type: textarea

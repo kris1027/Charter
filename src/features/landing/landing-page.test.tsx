@@ -34,7 +34,7 @@ describe('IndexPage', () => {
             heading('Three simple steps.'),
             screen.getByText('Templates'),
             heading('Ready to build your CV?'),
-            screen.getByText('Resume Builder · Your data never leaves your browser.'),
+            screen.getByText('Charter · Your data never leaves your browser.'),
         ];
 
         sections.slice(1).forEach((section, i) => {
@@ -139,7 +139,7 @@ describe('IndexPage', () => {
         await renderLanding();
 
         expect(
-            screen.getByText('Resume Builder · Your data never leaves your browser.'),
+            screen.getByText('Charter · Your data never leaves your browser.'),
         ).toBeInTheDocument();
     });
 });

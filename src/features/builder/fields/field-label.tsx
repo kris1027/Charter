@@ -12,7 +12,7 @@ export const FieldLabel = ({ htmlFor, label, required = false }: FieldLabelProps
         {required && (
             <>
                 {' '}
-                <span className='text-red-500'>*</span>
+                <span className='text-destructive'>*</span>
             </>
         )}
     </Label>

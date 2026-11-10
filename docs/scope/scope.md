@@ -1,4 +1,4 @@
-# Scope: Resume Builder
+# Scope: Charter
 
 A free, no sign up resume builder for job seekers (EN/PL): fill a form, pick one of three print clean templates, export or import a PDF. This pass checks the stack, refactors toward modern practice, makes the app faster, and refreshes the app UI. The resume templates keep their current look.
 
@@ -41,7 +41,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 11  | Builder responsiveness          | Slice 2    | done     |
 | 12  | Landing page refresh            | Slice 3    | done     |
 | 13  | Template gallery refresh        | Slice 3    | done     |
-| 14  | Builder UI refresh              | Slice 3    | planned  |
+| 14  | Builder UI refresh              | Slice 3    | done     |
 | 15  | Preview & export UI refresh     | Slice 3    | planned  |
 | 16  | Accessibility & Lighthouse pass | Slice 3    | planned  |
 
@@ -292,12 +292,19 @@ spec [0011](../specs/0011-template-gallery-refresh/index.md) · code in `src/fea
     - [x] Detail page: instant image, desktop PDF, phone image only (AC-12 to AC-17, AC-20, AC-22)
     - [x] Cleanup, lint guard, `DESIGN.md`, performance checks (AC-2, AC-18, AC-19, AC-21, AC-23)
 
-### 14. Builder UI refresh · needs a decision
+### 14. Builder UI refresh · done
 
 The form, section cards, drag handles and dialogs on the new design system, built on the split from feature 7.
 **Done when:** every section and dialog uses the new components, errors still show only after touch, and the builder works fully by keyboard.
+spec [0012](../specs/0012-builder-ui-refresh/index.md) · code in `src/features/builder/`
 
-- [ ] Design it (spec): `/architect builder ui refresh`
+- [x] Design it (spec): `/architect builder ui refresh`
+- [x] Build it: `/develop builder ui refresh`
+    - [x] Page frame, toolbar and actions menu (AC-1, AC-4 to AC-10, AC-16)
+    - [x] Section strip with progress (AC-11 to AC-15)
+    - [x] Sections, fields and live preview on tokens (AC-17 to AC-21, AC-34 to AC-36)
+    - [x] Preview CV always available, lists without a mouse (AC-22 to AC-33)
+    - [x] Cleanup and guards (AC-2, AC-3, AC-37 to AC-40)
 
 ### 15. Preview & export UI refresh · needs a decision
 
