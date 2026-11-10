@@ -146,6 +146,11 @@
             "pageCount_few": "{{count}} strony",
             "pageCount_many": "{{count}} stron",
             "pageCount_other": "{{count}} strony"
+        },
+        "reorder": {
+            "moved": "Przeniesiono na pozycję {{position}} z {{total}}",
+            "added": "Dodano: {{item}}",
+            "removed": "Usunięto: {{item}}"
         }
     },
     "form": {
@@ -358,7 +363,17 @@
         "removeLanguage": "Usuń język",
         "removeSkill": "Usuń umiejętność",
         "removeInterest": "Usuń zainteresowanie",
-        "skipToContent": "Przejdź do treści głównej"
+        "skipToContent": "Przejdź do treści głównej",
+        "moveUp": "Przesuń {{item}} w górę",
+        "moveDown": "Przesuń {{item}} w dół",
+        "moveLeft": "Przesuń w lewo",
+        "moveRight": "Przesuń w prawo",
+        "itemActions": "Działania: {{item}}",
+        "dragInstructions": "Naciśnij spację lub Enter, aby chwycić. Przesuwaj strzałkami, upuść spacją lub Enterem, Escape anuluje.",
+        "dragPickedUp": "Chwycono element na pozycji {{position}}",
+        "dragOver": "Nad pozycją {{position}}",
+        "dragDropped": "Upuszczono na pozycji {{position}}",
+        "dragCancelled": "Anulowano przenoszenie"
     },
     "errorBoundary": {
         "title": "Coś poszło nie tak",

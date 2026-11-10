@@ -48,6 +48,16 @@ const lastNameInput = () => screen.getByLabelText(/^Last Name/);
 const emailInput = () => screen.getByLabelText(/^Email/);
 const previewButton = () => screen.getByRole('button', { name: /Preview CV/ });
 
+// A chip's Remove lives in its menu (spec 0012, AC-30)
+const removeChip = async (
+    user: ReturnType<typeof userEvent.setup>,
+    name: string,
+    removeLabel: string,
+) => {
+    await user.click(screen.getByRole('button', { name: `Actions for ${name}` }));
+    await user.click(await screen.findByRole('menuitem', { name: removeLabel }));
+};
+
 const fileInput = () => screen.getByLabelText<HTMLInputElement>('Load PDF');
 
 const pdfFile = (size?: number) => {
@@ -150,12 +160,12 @@ describe('BuilderPage', () => {
         const input = screen.getByPlaceholderText('Enter a skill');
 
         await user.type(input, '   {Enter}');
-        expect(screen.queryAllByRole('button', { name: 'Remove skill' })).toHaveLength(0);
+        expect(screen.queryAllByRole('button', { name: /^Actions for/ })).toHaveLength(0);
 
         await user.type(input, ' React {Enter}');
         expect(screen.getByText('React')).toBeInTheDocument();
         expect(input).toHaveValue('');
-        expect(screen.getAllByRole('button', { name: 'Remove skill' })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: /^Actions for/ })).toHaveLength(1);
     });
 
     it('should add an interest on Enter and clear the input when the input is not blank', async () => {
@@ -164,7 +174,7 @@ describe('BuilderPage', () => {
         const input = screen.getByPlaceholderText('Enter an interest');
 
         await user.type(input, '{Enter}');
-        expect(screen.queryAllByRole('button', { name: 'Remove interest' })).toHaveLength(0);
+        expect(screen.queryAllByRole('button', { name: /^Actions for/ })).toHaveLength(0);
 
         await user.type(input, 'Chess{Enter}');
         expect(screen.getByText('Chess')).toBeInTheDocument();
@@ -182,7 +192,7 @@ describe('BuilderPage', () => {
         await renderWithRouter(BuilderPage);
 
         await user.click(screen.getAllByRole('button', { name: 'Remove experience' })[0]);
-        await user.click(screen.getAllByRole('button', { name: 'Remove skill' })[1]);
+        await removeChip(user, 'B', 'Remove skill');
 
         expect(valuesOf('Company')).toEqual(['Second']);
         expect(screen.getByText('A')).toBeInTheDocument();

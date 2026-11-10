@@ -144,6 +144,11 @@
             "pageLabel": "Resume preview, page {{page}} of {{total}}",
             "pageCount_one": "{{count}} page",
             "pageCount_other": "{{count}} pages"
+        },
+        "reorder": {
+            "moved": "Moved to position {{position}} of {{total}}",
+            "added": "Added {{item}}",
+            "removed": "Removed {{item}}"
         }
     },
     "form": {
@@ -356,7 +361,17 @@
         "removeLanguage": "Remove language",
         "removeSkill": "Remove skill",
         "removeInterest": "Remove interest",
-        "skipToContent": "Skip to main content"
+        "skipToContent": "Skip to main content",
+        "moveUp": "Move {{item}} up",
+        "moveDown": "Move {{item}} down",
+        "moveLeft": "Move left",
+        "moveRight": "Move right",
+        "itemActions": "Actions for {{item}}",
+        "dragInstructions": "Press Space or Enter to pick up. Use the arrow keys to move, Space or Enter to drop, Escape to cancel.",
+        "dragPickedUp": "Picked up item at position {{position}}",
+        "dragOver": "Over position {{position}}",
+        "dragDropped": "Dropped at position {{position}}",
+        "dragCancelled": "Move cancelled"
     },
     "errorBoundary": {
         "title": "Something went wrong",

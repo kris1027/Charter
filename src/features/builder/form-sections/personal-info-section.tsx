@@ -10,8 +10,8 @@ export const PersonalInfoSection = withForm({
 
         return (
             <FormSectionCard
+                sectionId='personalInfo'
                 icon={User}
-                iconGradient='from-blue-500 to-indigo-600'
                 title={t('sections.personalInfo.title')}
                 description={t('sections.personalInfo.description')}
             >
