@@ -7,6 +7,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ResetDialog } from '@/features/builder/toolbar/reset-dialog';
+import { useMenuActionFocus } from '@/features/builder/use-menu-action-focus';
 import { EllipsisVertical, RotateCcw, Save, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,8 +34,8 @@ export const BuilderActionsMenu = ({
     const { t } = useTranslation();
     const triggerRef = useRef<HTMLButtonElement>(null);
     const [resetOpen, setResetOpen] = useState(false);
-    // Set when Reset is chosen, so the closing menu leaves focus to the opening dialog
-    const resetChosen = useRef(false);
+    // Reset opens a dialog, so the closing menu leaves focus to it
+    const menuFocus = useMenuActionFocus();
 
     return (
         <>
@@ -53,11 +54,7 @@ export const BuilderActionsMenu = ({
                 <DropdownMenuContent
                     align='end'
                     className='w-44'
-                    onCloseAutoFocus={(event) => {
-                        if (!resetChosen.current) return;
-                        resetChosen.current = false;
-                        event.preventDefault();
-                    }}
+                    onCloseAutoFocus={menuFocus.onCloseAutoFocus}
                 >
                     <DropdownMenuItem
                         className={ITEM_CLASS}
@@ -74,10 +71,7 @@ export const BuilderActionsMenu = ({
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                         className={`${ITEM_CLASS} text-destructive focus:text-destructive`}
-                        onSelect={() => {
-                            resetChosen.current = true;
-                            setResetOpen(true);
-                        }}
+                        onSelect={menuFocus.placesFocus(() => setResetOpen(true))}
                     >
                         <RotateCcw className='size-4' aria-hidden='true' />
                         {t('builder.reset')}

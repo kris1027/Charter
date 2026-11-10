@@ -15,8 +15,9 @@ import {
     GripVertical,
     Trash2,
 } from 'lucide-react';
-import { useRef, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMenuActionFocus } from '@/features/builder/use-menu-action-focus';
 import { focusKey, type ItemMoveControls } from '@/features/builder/form-sections/sortable-ids';
 import {
     useSortableItem,
@@ -136,12 +137,8 @@ type SortableChipProps = {
 export const SortableChip = ({ id, name, removeLabel, onRemove, controls }: SortableChipProps) => {
     const { t } = useTranslation();
     const { setNodeRef, style, isDragging, handleProps } = useSortableItem(id);
-    // An action places focus itself, so Radix must not send it back to this index's trigger
-    const actionChosen = useRef(false);
-    const choose = (action: () => void) => () => {
-        actionChosen.current = true;
-        action();
-    };
+    // A move or remove places focus itself, so Radix must not send it back to this index's trigger
+    const menuFocus = useMenuActionFocus();
 
     return (
         <div
@@ -162,18 +159,11 @@ export const SortableChip = ({ id, name, removeLabel, onRemove, controls }: Sort
                         <EllipsisVertical className='size-3.5' aria-hidden='true' />
                     </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    align='start'
-                    onCloseAutoFocus={(event) => {
-                        if (!actionChosen.current) return;
-                        actionChosen.current = false;
-                        event.preventDefault();
-                    }}
-                >
+                <DropdownMenuContent align='start' onCloseAutoFocus={menuFocus.onCloseAutoFocus}>
                     <DropdownMenuItem
                         className='gap-2'
                         disabled={!controls.canMoveUp}
-                        onSelect={choose(controls.moveUp)}
+                        onSelect={menuFocus.placesFocus(controls.moveUp)}
                     >
                         <ArrowLeft className='size-4' aria-hidden='true' />
                         {t('accessibility.moveLeft')}
@@ -181,7 +171,7 @@ export const SortableChip = ({ id, name, removeLabel, onRemove, controls }: Sort
                     <DropdownMenuItem
                         className='gap-2'
                         disabled={!controls.canMoveDown}
-                        onSelect={choose(controls.moveDown)}
+                        onSelect={menuFocus.placesFocus(controls.moveDown)}
                     >
                         <ArrowRight className='size-4' aria-hidden='true' />
                         {t('accessibility.moveRight')}
@@ -189,7 +179,7 @@ export const SortableChip = ({ id, name, removeLabel, onRemove, controls }: Sort
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                         className='text-destructive focus:text-destructive gap-2'
-                        onSelect={choose(onRemove)}
+                        onSelect={menuFocus.placesFocus(onRemove)}
                     >
                         <Trash2 className='size-4' aria-hidden='true' />
                         {removeLabel}
