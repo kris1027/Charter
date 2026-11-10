@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { FieldError } from '@/components/ui/field-error';
 import { useFieldContext } from '@/features/builder/form-context';
+import { fieldA11y } from '@/features/builder/fields/field-a11y';
 import { FieldLabel } from '@/features/builder/fields/field-label';
 
 type TextFieldProps = {
@@ -10,16 +11,11 @@ type TextFieldProps = {
     required?: boolean;
 };
 
+// The error border comes from Input's aria-invalid style, never from a class passed here
 export const TextField = ({ label, placeholder, type, required = false }: TextFieldProps) => {
     const field = useFieldContext<string>();
-    const { errors, isTouched, isValid } = field.state.meta;
-    const isInvalid = isTouched && !isValid;
-    // Required inputs keep their transition class; others gain only the invalid border
-    const inputClass = required
-        ? `transition-all ${isInvalid ? 'border-red-500' : ''}`
-        : isInvalid
-          ? 'border-red-500'
-          : undefined;
+    const { errors, isTouched } = field.state.meta;
+    const { errorId, ariaProps } = fieldA11y(field.name, field.state.meta);
 
     return (
         <div className='space-y-2'>
@@ -32,9 +28,9 @@ export const TextField = ({ label, placeholder, type, required = false }: TextFi
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder={placeholder}
-                className={inputClass}
+                {...ariaProps}
             />
-            <FieldError errors={errors} isTouched={isTouched} />
+            <FieldError id={errorId} errors={errors} isTouched={isTouched} />
         </div>
     );
 };

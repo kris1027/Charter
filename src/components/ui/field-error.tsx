@@ -2,11 +2,13 @@ import { AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 type FieldErrorProps = {
+    // Lets the field point aria-describedby at the message
+    id?: string;
     errors: ReadonlyArray<string | { message: string } | undefined>;
     isTouched: boolean;
 };
 
-export const FieldError = ({ errors, isTouched }: FieldErrorProps) => {
+export const FieldError = ({ id, errors, isTouched }: FieldErrorProps) => {
     const { t } = useTranslation();
 
     const validErrors = errors.filter(
@@ -23,8 +25,8 @@ export const FieldError = ({ errors, isTouched }: FieldErrorProps) => {
         .join(', ');
 
     return (
-        <p role='alert' className='text-destructive flex items-center gap-1 text-sm'>
-            <AlertCircle className='h-3 w-3' />
+        <p id={id} role='alert' className='text-destructive flex items-center gap-1 text-sm'>
+            <AlertCircle className='h-3 w-3' aria-hidden='true' />
             {message}
         </p>
     );
