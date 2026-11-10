@@ -14,16 +14,16 @@ type LivePreviewPanelProps = {
     unavailableAction: ReactNode;
 };
 
-// The wide screen panel beside the form: sticky below the toolbar, scrolling inside (spec 0009)
+// The wide screen panel beside the form: sticky below the bars, scrolling inside (spec 0009)
 export const LivePreviewPanel = ({ preview, unavailableAction }: LivePreviewPanelProps) => {
     const { t } = useTranslation();
 
     return (
         <aside
             aria-label={t('builder.livePreview.title')}
-            // Strict containment keeps a page swap from laying out the long form beside it; no
-            // backdrop blur, which would repaint behind every redraw
-            className='sticky top-24 h-[calc(100vh-7rem)] space-y-3 overflow-y-auto rounded-2xl border border-slate-200/60 bg-white/90 p-4 [contain:strict] dark:border-white/5 dark:bg-slate-900/90'
+            // Strict containment keeps a page swap from laying out the long form beside it. It sticks
+            // below the toolbar and the section strip (spec 0012, AC-34)
+            className='bg-card shadow-surface sticky top-[7.25rem] h-[calc(100vh-8.25rem)] space-y-3 overflow-y-auto rounded-xl border p-4 [contain:strict]'
         >
             <LivePreviewTitle preview={preview} />
             <LivePreviewBody preview={preview} unavailableAction={unavailableAction} />
