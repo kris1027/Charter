@@ -52,8 +52,17 @@ const BuilderPage = () => {
     // Live preview (spec 0009): a side panel from 1280px, a sheet below that
     const isWide = useMediaQuery(WIDE_PREVIEW_QUERY);
     const previewPanel = usePreviewOpen();
-    const [sheetOpen, setSheetOpen] = useState(false);
+    const [sheetOpen, setSheetOpenState] = useState(false);
     const showPanel = isWide && previewPanel.open;
+
+    // onSubmitInvalid reads these at call time, so it never depends on which options useAppForm
+    // applied last (spec 0012, AC-24)
+    const sheetOpenNow = useRef(false);
+    const setSheetOpen = (open: boolean) => {
+        sheetOpenNow.current = open;
+        setSheetOpenState(open);
+    };
+    const isWideNow = () => window.matchMedia(WIDE_PREVIEW_QUERY).matches;
 
     // Set when a submit from the sheet fails: the sheet closes first, then focus goes to the field
     const focusInvalidOnSheetClose = useRef(false);
@@ -83,7 +92,7 @@ const BuilderPage = () => {
             navigate({ to: '/preview', search: { templateId: value.templateId } });
         },
         onSubmitInvalid: () => {
-            if (!isWide && sheetOpen) {
+            if (!isWideNow() && sheetOpenNow.current) {
                 focusInvalidOnSheetClose.current = true;
                 setSheetOpen(false);
                 return;
