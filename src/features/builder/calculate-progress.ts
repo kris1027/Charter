@@ -16,20 +16,24 @@ export const isSectionComplete = (id: BuilderSectionId, values: ResumeFormValues
     }
 };
 
+// What each list adds to the percent once it holds an item; personal info adds the other 30
+const LIST_WEIGHTS: { id: BuilderSectionId; weight: number }[] = [
+    { id: 'experiences', weight: 25 },
+    { id: 'education', weight: 20 },
+    { id: 'skills', weight: 15 },
+    { id: 'languages', weight: 5 },
+    { id: 'interests', weight: 5 },
+];
+
 // Percent of the resume filled in
 export const calculateProgress = (values: ResumeFormValues) => {
-    let progress = 0;
-
+    const { firstName, lastName, email } = values.personalInfo;
     // Personal info (30%), one field at a time
-    if (values.personalInfo.firstName) progress += 10;
-    if (values.personalInfo.lastName) progress += 10;
-    if (values.personalInfo.email) progress += 10;
+    const personal = [firstName, lastName, email].filter(Boolean).length * 10;
+    const lists = LIST_WEIGHTS.filter(({ id }) => isSectionComplete(id, values)).reduce(
+        (sum, { weight }) => sum + weight,
+        0,
+    );
 
-    if (isSectionComplete('experiences', values)) progress += 25;
-    if (isSectionComplete('education', values)) progress += 20;
-    if (isSectionComplete('skills', values)) progress += 15;
-    if (isSectionComplete('languages', values)) progress += 5;
-    if (isSectionComplete('interests', values)) progress += 5;
-
-    return Math.min(progress, 100);
+    return Math.min(personal + lists, 100);
 };
