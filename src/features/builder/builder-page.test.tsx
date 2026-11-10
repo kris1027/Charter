@@ -46,7 +46,15 @@ const valuesOf = (label: string | RegExp) =>
 const firstNameInput = () => screen.getByLabelText(/^First Name/);
 const lastNameInput = () => screen.getByLabelText(/^Last Name/);
 const emailInput = () => screen.getByLabelText(/^Email/);
-const previewButton = () => screen.getByRole('button', { name: /Preview CV/ });
+// Preview CV shows in the toolbar and at the end of the form (spec 0012, AC-22)
+const previewButtons = () => screen.getAllByRole('button', { name: 'Preview CV' });
+const previewButton = () => previewButtons()[0];
+
+// Load PDF, Save and Reset live in the actions menu (spec 0012, AC-7)
+const chooseAction = async (user: ReturnType<typeof userEvent.setup>, name: string) => {
+    await user.click(screen.getByRole('button', { name: 'More actions' }));
+    await user.click(await screen.findByRole('menuitem', { name }));
+};
 
 // A chip's Remove lives in its menu (spec 0012, AC-30)
 const removeChip = async (
@@ -95,7 +103,7 @@ describe('BuilderPage', () => {
         await renderWithRouter(BuilderPage, { initialEntry: '/builder?templateId=veterinary' });
         expect(screen.getByText('Veterinary Template')).toBeInTheDocument();
 
-        await user.click(screen.getByRole('button', { name: 'Save' }));
+        await chooseAction(user, 'Save');
         expect(storedResume().templateId).toBe('veterinary');
     });
 
@@ -205,7 +213,7 @@ describe('BuilderPage', () => {
         await renderWithRouter(BuilderPage);
 
         await user.type(firstNameInput(), 'Ada');
-        await user.click(screen.getByRole('button', { name: 'Save' }));
+        await chooseAction(user, 'Save');
 
         expect(storedResume().personalInfo.firstName).toBe('Ada');
         expect(JSON.parse(localStorage.getItem('resumeData_backup') ?? '')).toEqual(storedResume());
@@ -239,9 +247,9 @@ describe('BuilderPage', () => {
             }),
         );
         await renderWithRouter(BuilderPage);
-        await user.click(screen.getByRole('button', { name: 'Save' }));
+        await chooseAction(user, 'Save');
 
-        await user.click(screen.getByRole('button', { name: 'Reset' }));
+        await chooseAction(user, 'Reset');
         await user.click(await screen.findByRole('button', { name: 'Reset All Data' }));
 
         expect(localStorage.getItem('resumeData')).toBeNull();
@@ -369,16 +377,25 @@ describe('BuilderPage', () => {
         },
     );
 
-    it('should unlock Preview when the required fields are filled', async () => {
+    // Spec 0012, AC-22, AC-23: never disabled; an invalid form focuses its first problem
+    it('should focus each first invalid field in turn when Preview CV is pressed on an empty form', async () => {
         const user = userEvent.setup();
         await renderWithRouter(BuilderPage);
-        expect(previewButton()).toBeDisabled();
+        expect(previewButtons()).toHaveLength(2);
+        previewButtons().forEach((button) => expect(button).toBeEnabled());
+
+        await user.click(previewButton());
+
+        await waitFor(() => expect(firstNameInput()).toHaveFocus());
+        expect(firstNameInput()).toHaveAttribute('aria-invalid', 'true');
+        expect(lastNameInput()).toHaveAttribute('aria-invalid', 'true');
+        expect(emailInput()).toHaveAttribute('aria-invalid', 'true');
 
         await user.type(firstNameInput(), 'Ada');
-        await user.type(lastNameInput(), 'Lovelace');
-        await user.type(emailInput(), 'ada@example.com');
+        await user.click(previewButtons()[1]);
 
-        await waitFor(() => expect(previewButton()).toBeEnabled());
+        await waitFor(() => expect(lastNameInput()).toHaveFocus());
+        expect(firstNameInput()).not.toHaveAttribute('aria-invalid');
     });
 
     it('should store the resume and open the preview when a valid form is submitted', async () => {
@@ -388,7 +405,6 @@ describe('BuilderPage', () => {
         await user.type(firstNameInput(), 'Ada');
         await user.type(lastNameInput(), 'Lovelace');
         await user.type(emailInput(), 'ada@example.com');
-        await waitFor(() => expect(previewButton()).toBeEnabled());
         await user.click(previewButton());
 
         expect(await screen.findByText('preview stub')).toBeInTheDocument();
@@ -405,7 +421,7 @@ describe('BuilderPage', () => {
         });
         vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-        await user.click(screen.getByRole('button', { name: 'Save' }));
+        await chooseAction(user, 'Save');
 
         expect(screen.getByText('Save failed — storage may be full')).toBeInTheDocument();
     });
@@ -422,8 +438,10 @@ describe('BuilderPage', () => {
         expect(await screen.findByText('20%')).toBeInTheDocument();
         await user.type(lastNameInput(), 'Lovelace');
         expect(await screen.findByText('30%')).toBeInTheDocument();
-
-        await waitFor(() => expect(previewButton()).toBeEnabled());
+        expect(screen.getByRole('progressbar', { name: 'Form Progress' })).toHaveAttribute(
+            'aria-valuenow',
+            '30',
+        );
     });
 
     // Spec 0005, AC-10: an unknown templateId is dropped (the old page showed it raw)
@@ -437,7 +455,7 @@ describe('BuilderPage', () => {
 
         expect(screen.getByText('Default Template')).toBeInTheDocument();
         expect(router.state.location.search).toEqual({});
-        await user.click(screen.getByRole('button', { name: 'Save' }));
+        await chooseAction(user, 'Save');
         expect(storedResume().templateId).toBe('default');
     });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { calculateProgress } from '@/features/builder/calculate-progress';
+import { calculateProgress, isSectionComplete } from '@/features/builder/calculate-progress';
 import {
     EMPTY_EDUCATION,
     EMPTY_EXPERIENCE,
@@ -50,5 +50,40 @@ describe('calculateProgress', () => {
                 interests: [{ name: 'Chess' }],
             }),
         ).toBe(100);
+    });
+});
+
+// Spec 0012, AC-13: the strip's checks read the same rules as the percent
+describe('isSectionComplete', () => {
+    it('should check personal info only when all three required fields are filled', () => {
+        const partial = { ...EMPTY_PERSONAL_INFO, firstName: 'Ada', lastName: 'L' };
+        expect(isSectionComplete('personalInfo', { ...EMPTY_RESUME, personalInfo: partial })).toBe(
+            false,
+        );
+        expect(
+            isSectionComplete('personalInfo', {
+                ...EMPTY_RESUME,
+                personalInfo: { ...partial, email: 'not an email' },
+            }),
+        ).toBe(true);
+    });
+
+    it('should check a list when it holds any item, even a blank one', () => {
+        expect(isSectionComplete('experiences', EMPTY_RESUME)).toBe(false);
+        expect(
+            isSectionComplete('experiences', { ...EMPTY_RESUME, experiences: [EMPTY_EXPERIENCE] }),
+        ).toBe(true);
+        expect(
+            isSectionComplete('interests', { ...EMPTY_RESUME, interests: [{ name: 'Chess' }] }),
+        ).toBe(true);
+    });
+
+    it('should never check GDPR', () => {
+        expect(
+            isSectionComplete('gdprConsent', {
+                ...EMPTY_RESUME,
+                gdprConsent: { enabled: true, companyName: 'Acme' },
+            }),
+        ).toBe(false);
     });
 });

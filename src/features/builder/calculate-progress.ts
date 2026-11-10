@@ -1,26 +1,35 @@
+import type { BuilderSectionId } from '@/features/builder/builder-sections';
 import type { ResumeFormValues } from '@/features/resume/form-types';
 
-// Percent of the resume filled in; Preview unlocks at PREVIEW_UNLOCK_PROGRESS
+// Whether the section strip shows a check (spec 0012, AC-13). Filled means any non empty string,
+// and a list counts once it holds any item, even a blank card, the same as the percent below
+export const isSectionComplete = (id: BuilderSectionId, values: ResumeFormValues): boolean => {
+    switch (id) {
+        case 'personalInfo': {
+            const { firstName, lastName, email } = values.personalInfo;
+            return Boolean(firstName && lastName && email);
+        }
+        case 'gdprConsent':
+            return false;
+        default:
+            return values[id].length > 0;
+    }
+};
+
+// Percent of the resume filled in
 export const calculateProgress = (values: ResumeFormValues) => {
     let progress = 0;
 
-    // Personal info (30%)
+    // Personal info (30%), one field at a time
     if (values.personalInfo.firstName) progress += 10;
     if (values.personalInfo.lastName) progress += 10;
     if (values.personalInfo.email) progress += 10;
 
-    if (values.experiences.length > 0) progress += 25;
-    if (values.education.length > 0) progress += 20;
-    if (values.skills.length > 0) progress += 15;
-    if (values.languages.length > 0) progress += 5;
-    if (values.interests.length > 0) progress += 5;
+    if (isSectionComplete('experiences', values)) progress += 25;
+    if (isSectionComplete('education', values)) progress += 20;
+    if (isSectionComplete('skills', values)) progress += 15;
+    if (isSectionComplete('languages', values)) progress += 5;
+    if (isSectionComplete('interests', values)) progress += 5;
 
     return Math.min(progress, 100);
 };
-
-// The three required fields are worth 30 together
-export const PREVIEW_UNLOCK_PROGRESS = 30;
-
-// Gate for Preview CV and the live preview's Open preview button
-export const canOpenPreview = (state: { canSubmit: boolean; values: ResumeFormValues }) =>
-    state.canSubmit && calculateProgress(state.values) >= PREVIEW_UNLOCK_PROGRESS;

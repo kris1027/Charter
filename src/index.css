@@ -1090,6 +1090,17 @@
         @apply bg-background text-foreground;
     }
 
+    /* Builder only (spec 0012, AC-16): focused fields and section jumps land clear of the sticky
+       toolbar (and, from md, the section strip) and of the floating Preview button */
+    html:has([data-builder-page]) {
+        scroll-padding-top: 4.5rem;
+        scroll-padding-bottom: 5.5rem;
+
+        @media (width >= 48rem) {
+            scroll-padding-top: 7.25rem;
+        }
+    }
+
     /* One focus indicator for every control; primitives never add outline-none */
     :focus-visible {
         outline: 2px solid var(--ring);

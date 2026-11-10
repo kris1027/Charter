@@ -109,7 +109,6 @@
     },
     "builder": {
         "title": "Build Your CV",
-        "template": "Template",
         "loadPdf": "Load PDF",
         "loading": "Loading...",
         "save": "Save",
@@ -119,14 +118,12 @@
         "saveFailed": "Save failed — storage may be full",
         "reset": "Reset",
         "previewCv": "Preview CV",
-        "processing": "Processing...",
         "progress": {
-            "title": "Form Progress",
-            "complete": "Great! Your CV is complete. Click 'Preview CV' to see the result.",
-            "incomplete": "Complete all sections to maximize your CV's impact."
+            "title": "Form Progress"
         },
         "validation": {
-            "fixErrors": "Please fix the errors above before proceeding."
+            "fixErrors": "Please fix the errors above before proceeding.",
+            "fixErrorsUnknown": "Something in your resume needs fixing before you can preview it."
         },
         "pdfTooLarge": "The PDF file is too large. Maximum size is 10MB.",
         "livePreview": {
@@ -144,6 +141,21 @@
             "pageLabel": "Resume preview, page {{page}} of {{total}}",
             "pageCount_one": "{{count}} page",
             "pageCount_other": "{{count}} pages"
+        },
+        "changeTemplate": "Change template, current: {{name}}",
+        "actions": {
+            "label": "More actions"
+        },
+        "sectionNav": {
+            "label": "Resume sections",
+            "completed": "Completed",
+            "personalInfo": "Personal",
+            "experiences": "Experience",
+            "education": "Education",
+            "skills": "Skills",
+            "languages": "Languages",
+            "interests": "Interests",
+            "gdprConsent": "GDPR"
         },
         "reorder": {
             "moved": "Moved to position {{position}} of {{total}}",

@@ -109,7 +109,6 @@
     },
     "builder": {
         "title": "Stwórz swoje CV",
-        "template": "Szablon",
         "loadPdf": "Wczytaj PDF",
         "loading": "Wczytywanie...",
         "save": "Zapisz",
@@ -119,14 +118,12 @@
         "saveFailed": "Zapis nie powiódł się — pamięć może być pełna",
         "reset": "Resetuj",
         "previewCv": "Podgląd CV",
-        "processing": "Przetwarzanie...",
         "progress": {
-            "title": "Postęp formularza",
-            "complete": "Świetnie! Twoje CV jest kompletne. Kliknij 'Podgląd CV', aby zobaczyć wynik.",
-            "incomplete": "Uzupełnij wszystkie sekcje, aby zmaksymalizować potencjał CV."
+            "title": "Postęp formularza"
         },
         "validation": {
-            "fixErrors": "Proszę naprawić błędy powyżej przed kontynuowaniem."
+            "fixErrors": "Proszę naprawić błędy powyżej przed kontynuowaniem.",
+            "fixErrorsUnknown": "Coś w Twoim CV wymaga poprawy przed podglądem."
         },
         "pdfTooLarge": "Plik PDF jest zbyt duży. Maksymalny rozmiar to 10MB.",
         "livePreview": {
@@ -146,6 +143,21 @@
             "pageCount_few": "{{count}} strony",
             "pageCount_many": "{{count}} stron",
             "pageCount_other": "{{count}} strony"
+        },
+        "changeTemplate": "Zmień szablon, obecny: {{name}}",
+        "actions": {
+            "label": "Więcej działań"
+        },
+        "sectionNav": {
+            "label": "Sekcje CV",
+            "completed": "Ukończono",
+            "personalInfo": "Dane",
+            "experiences": "Doświadczenie",
+            "education": "Wykształcenie",
+            "skills": "Umiejętności",
+            "languages": "Języki",
+            "interests": "Zainteresowania",
+            "gdprConsent": "RODO"
         },
         "reorder": {
             "moved": "Przeniesiono na pozycję {{position}} z {{total}}",

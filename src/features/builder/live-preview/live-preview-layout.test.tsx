@@ -125,14 +125,28 @@ describe('builder live preview layout', () => {
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
-    it('should offer the gated Open preview button when the worker is unavailable', async () => {
+    // Spec 0012, AC-22: no gate, the same as Preview CV
+    it('should offer an enabled Open preview button when the worker is unavailable', async () => {
         setWidth(true);
         await renderWithRouter(BuilderPage);
 
         act(() => emitStatus('unavailable'));
 
         expect(screen.getByText('Live preview is unavailable here')).toBeInTheDocument();
-        // An empty form is under 30% progress, the same rule as Preview CV
-        expect(screen.getByRole('button', { name: 'Open preview' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Open preview' })).toBeEnabled();
+    });
+
+    // Spec 0012, AC-24: the sheet lets go of focus first, then the invalid field takes it
+    it('should close the sheet and focus first name when Open preview fails from the sheet', async () => {
+        const user = userEvent.setup();
+        setWidth(false);
+        await renderWithRouter(BuilderPage);
+        await user.click(screen.getByRole('button', { name: 'Preview' }));
+        act(() => emitStatus('unavailable'));
+
+        await user.click(screen.getByRole('button', { name: 'Open preview' }));
+
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+        await waitFor(() => expect(screen.getByLabelText(/^First Name/)).toHaveFocus());
     });
 });
