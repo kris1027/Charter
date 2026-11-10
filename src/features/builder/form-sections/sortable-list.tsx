@@ -18,10 +18,8 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { focusByKey } from '@/features/builder/form-sections/focus-field';
 import {
-    findMove,
     focusKey,
-    sortableId,
-    sortableIndex,
+    sortableIds,
     type ItemMoveControls,
 } from '@/features/builder/form-sections/sortable-ids';
 
@@ -55,12 +53,14 @@ export const SortableList = ({
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
     );
 
+    const ids = sortableIds(idPrefix, count);
+
     const handleDragEnd = ({ active, over }: DragEndEvent) => {
-        const move = findMove(idPrefix, count, active.id, over?.id);
+        const move = ids.findMove(active.id, over?.id);
         if (move) onMove(move.from, move.to);
     };
 
-    const position = (id: string | number) => sortableIndex(idPrefix, id) + 1;
+    const position = (id: string | number) => ids.indexOf(id) + 1;
     const announcements: Announcements = {
         onDragStart: ({ active }) =>
             t('accessibility.dragPickedUp', { position: position(active.id) }),
@@ -78,7 +78,7 @@ export const SortableList = ({
     const move = (from: number, to: number, control: 'moveUp' | 'moveDown') => {
         onMove(from, to);
         onAnnounce(t('builder.reorder.moved', { position: to + 1, total: count }));
-        const id = sortableId(idPrefix, to);
+        const id = ids.at(to);
         if (strategy === 'horizontal') return focusByKey(focusKey(id, 'menu'));
         const atEnd = control === 'moveUp' ? to === 0 : to === count - 1;
         const target = atEnd ? (control === 'moveUp' ? 'moveDown' : 'moveUp') : control;
@@ -92,8 +92,6 @@ export const SortableList = ({
         moveDown: () => move(index, index + 1, 'moveDown'),
     });
 
-    const ids = Array.from({ length: count }, (_, index) => sortableId(idPrefix, index));
-
     return (
         <DndContext
             sensors={sensors}
@@ -105,7 +103,7 @@ export const SortableList = ({
             }}
         >
             <SortableContext
-                items={ids}
+                items={ids.all}
                 strategy={
                     strategy === 'vertical'
                         ? verticalListSortingStrategy
@@ -113,7 +111,7 @@ export const SortableList = ({
                 }
             >
                 <div className={className}>
-                    {ids.map((id, index) => children(index, id, controlsFor(index)))}
+                    {ids.all.map((id, index) => children(index, id, controlsFor(index)))}
                 </div>
             </SortableContext>
         </DndContext>
