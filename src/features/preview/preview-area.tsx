@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { PreviewPages } from '@/features/pdf/live-preview/preview-pages';
+import {
+    PAGE_MAX_WIDTH_CLASS,
+    PAGE_SHEET_CLASS,
+    WARNING_NOTICE_CLASS,
+} from '@/features/pdf/live-preview/preview-styles';
 import type { PreviewStatus } from '@/features/preview/use-preview-document';
 
 type PreviewAreaProps = {
@@ -35,7 +40,7 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
                     {t('pdfPreview.preparing')}
                 </p>
             )}
-            <div className='mx-auto max-w-[900px] space-y-4'>
+            <div className={`mx-auto space-y-4 ${PAGE_MAX_WIDTH_CLASS}`}>
                 {isUnavailable && (
                     <p
                         role='status'
@@ -47,7 +52,7 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
                 {isFailed && (
                     <div
                         role='status'
-                        className='border-warning/40 bg-warning/10 text-foreground flex flex-wrap items-center justify-between gap-3 rounded-md border px-4 py-3 text-sm'
+                        className={`${WARNING_NOTICE_CLASS} flex flex-wrap items-center justify-between gap-3 px-4 py-3`}
                     >
                         <p>{t('preview.renderFailed')}</p>
                         <Button
@@ -66,7 +71,7 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
                 {isLoading && (
                     <div
                         data-loading-sheet
-                        className='bg-paper shadow-surface ring-border aspect-[1/1.4142] w-full max-w-[900px] ring-1'
+                        className={`aspect-[1/1.4142] w-full ${PAGE_MAX_WIDTH_CLASS} ${PAGE_SHEET_CLASS}`}
                     />
                 )}
                 {!isUnavailable && (

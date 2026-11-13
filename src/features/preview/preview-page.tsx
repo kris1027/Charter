@@ -30,7 +30,10 @@ const SavedResumePreview = ({ data, templateId }: SavedResumePreviewProps) => {
     return (
         <>
             <PreviewToolbar
-                actions={{ templateId, onDownload: download, isExporting, downloadRef }}
+                templateId={templateId}
+                onDownload={download}
+                isExporting={isExporting}
+                downloadRef={downloadRef}
             />
             <PreviewStrip
                 pages={preview.shown?.pages ?? null}

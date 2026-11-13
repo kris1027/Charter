@@ -23,8 +23,7 @@ const MOTION_BANS = ['motion/react', 'framer-motion'].map((name) => ({
     message: MOTION_MESSAGE,
 }));
 
-// Pages that stay still import nothing from the animation library at all (spec 0013, AC-2)
-const MOTION_FREE_AREAS = ['preview'];
+// The preview page stays still and imports nothing from the animation library (spec 0013, AC-2)
 const NO_MOTION = {
     group: ['motion', 'motion/*', 'framer-motion'],
     message: 'This page area imports nothing from motion (spec 0013).',
@@ -149,7 +148,7 @@ export default defineConfig([
                     featureDirs(PAGE_AREAS.filter((a) => a !== area)),
                     'Page areas never import each other',
                 ),
-                ...(MOTION_FREE_AREAS.includes(area) ? [NO_MOTION] : []),
+                ...(area === 'preview' ? [NO_MOTION] : []),
             ],
         ),
     ),

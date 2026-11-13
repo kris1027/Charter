@@ -14,24 +14,30 @@ type PreviewToolbarActions = {
     downloadRef: RefObject<HTMLButtonElement | null>;
 };
 
-type PreviewToolbarProps = {
-    // Left out in the empty state: only the title and the shell toggles (AC-25)
-    actions?: PreviewToolbarActions;
-};
+// All of the actions or none of them. None in the empty state: only the title and the shell
+// toggles (AC-25)
+type PreviewToolbarProps =
+    PreviewToolbarActions | Partial<Record<keyof PreviewToolbarActions, never>>;
 
 // The 56px sticky bar (spec 0013, AC-3 to AC-6): the edit link and title on the left, then
 // Download PDF and the shell toggles
-export const PreviewToolbar = ({ actions }: PreviewToolbarProps) => {
+export const PreviewToolbar = ({
+    templateId,
+    onDownload,
+    isExporting = false,
+    downloadRef,
+}: PreviewToolbarProps) => {
+    const hasActions = onDownload !== undefined;
     const { t } = useTranslation();
 
     return (
         <div className='bg-background sticky top-0 z-10 h-14 border-b'>
             <div className='mx-auto flex h-full max-w-6xl items-center gap-2 px-4'>
-                {actions && (
+                {hasActions && (
                     <Button asChild variant='ghost' size='sm' className='-ml-2.5'>
                         <Link
                             to='/builder'
-                            search={{ templateId: actions.templateId }}
+                            search={{ templateId }}
                             aria-label={t('preview.editCv')}
                         >
                             <Pencil aria-hidden='true' />
@@ -42,26 +48,26 @@ export const PreviewToolbar = ({ actions }: PreviewToolbarProps) => {
                 <h1
                     className={`font-display truncate text-lg font-semibold ${
                         // With no actions the title is the only thing on the left, so it always shows
-                        actions ? 'sr-only md:not-sr-only' : ''
+                        hasActions ? 'sr-only md:not-sr-only' : ''
                     }`}
                 >
                     {t('preview.title')}
                 </h1>
 
                 <div className='ml-auto flex shrink-0 items-center gap-2'>
-                    {actions && (
+                    {hasActions && (
                         <Button
-                            ref={actions.downloadRef}
+                            ref={downloadRef}
                             type='button'
                             size='sm'
-                            onClick={actions.onDownload}
-                            disabled={actions.isExporting}
-                            aria-busy={actions.isExporting || undefined}
+                            onClick={onDownload}
+                            disabled={isExporting}
+                            aria-busy={isExporting || undefined}
                             aria-label={t('preview.downloadPdf')}
                             // The Lighthouse seed script waits for this (spec 0003)
                             data-testid='export-pdf'
                         >
-                            {actions.isExporting ? (
+                            {isExporting ? (
                                 <Loader2 aria-hidden='true' className='animate-spin' />
                             ) : (
                                 <Download aria-hidden='true' />

@@ -31,7 +31,7 @@ export const LivePreviewBody = ({ preview, unavailableAction }: LivePreviewBodyP
             {pageCount > 0 && (
                 <div className='text-muted-foreground flex flex-wrap items-center gap-2 text-xs'>
                     <span className='bg-muted text-foreground rounded-md px-2 py-0.5 font-medium'>
-                        {t('builder.livePreview.pageCount', { count: pageCount })}
+                        {t('pdfPreview.pageCount', { count: pageCount })}
                     </span>
                     {pageCount > 1 && <span>{t('builder.livePreview.fullSizeHint')}</span>}
                 </div>

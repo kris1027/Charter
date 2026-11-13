@@ -25,7 +25,7 @@ export const PreviewStrip = ({ pages, fit, mode, onModeChange }: PreviewStripPro
                     {pages !== null && (
                         <>
                             <span className='text-foreground font-medium'>
-                                {t('preview.pageCount', { count: pages })}
+                                {t('pdfPreview.pageCount', { count: pages })}
                             </span>
                             {fit === 'checking' && ` · ${t('preview.fit.checking')}`}
                             {fit === 'tooLong' && ` · ${t('preview.fit.tooLong')}`}

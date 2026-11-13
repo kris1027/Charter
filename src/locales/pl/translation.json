@@ -134,11 +134,7 @@
             "updating": "Aktualizuję…",
             "fullSizeHint": "Pełny rozmiar, Podgląd może zmieścić go na jednej stronie",
             "unavailable": "Podgląd na żywo jest tu niedostępny",
-            "openPreviewPage": "Otwórz podgląd",
-            "pageCount_one": "{{count}} strona",
-            "pageCount_few": "{{count}} strony",
-            "pageCount_many": "{{count}} stron",
-            "pageCount_other": "{{count}} strony"
+            "openPreviewPage": "Otwórz podgląd"
         },
         "changeTemplate": "Zmień szablon, obecny: {{name}}",
         "actions": {
@@ -304,10 +300,6 @@
             "checking": "Sprawdzam, czy zmieści się na jednej stronie…",
             "tooLong": "Za długie na jedną stronę"
         },
-        "pageCount_one": "{{count}} strona",
-        "pageCount_few": "{{count}} strony",
-        "pageCount_many": "{{count}} stron",
-        "pageCount_other": "{{count}} strony",
         "renderFailed": "Nie udało się narysować podglądu",
         "retry": "Spróbuj ponownie",
         "unavailable": "Podgląd nie może się tu wyświetlić. Nadal możesz pobrać PDF.",
@@ -316,7 +308,11 @@
     "pdfPreview": {
         "preparing": "Przygotowuję podgląd…",
         "updateFailed": "Nie udało się odświeżyć podglądu",
-        "pageLabel": "Podgląd CV, strona {{page}} z {{total}}"
+        "pageLabel": "Podgląd CV, strona {{page}} z {{total}}",
+        "pageCount_one": "{{count}} strona",
+        "pageCount_few": "{{count}} strony",
+        "pageCount_many": "{{count}} stron",
+        "pageCount_other": "{{count}} strony"
     },
     "proficiency": {
         "A1": "A1 - Początkujący",

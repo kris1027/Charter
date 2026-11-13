@@ -2,6 +2,11 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { useTranslation } from 'react-i18next';
 import { destroyPdf, drawPdfPages, loadPdf } from '@/features/pdf/live-preview/draw-pdf-pages';
+import {
+    PAGE_MAX_WIDTH_CLASS,
+    PAGE_SHEET_CLASS,
+    WARNING_NOTICE_CLASS,
+} from '@/features/pdf/live-preview/preview-styles';
 
 export const MAX_PAGE_CSS_WIDTH = 900;
 const RESIZE_DEBOUNCE_MS = 150;
@@ -76,7 +81,7 @@ export const PreviewPages = ({
                 'aria-label',
                 t('pdfPreview.pageLabel', { page: index + 1, total: canvases.length }),
             );
-            canvas.className = 'block bg-paper shadow-surface ring-1 ring-border';
+            canvas.className = `block ${PAGE_SHEET_CLASS}`;
         });
     };
 
@@ -155,10 +160,7 @@ export const PreviewPages = ({
     return (
         <div className='space-y-3'>
             {showNotices && (renderFailed || drawFailed) && (
-                <p
-                    role='status'
-                    className='border-warning/40 bg-warning/10 text-foreground rounded-md border px-3 py-2 text-sm'
-                >
+                <p role='status' className={`${WARNING_NOTICE_CLASS} px-3 py-2`}>
                     {t('pdfPreview.updateFailed')}
                 </p>
             )}
@@ -167,7 +169,7 @@ export const PreviewPages = ({
                     {t('pdfPreview.preparing')}
                 </p>
             )}
-            <div ref={pagesRef} className='mx-auto flex max-w-[900px] flex-col gap-4' />
+            <div ref={pagesRef} className={`mx-auto flex flex-col gap-4 ${PAGE_MAX_WIDTH_CLASS}`} />
         </div>
     );
 };
