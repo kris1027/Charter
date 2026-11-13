@@ -11,39 +11,39 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 ## At a glance
 
-| #   | Feature                         | Phase      | Status   |
-| --- | ------------------------------- | ---------- | -------- |
-| A   | Landing page                    | Existing   | existing |
-| B   | Template gallery & detail       | Existing   | existing |
-| C   | Builder form                    | Existing   | existing |
-| D   | Resume templates & preview      | Existing   | existing |
-| E   | PDF export                      | Existing   | existing |
-| F   | PDF import                      | Existing   | existing |
-| G   | Local persistence               | Existing   | existing |
-| H   | i18n (EN/PL)                    | Existing   | existing |
-| I   | Theme (light/dark/system)       | Existing   | existing |
-| J   | PWA & offline                   | Existing   | existing |
-| K   | SEO                             | Existing   | existing |
-| 1   | Coding standards & AGENTS.md    | Foundation | done     |
-| 2   | Stack review                    | Foundation | done     |
-| 3   | Upgrades & replacements         | Foundation | done     |
-| 17  | Unified radix-ui package        | Foundation | done     |
-| 18  | Intl dates instead of date-fns  | Foundation | done     |
-| 19  | Single CSP source               | Foundation | done     |
-| 20  | React Compiler                  | Foundation | done     |
-| 4   | Feature based folder structure  | Foundation | done     |
-| 5   | Performance budgets             | Foundation | done     |
-| 6   | Design system refresh           | Foundation | done     |
-| 7   | Builder page split              | Slice 1    | done     |
-| 8   | Shared template model           | Slice 1    | done     |
-| 9   | PDF import parser restructure   | Slice 1    | done     |
-| 10  | Lazy load heavy engines         | Slice 2    | done     |
-| 11  | Builder responsiveness          | Slice 2    | done     |
-| 12  | Landing page refresh            | Slice 3    | done     |
-| 13  | Template gallery refresh        | Slice 3    | done     |
-| 14  | Builder UI refresh              | Slice 3    | done     |
-| 15  | Preview & export UI refresh     | Slice 3    | planned  |
-| 16  | Accessibility & Lighthouse pass | Slice 3    | planned  |
+| #   | Feature                         | Phase      | Status      |
+| --- | ------------------------------- | ---------- | ----------- |
+| A   | Landing page                    | Existing   | existing    |
+| B   | Template gallery & detail       | Existing   | existing    |
+| C   | Builder form                    | Existing   | existing    |
+| D   | Resume templates & preview      | Existing   | existing    |
+| E   | PDF export                      | Existing   | existing    |
+| F   | PDF import                      | Existing   | existing    |
+| G   | Local persistence               | Existing   | existing    |
+| H   | i18n (EN/PL)                    | Existing   | existing    |
+| I   | Theme (light/dark/system)       | Existing   | existing    |
+| J   | PWA & offline                   | Existing   | existing    |
+| K   | SEO                             | Existing   | existing    |
+| 1   | Coding standards & AGENTS.md    | Foundation | done        |
+| 2   | Stack review                    | Foundation | done        |
+| 3   | Upgrades & replacements         | Foundation | done        |
+| 17  | Unified radix-ui package        | Foundation | done        |
+| 18  | Intl dates instead of date-fns  | Foundation | done        |
+| 19  | Single CSP source               | Foundation | done        |
+| 20  | React Compiler                  | Foundation | done        |
+| 4   | Feature based folder structure  | Foundation | done        |
+| 5   | Performance budgets             | Foundation | done        |
+| 6   | Design system refresh           | Foundation | done        |
+| 7   | Builder page split              | Slice 1    | done        |
+| 8   | Shared template model           | Slice 1    | done        |
+| 9   | PDF import parser restructure   | Slice 1    | done        |
+| 10  | Lazy load heavy engines         | Slice 2    | done        |
+| 11  | Builder responsiveness          | Slice 2    | done        |
+| 12  | Landing page refresh            | Slice 3    | done        |
+| 13  | Template gallery refresh        | Slice 3    | done        |
+| 14  | Builder UI refresh              | Slice 3    | done        |
+| 15  | Preview & export UI refresh     | Slice 3    | in-progress |
+| 16  | Accessibility & Lighthouse pass | Slice 3    | planned     |
 
 ## Already built
 
@@ -306,12 +306,18 @@ spec [0012](../specs/0012-builder-ui-refresh/index.md) · code in `src/features/
     - [x] Preview CV always available, lists without a mouse (AC-22 to AC-33)
     - [x] Cleanup and guards (AC-2, AC-3, AC-37 to AC-40)
 
-### 15. Preview & export UI refresh · needs a decision
+### 15. Preview & export UI refresh · in-progress
 
 Preview page chrome (mode switch, export, back to edit) on the new design system; the resume itself stays white and print clean.
 **Done when:** the toolbar uses the new components in both themes, the resume area is unchanged, and print output is unchanged.
+spec [0013](../specs/0013-preview-ui-refresh/index.md) · code in `src/features/preview/`, `src/features/pdf/live-preview/`
 
-- [ ] Design it (spec): `/architect preview ui refresh`
+- [x] Design it (spec): `/architect preview ui refresh`
+- [ ] Build it: `/develop preview ui refresh`
+    - [x] Worker drawn pages, token toolbar, download from kept bytes (AC-1, AC-3 to AC-6, AC-8, AC-9, AC-11, AC-19 to AC-21, AC-28)
+    - [x] Fit search through the worker, page strip and modes (AC-12 to AC-19)
+    - [x] Loading, unavailable, failure, export error and empty states (AC-10, AC-20, AC-22 to AC-25)
+    - [ ] Guards, copy cleanup and checks (AC-2, AC-7, AC-26, AC-27, AC-29)
 
 ### 16. Accessibility & Lighthouse pass
 
