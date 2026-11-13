@@ -112,9 +112,14 @@ export const usePreviewDocument = ({
             client.onResult(settle);
             client.onStatus((status) => {
                 if (status === 'unavailable') {
-                    // Latched until reload, even if a late ready follows (AC-22)
+                    // Latched until reload, even if a late ready follows. The pages and their
+                    // kept bytes stay; only the switch is dropped (AC-22)
                     unavailableRef.current = true;
-                    setState((prev) => ({ ...prev, status: 'unavailable' }));
+                    setState((prev) => ({
+                        ...prev,
+                        status: 'unavailable',
+                        fit: prev.fit === 'fits' ? 'failed' : prev.fit,
+                    }));
                     settle(FAILED);
                     return;
                 }

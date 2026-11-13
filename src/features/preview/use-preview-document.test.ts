@@ -273,6 +273,19 @@ describe('usePreviewDocument', () => {
         expect(fake.requests).toHaveLength(2);
     });
 
+    it('should drop the switch but keep the shown bytes when the worker crashes after the search', async () => {
+        const { fake, current } = await setup();
+        await answerAll(fake, 2, 0.3);
+        act(() => current().setMode('onePage'));
+        const onePage = current().shown;
+        expect(current().fit).toBe('fits');
+
+        await fake.emitStatus('unavailable');
+
+        expect(current()).toMatchObject({ status: 'unavailable', fit: 'failed', mode: 'onePage' });
+        expect(current().shown).toBe(onePage);
+    });
+
     it('should drop a late result when nothing is waiting for it', async () => {
         const { fake, current } = await setup();
         await fake.respond({ ok: false });
