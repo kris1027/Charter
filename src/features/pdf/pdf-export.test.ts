@@ -4,7 +4,7 @@ vi.mock('@/features/pdf/pdfjs-singleton', () => ({
     getPdfjs: vi.fn(),
 }));
 
-import { generateResumeFilename, countPdfPages } from './pdf-export';
+import { generateResumeFilename, countPdfBytes } from './pdf-export';
 import { getPdfjs } from '@/features/pdf/pdfjs-singleton';
 
 describe('generateResumeFilename', () => {
@@ -29,24 +29,32 @@ describe('generateResumeFilename', () => {
     });
 });
 
-describe('countPdfPages', () => {
-    function makeGetDocument(numPages: number) {
-        return vi.fn().mockReturnValue({
+describe('countPdfBytes', () => {
+    const makeGetDocument = (numPages: number) =>
+        vi.fn().mockReturnValue({
             promise: Promise.resolve({ numPages }),
             destroy: vi.fn().mockResolvedValue(undefined),
         });
-    }
 
-    it('returns the numPages from pdfjs', async () => {
-        vi.mocked(getPdfjs).mockResolvedValue({
-            getDocument: makeGetDocument(3),
-        } as never);
+    it('should return the page count when pdfjs opens the bytes', async () => {
+        vi.mocked(getPdfjs).mockResolvedValue({ getDocument: makeGetDocument(3) } as never);
 
-        const blob = new Blob(['fake pdf'], { type: 'application/pdf' });
-        expect(await countPdfPages(blob)).toBe(3);
+        expect(await countPdfBytes(new ArrayBuffer(8))).toBe(3);
     });
 
-    it('returns 1 when pdfjs throws', async () => {
+    it('should hand pdfjs a copy when counting, so the kept bytes stay usable', async () => {
+        const getDocument = makeGetDocument(1);
+        vi.mocked(getPdfjs).mockResolvedValue({ getDocument } as never);
+        const kept = new ArrayBuffer(8);
+
+        await countPdfBytes(kept);
+
+        const { data } = getDocument.mock.calls[0][0] as { data: Uint8Array };
+        expect(data.buffer).not.toBe(kept);
+        expect(data.byteLength).toBe(8);
+    });
+
+    it('should return null when pdfjs cannot read the bytes', async () => {
         vi.mocked(getPdfjs).mockResolvedValue({
             getDocument: vi.fn().mockReturnValue({
                 promise: Promise.reject(new Error('parse error')),
@@ -54,7 +62,6 @@ describe('countPdfPages', () => {
             }),
         } as never);
 
-        const blob = new Blob(['not a pdf'], { type: 'application/pdf' });
-        expect(await countPdfPages(blob)).toBe(1);
+        expect(await countPdfBytes(new ArrayBuffer(8))).toBeNull();
     });
 });

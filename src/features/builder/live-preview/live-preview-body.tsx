@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { LivePreview } from '@/features/builder/live-preview/use-live-preview';
-import { PreviewPages } from '@/features/builder/live-preview/preview-pages';
+import { PreviewPages } from '@/features/pdf/live-preview/preview-pages';
 
 type LivePreviewBodyProps = {
     preview: LivePreview;
@@ -12,6 +12,7 @@ type LivePreviewBodyProps = {
 // What the side panel and the narrow screen sheet both show: notices and the drawn pages
 export const LivePreviewBody = ({ preview, unavailableAction }: LivePreviewBodyProps) => {
     const { t } = useTranslation();
+    const [pageCount, setPageCount] = useState(0);
 
     if (preview.status === 'unavailable') {
         return (
@@ -25,7 +26,23 @@ export const LivePreviewBody = ({ preview, unavailableAction }: LivePreviewBodyP
         );
     }
 
-    return <PreviewPages pdf={preview.pdf} renderFailed={preview.failed} />;
+    return (
+        <div className='space-y-3'>
+            {pageCount > 0 && (
+                <div className='text-muted-foreground flex flex-wrap items-center gap-2 text-xs'>
+                    <span className='bg-muted text-foreground rounded-md px-2 py-0.5 font-medium'>
+                        {t('builder.livePreview.pageCount', { count: pageCount })}
+                    </span>
+                    {pageCount > 1 && <span>{t('builder.livePreview.fullSizeHint')}</span>}
+                </div>
+            )}
+            <PreviewPages
+                pdf={preview.pdf}
+                renderFailed={preview.failed}
+                onPageCount={setPageCount}
+            />
+        </div>
+    );
 };
 
 type LivePreviewTitleProps = { preview: LivePreview; titleId?: string };

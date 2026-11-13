@@ -1,8 +1,7 @@
 {
     "nav": {
         "backToTemplates": "Powrót do szablonów",
-        "backToHome": "Powrót do strony głównej",
-        "backToEditor": "Powrót do edytora"
+        "backToHome": "Powrót do strony głównej"
     },
     "home": {
         "hero": {
@@ -132,13 +131,10 @@
             "hide": "Ukryj podgląd",
             "open": "Podgląd",
             "close": "Zamknij podgląd",
-            "preparing": "Przygotowuję podgląd…",
             "updating": "Aktualizuję…",
             "fullSizeHint": "Pełny rozmiar, Podgląd może zmieścić go na jednej stronie",
-            "updateFailed": "Nie udało się odświeżyć podglądu",
             "unavailable": "Podgląd na żywo jest tu niedostępny",
             "openPreviewPage": "Otwórz podgląd",
-            "pageLabel": "Podgląd CV, strona {{page}} z {{total}}",
             "pageCount_one": "{{count}} strona",
             "pageCount_few": "{{count}} strony",
             "pageCount_many": "{{count}} stron",
@@ -292,25 +288,35 @@
     },
     "preview": {
         "title": "Podgląd Twojego CV",
-        "loadingPreview": "Podgląd Twojego CV...",
         "noData": "Nie znaleziono danych CV",
         "noDataHint": "Proszę najpierw wypełnić formularz, aby zobaczyć podgląd CV.",
         "startBuilding": "Zacznij tworzyć CV",
-        "multiPage": "Wiele stron",
-        "singlePage": "Jedna strona",
         "downloadPdf": "Pobierz PDF",
-        "exporting": "Eksportowanie...",
         "editCv": "Edytuj CV",
-        "success": {
-            "title": "Gratulacje! Twoje CV jest gotowe.",
-            "subtitle": "Możesz teraz pobrać jako PDF lub kontynuować edycję."
-        },
-        "contentWarning": {
-            "title": "Treść jest bardzo długa",
-            "subtitle": "Twoje CV zostało przeskalowane do minimum (50%). Rozważ skrócenie treści dla lepszej czytelności."
-        },
         "exportError": "Nie udało się wyeksportować PDF. Spróbuj ponownie.",
-        "exportErrorTitle": "Błąd eksportu"
+        "exportErrorTitle": "Błąd eksportu",
+        "mode": {
+            "label": "Układ stron",
+            "full": "Pełny rozmiar",
+            "onePage": "Jedna strona"
+        },
+        "fit": {
+            "checking": "Sprawdzam, czy zmieści się na jednej stronie…",
+            "tooLong": "Za długie na jedną stronę"
+        },
+        "pageCount_one": "{{count}} strona",
+        "pageCount_few": "{{count}} strony",
+        "pageCount_many": "{{count}} stron",
+        "pageCount_other": "{{count}} strony",
+        "renderFailed": "Nie udało się narysować podglądu",
+        "retry": "Spróbuj ponownie",
+        "unavailable": "Podgląd nie może się tu wyświetlić. Nadal możesz pobrać PDF.",
+        "chooseTemplate": "Wybierz szablon"
+    },
+    "pdfPreview": {
+        "preparing": "Przygotowuję podgląd…",
+        "updateFailed": "Nie udało się odświeżyć podglądu",
+        "pageLabel": "Podgląd CV, strona {{page}} z {{total}}"
     },
     "proficiency": {
         "A1": "A1 - Początkujący",
