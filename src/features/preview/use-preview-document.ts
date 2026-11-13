@@ -2,23 +2,30 @@ import { useEffect, useRef, useState } from 'react';
 import {
     createPreviewClient,
     type PreviewClient,
-    type PreviewResult,
 } from '@/features/pdf/live-preview/preview-client';
-import { countPdfBytes } from '@/features/pdf/pdf-export';
+import { countPdfPages } from '@/features/pdf/pdf-export';
 import {
     findOnePageScale,
+    type CountedPdf,
     type OnePageFit,
-    type Trial,
+    type OnePageSearch,
 } from '@/features/preview/find-one-page-scale';
+import {
+    createSerialPreviewClient,
+    type SerialPreviewClient,
+} from '@/features/preview/serial-preview-client';
 import type { ResumeData } from '@/features/resume/form-types';
 import type { AppLang } from '@/lib/app-lang';
 import type { TemplateId } from '@/lib/template-ids';
 
 export const FIT_SEARCH_CAP_MS = 60_000;
 
+// What /preview draws and downloads: the saved resume, its template and the page language
+export type PreviewSource = { data: ResumeData; templateId: TemplateId; lang: AppLang };
+
 export type PreviewMode = 'full' | 'onePage';
 export type PreviewStatus = 'starting' | 'rendering' | 'ready' | 'failed' | 'unavailable';
-export type PreviewFit = 'idle' | 'checking' | 'fits' | 'too-long' | 'failed';
+export type PreviewFit = 'idle' | 'checking' | OnePageSearch['fit'];
 
 export type PreviewDocument = {
     status: PreviewStatus;
@@ -26,17 +33,15 @@ export type PreviewDocument = {
     mode: PreviewMode;
     setMode: (mode: PreviewMode) => void;
     // The kept bytes for the selected mode
-    shown: Trial | null;
-    // 0 for full, the winning scale for onePage
-    scale: number;
+    shown: CountedPdf | null;
+    // The renderer's compactScale for the selected mode: 0 (no compacting) for full, the
+    // winning scale for onePage
+    compactScale: number;
     retry: () => void;
 };
 
-type UsePreviewDocumentOptions = {
-    data: ResumeData;
-    templateId: TemplateId;
-    lang: AppLang;
-    // Both must keep their identity between renders: a new one starts a new run
+type UsePreviewDocumentOptions = PreviewSource & {
+    // Test seams. Both must keep their identity between renders: a new one starts a new run
     createClient?: () => PreviewClient;
     countPages?: (pdf: ArrayBuffer) => Promise<number | null>;
 };
@@ -45,31 +50,29 @@ type State = {
     status: PreviewStatus;
     fit: PreviewFit;
     mode: PreviewMode;
-    full: Trial | null;
+    full: CountedPdf | null;
     onePage: OnePageFit | null;
 };
 
 const INITIAL: State = { status: 'starting', fit: 'idle', mode: 'full', full: null, onePage: null };
-const FAILED: PreviewResult = { ok: false };
+const SEARCH_CAPPED: OnePageSearch = { fit: 'failed' };
+
+// Unavailable is latched until reload (AC-22): no later status replaces it
+const latched = (current: PreviewStatus, next: PreviewStatus): PreviewStatus =>
+    current === 'unavailable' ? current : next;
 
 // The /preview engine (spec 0013): renders the saved resume in the preview worker at full size,
-// then searches for the scale that fits one page, keeping the bytes of both versions.
-// Only one worker request is ever outstanding: the client has one waiting slot and one result
-// callback with no request id, so two requests in flight could swap their answers.
+// then searches for the scale that fits one page, keeping the bytes of both versions. The
+// worker requests go one at a time through the serial preview client.
 export const usePreviewDocument = ({
     data,
     templateId,
     lang,
     createClient = createPreviewClient,
-    countPages = countPdfBytes,
+    countPages = countPdfPages,
 }: UsePreviewDocumentOptions): PreviewDocument => {
-    const clientRef = useRef<PreviewClient | null>(null);
+    const workerRef = useRef<SerialPreviewClient | null>(null);
     const disposeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-    const waiterRef = useRef<((result: PreviewResult) => void) | null>(null);
-    const inFlightRef = useRef<Promise<PreviewResult> | null>(null);
-    const unavailableRef = useRef(false);
-    const disposedRef = useRef(false);
-    const workerReadyRef = useRef(false);
     const runIdRef = useRef(0);
     const [state, setState] = useState(INITIAL);
     const [attempt, setAttempt] = useState(0);
@@ -78,16 +81,10 @@ export const usePreviewDocument = ({
     // in development keeps the one worker instead of starting a second
     useEffect(() => {
         clearTimeout(disposeTimerRef.current);
-        disposedRef.current = false;
         return () => {
             disposeTimerRef.current = setTimeout(() => {
-                disposedRef.current = true;
-                const waiter = waiterRef.current;
-                waiterRef.current = null;
-                inFlightRef.current = null;
-                waiter?.(FAILED);
-                clientRef.current?.dispose();
-                clientRef.current = null;
+                workerRef.current?.dispose();
+                workerRef.current = null;
             }, 0);
         };
     }, []);
@@ -98,54 +95,25 @@ export const usePreviewDocument = ({
         const runId = ++runIdRef.current;
         const isStale = () => runId !== runIdRef.current;
 
-        // A result with nothing waiting (a late answer after a timeout) is dropped here
-        const settle = (result: PreviewResult) => {
-            const waiter = waiterRef.current;
-            waiterRef.current = null;
-            inFlightRef.current = null;
-            waiter?.(result);
-        };
-
-        const getClient = () => {
-            if (clientRef.current) return clientRef.current;
-            const client = createClient();
-            client.onResult(settle);
-            client.onStatus((status) => {
-                if (status === 'unavailable') {
-                    // Latched until reload, even if a late ready follows. The pages and their
-                    // kept bytes stay; only the switch is dropped (AC-22)
-                    unavailableRef.current = true;
+        const getWorker = () =>
+            (workerRef.current ??= createSerialPreviewClient({
+                createClient,
+                onReady: () =>
+                    setState((prev) =>
+                        prev.status === 'starting' ? { ...prev, status: 'rendering' } : prev,
+                    ),
+                // The pages and their kept bytes stay; only the switch is dropped (AC-22)
+                onUnavailable: () =>
                     setState((prev) => ({
                         ...prev,
                         status: 'unavailable',
                         fit: prev.fit === 'fits' ? 'failed' : prev.fit,
-                    }));
-                    settle(FAILED);
-                    return;
-                }
-                if (status === 'starting') return;
-                workerReadyRef.current = true;
-                setState((prev) =>
-                    prev.status === 'starting' ? { ...prev, status: 'rendering' } : prev,
-                );
-            });
-            clientRef.current = client;
-            return client;
-        };
-
-        const renderOnce = (compactScale: number): Promise<PreviewResult> => {
-            if (unavailableRef.current || disposedRef.current) return Promise.resolve(FAILED);
-            const result = new Promise<PreviewResult>((resolve) => {
-                waiterRef.current = resolve;
-            });
-            inFlightRef.current = result;
-            getClient().request({ data, templateId, compactScale, lang });
-            return result;
-        };
+                    })),
+            }));
 
         // null on a failed render, or on a page count that errors or comes back 0
-        const renderCounted = async (compactScale: number): Promise<Trial | null> => {
-            const result = await renderOnce(compactScale);
+        const renderCounted = async (compactScale: number): Promise<CountedPdf | null> => {
+            const result = await getWorker().render({ data, templateId, compactScale, lang });
             if (!result.ok) return null;
             const pages = await countPages(result.pdf).catch(() => null);
             return pages ? { pdf: result.pdf, pages } : null;
@@ -155,64 +123,58 @@ export const usePreviewDocument = ({
         const searchOnePage = async () => {
             let capped = false;
             let capTimer: ReturnType<typeof setTimeout> | undefined;
-            const cap = new Promise<null>((resolve) => {
+            const cap = new Promise<OnePageSearch>((resolve) => {
                 capTimer = setTimeout(() => {
                     capped = true;
-                    resolve(null);
+                    resolve(SEARCH_CAPPED);
                 }, FIT_SEARCH_CAP_MS);
             });
-            const fit = await Promise.race([
+            const search = await Promise.race([
                 findOnePageScale(async (scale) =>
                     capped || isStale() ? null : renderCounted(scale),
                 ),
                 cap,
             ]);
             clearTimeout(capTimer);
-            return fit;
+            return search;
         };
 
         const run = async () => {
             // A tick first: StrictMode's replayed effect overtakes this run before it does anything
             await null;
             if (isStale()) return;
+            const worker = getWorker();
             // The kept bytes go at once, but the drawn pages stay until new bytes are shown
             setState((prev) => ({
                 ...INITIAL,
-                status:
-                    prev.status === 'unavailable'
-                        ? 'unavailable'
-                        : workerReadyRef.current
-                          ? 'rendering'
-                          : 'starting',
+                status: latched(prev.status, worker.isReady() ? 'rendering' : 'starting'),
             }));
             // Waits for a request an older run left in flight and throws its result away
-            await inFlightRef.current;
+            await worker.inFlight();
             if (isStale()) return;
 
             const full = await renderCounted(0);
             if (isStale()) return;
             if (!full) {
-                setState((prev) =>
-                    prev.status === 'unavailable' ? prev : { ...prev, status: 'failed' },
-                );
+                setState((prev) => ({ ...prev, status: latched(prev.status, 'failed') }));
                 return;
             }
             const isMultiPage = full.pages > 1;
             setState((prev) => ({
                 ...prev,
                 full,
-                status: prev.status === 'unavailable' ? 'unavailable' : 'ready',
+                status: latched(prev.status, 'ready'),
                 fit: isMultiPage ? 'checking' : 'idle',
             }));
             if (!isMultiPage) return;
 
-            const fit = await searchOnePage();
+            const search = await searchOnePage();
             if (isStale()) return;
-            setState((prev) => {
-                if (fit === null) return { ...prev, fit: 'failed' };
-                if (fit === 'too-long') return { ...prev, fit: 'too-long' };
-                return { ...prev, fit: 'fits', onePage: fit };
-            });
+            setState((prev) => ({
+                ...prev,
+                fit: search.fit,
+                onePage: search.fit === 'fits' ? search.onePage : null,
+            }));
         };
 
         void run();
@@ -230,7 +192,7 @@ export const usePreviewDocument = ({
         setMode: (mode) =>
             setState((prev) => (mode === 'onePage' && !prev.onePage ? prev : { ...prev, mode })),
         shown: onePage ?? state.full,
-        scale: onePage?.scale ?? 0,
+        compactScale: onePage?.scale ?? 0,
         retry: () => setAttempt((count) => count + 1),
     };
 };

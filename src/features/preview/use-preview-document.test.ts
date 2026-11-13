@@ -109,7 +109,12 @@ describe('usePreviewDocument', () => {
 
         await fake.respond({ ok: true, pdf });
 
-        expect(current()).toMatchObject({ status: 'ready', fit: 'idle', mode: 'full', scale: 0 });
+        expect(current()).toMatchObject({
+            status: 'ready',
+            fit: 'idle',
+            mode: 'full',
+            compactScale: 0,
+        });
         expect(current().shown).toEqual({ pdf, pages: 1 });
         expect(current().shown?.pdf).toBe(pdf);
         expect(fake.requests).toHaveLength(1);
@@ -132,7 +137,7 @@ describe('usePreviewDocument', () => {
         expect(current().shown?.pages).toBe(2);
         await answerAll(fake, 2, 0.3);
 
-        expect(current()).toMatchObject({ fit: 'fits', mode: 'full', scale: 0 });
+        expect(current()).toMatchObject({ fit: 'fits', mode: 'full', compactScale: 0 });
         expect(fake.requests.map((request) => request.compactScale)).toEqual([
             0, 1, 0.5, 0.25, 0.375, 0.3125, 0.28125, 0.296875,
         ]);
@@ -147,7 +152,7 @@ describe('usePreviewDocument', () => {
 
         act(() => current().setMode('onePage'));
 
-        expect(current()).toMatchObject({ mode: 'onePage', scale: 0.3125 });
+        expect(current()).toMatchObject({ mode: 'onePage', compactScale: 0.3125 });
         expect(current().shown?.pages).toBe(1);
         expect(scaleOf(current().shown!.pdf)).toBe(0.3125);
         expect(fake.requests).toHaveLength(8);
@@ -172,7 +177,7 @@ describe('usePreviewDocument', () => {
 
         await answerAll(fake, 3, 2);
 
-        expect(current()).toMatchObject({ status: 'ready', fit: 'too-long', scale: 0 });
+        expect(current()).toMatchObject({ status: 'ready', fit: 'tooLong', compactScale: 0 });
         expect(fake.requests.map((request) => request.compactScale)).toEqual([0, 1]);
         expect(current().shown?.pages).toBe(3);
     });
@@ -213,7 +218,7 @@ describe('usePreviewDocument', () => {
         hook.rerender({ lang: 'pl' });
         await act(async () => {});
 
-        expect(current()).toMatchObject({ mode: 'full', fit: 'idle', scale: 0 });
+        expect(current()).toMatchObject({ mode: 'full', fit: 'idle', compactScale: 0 });
         expect(current().shown).toBeNull();
 
         await answerAll(fake, 2, 0.3);
@@ -222,7 +227,7 @@ describe('usePreviewDocument', () => {
         expect(current().shown?.pages).toBe(2);
     });
 
-    it('should never have two requests open at once', async () => {
+    it('should never have two requests open at once when runs overtake each other', async () => {
         const { fake, hook, current } = await setup();
         await answer(fake, 2, 0.3);
         await answer(fake, 2, 0.3);
@@ -244,7 +249,7 @@ describe('usePreviewDocument', () => {
 
         await fake.emitStatus('unavailable');
 
-        expect(current()).toMatchObject({ status: 'unavailable', fit: 'idle', scale: 0 });
+        expect(current()).toMatchObject({ status: 'unavailable', fit: 'idle', compactScale: 0 });
         expect(current().shown).toBeNull();
 
         await fake.emitStatus('ready');
@@ -353,7 +358,7 @@ describe('usePreviewDocument', () => {
         },
     );
 
-    it('should end the search as failed after 60 seconds and drop the late result', async () => {
+    it('should end the search as failed and drop the late result when it passes 60 seconds', async () => {
         vi.useFakeTimers();
         const { fake, current } = await setup();
         await answer(fake, 2, 0.3);

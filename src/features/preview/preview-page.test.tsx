@@ -17,7 +17,7 @@ import {
     type PreviewClientStatus,
     type PreviewResult,
 } from '@/features/pdf/live-preview/preview-client';
-import { countPdfBytes, exportToPDF, savePdf } from '@/features/pdf/pdf-export';
+import { countPdfPages, exportToPDF, savePdf } from '@/features/pdf/pdf-export';
 import { PreviewPage } from '@/features/preview/preview-page';
 import { validatePreviewSearch } from '@/features/preview/preview-search';
 import { EMPTY_RESUME } from '@/features/resume/stored-resume';
@@ -32,7 +32,7 @@ vi.mock('@/features/pdf/live-preview/draw-pdf-pages', () => ({
 }));
 vi.mock('@/features/pdf/pdf-export', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/features/pdf/pdf-export')>()),
-    countPdfBytes: vi.fn(),
+    countPdfPages: vi.fn(),
     exportToPDF: vi.fn(),
     savePdf: vi.fn(),
 }));
@@ -114,7 +114,7 @@ describe('PreviewPage', () => {
         localStorage.clear();
         requests = [];
         vi.mocked(createPreviewClient).mockReset().mockImplementation(fakeClient);
-        vi.mocked(countPdfBytes)
+        vi.mocked(countPdfPages)
             .mockReset()
             .mockImplementation(async (pdf) => pagesOf(pdf));
         vi.mocked(exportToPDF).mockReset().mockResolvedValue(undefined);
@@ -134,7 +134,7 @@ describe('PreviewPage', () => {
         };
     });
 
-    it('should show a blank sheet and the preparing line until the first render lands', async () => {
+    it('should show a blank sheet and the preparing line when the first render has not landed', async () => {
         saveResume();
         const { container } = await renderPreview();
 
@@ -172,7 +172,7 @@ describe('PreviewPage', () => {
         expect(requests).toHaveLength(1);
     });
 
-    it('should show checking, then the switch, and draw one page without a new request', async () => {
+    it('should show checking, then the switch, and draw one page without a new request when the resume fits', async () => {
         const user = userEvent.setup();
         saveResume();
         await renderPreview();
@@ -204,7 +204,7 @@ describe('PreviewPage', () => {
         expect(exportToPDF).not.toHaveBeenCalled();
     });
 
-    it('should move between the modes with the arrow keys', async () => {
+    it('should move between the modes when the arrow keys are pressed', async () => {
         const user = userEvent.setup();
         saveResume();
         await renderPreview();
@@ -311,7 +311,7 @@ describe('PreviewPage', () => {
         expect(screen.queryByText('The preview could not be drawn')).not.toBeInTheDocument();
     });
 
-    it('should mark Download busy while the fallback export runs', async () => {
+    it('should mark Download busy when the fallback export is running', async () => {
         const user = userEvent.setup();
         let finish: () => void = () => {};
         vi.mocked(exportToPDF).mockReturnValue(

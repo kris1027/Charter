@@ -20,23 +20,17 @@ const SavedResumePreview = ({ data, templateId }: SavedResumePreviewProps) => {
     const { i18n } = useTranslation();
     const lang = normalizeLang(i18n.language);
     const downloadRef = useRef<HTMLButtonElement>(null);
-    const preview = usePreviewDocument({ data, templateId, lang });
-    const { download, isExporting, exportFailed, dismissExportError } = useDownload({
-        data,
-        templateId,
-        lang,
-        shown: preview.shown,
-        scale: preview.scale,
-    });
+    const source = { data, templateId, lang };
+    const preview = usePreviewDocument(source);
+    const { download, isExporting, exportFailed, dismissExportError } = useDownload(
+        source,
+        preview,
+    );
 
     return (
         <>
             <PreviewToolbar
-                showActions
-                templateId={templateId}
-                onDownload={download}
-                isExporting={isExporting}
-                downloadRef={downloadRef}
+                actions={{ templateId, onDownload: download, isExporting, downloadRef }}
             />
             <PreviewStrip
                 pages={preview.shown?.pages ?? null}
@@ -75,7 +69,7 @@ export const PreviewPage = () => {
                 <SavedResumePreview data={resume} templateId={templateId} />
             ) : (
                 <>
-                    <PreviewToolbar showActions={false} />
+                    <PreviewToolbar />
                     <PreviewEmptyState templateId={templateId} />
                 </>
             )}

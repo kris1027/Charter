@@ -49,7 +49,7 @@ export function savePdf(blob: Blob, filename: string): void {
 
 // Page count of PDF bytes, or null when they cannot be read, so a broken PDF never counts as
 // one page. pdf.js takes ownership of the bytes it gets, so it only ever gets a copy
-export async function countPdfBytes(pdf: ArrayBuffer): Promise<number | null> {
+export async function countPdfPages(pdf: ArrayBuffer): Promise<number | null> {
     try {
         const { getDocument } = await getPdfjs();
         const loadingTask = getDocument({ data: new Uint8Array(pdf.slice(0)) });

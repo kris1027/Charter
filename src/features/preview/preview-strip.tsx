@@ -28,7 +28,7 @@ export const PreviewStrip = ({ pages, fit, mode, onModeChange }: PreviewStripPro
                                 {t('preview.pageCount', { count: pages })}
                             </span>
                             {fit === 'checking' && ` · ${t('preview.fit.checking')}`}
-                            {fit === 'too-long' && ` · ${t('preview.fit.tooLong')}`}
+                            {fit === 'tooLong' && ` · ${t('preview.fit.tooLong')}`}
                         </>
                     )}
                 </p>

@@ -1,22 +1,14 @@
 import { useState } from 'react';
 import { exportToPDF, generateResumeFilename, savePdf } from '@/features/pdf/pdf-export';
-import type { ResumeData } from '@/features/resume/form-types';
-import type { AppLang } from '@/lib/app-lang';
-import type { TemplateId } from '@/lib/template-ids';
-
-type UseDownloadOptions = {
-    data: ResumeData;
-    templateId: TemplateId;
-    lang: AppLang;
-    // The kept bytes for the selected mode, when there are any
-    shown: { pdf: ArrayBuffer } | null;
-    // The selected mode's scale, for the fallback export
-    scale: number;
-};
+import type { PreviewDocument, PreviewSource } from '@/features/preview/use-preview-document';
 
 // Download PDF (spec 0013): saves the bytes on screen at once (AC-19). Without them (before the
-// first render, worker unavailable, render failed) it falls back to a fresh export (AC-20)
-export const useDownload = ({ data, templateId, lang, shown, scale }: UseDownloadOptions) => {
+// first render, worker unavailable, render failed) it falls back to a fresh export at the
+// selected mode's scale (AC-20)
+export const useDownload = (
+    { data, templateId, lang }: PreviewSource,
+    { shown, compactScale }: Pick<PreviewDocument, 'shown' | 'compactScale'>,
+) => {
     const [isExporting, setIsExporting] = useState(false);
     const [exportFailed, setExportFailed] = useState(false);
 
@@ -32,7 +24,7 @@ export const useDownload = ({ data, templateId, lang, shown, scale }: UseDownloa
         }
         setIsExporting(true);
         try {
-            await exportToPDF(data, templateId, { filename, compactScale: scale, lang });
+            await exportToPDF(data, templateId, { filename, compactScale, lang });
         } catch (error) {
             if (import.meta.env.DEV) console.error('Failed to export PDF:', error);
             setExportFailed(true);
