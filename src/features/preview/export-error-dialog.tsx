@@ -2,7 +2,7 @@ import { FileWarning } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     AlertDialog,
-    AlertDialogAction,
+    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
@@ -36,7 +36,8 @@ export const ExportErrorDialog = ({ open, onClose, onCloseAutoFocus }: ExportErr
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogAction>{t('dialogs.pdfError.ok')}</AlertDialogAction>
+                    {/* The outline close button: Download PDF stays the only default button (AC-6) */}
+                    <AlertDialogCancel>{t('dialogs.pdfError.ok')}</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
