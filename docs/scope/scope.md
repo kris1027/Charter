@@ -240,7 +240,7 @@ spec [0007](../specs/0007-pdf-import-parser/index.md) · code in `src/features/p
 
 Load the PDF renderer, pdf.js, fonts and the animation library only on the pages and actions that need them, within the budgets from feature 5.
 **Done when:** the landing page ships none of those engines, export and import still work offline, and every page meets its JS budget.
-spec [0008](../specs/0008-lazy-load-heavy-engines/index.md) · code in `src/app/motion-provider.tsx`, `src/features/templates/pdf/lazy-template-viewer.tsx`, `src/features/pdf/pdf-export.tsx`
+spec [0008](../specs/0008-lazy-load-heavy-engines/index.md) · code in `src/app/motion-provider.tsx`, `src/features/pdf/pdf-export.tsx`
 
 - [x] Design it (spec): `/architect lazy load heavy engines: ratify the assumed LazyMotion decision`
 - [x] Build it: `/develop lazy load heavy engines`

@@ -25,7 +25,7 @@ _Page shell and toolbar_
 - **AC-2**: `src/features/preview/**/*.{ts,tsx}` is in `TOKEN_ONLY_FILES` and imports nothing from `motion/react`. `pnpm lint` passes.
 - **AC-3**: The toolbar is `sticky top-0 z-10`, 56px high (`h-14`), solid `bg-background` with a bottom border. Left to right: the edit link, the `h1`, then, pushed right: Download PDF, `LanguageToggle`, `ThemeToggle`.
 - **AC-4**: One edit link replaces both Back to editor and Edit CV. It goes to `/builder` with `search={{ templateId }}` (the resolved id from AC-21), shows a pencil icon plus `preview.editCv` from `sm` up and only the icon below that, and its accessible name is `preview.editCv` at every width.
-- **AC-5**: The page has exactly one `h1` (`preview.title`), in the toolbar, visible from `md` up and `sr-only` below that. It uses `font-display` and no gradient.
+- **AC-5**: The page has exactly one `h1` (`preview.title`), in the toolbar, visible from `md` up and `sr-only` below that. In the empty state (AC-25) the toolbar has no edit link and no Download, so the title is the only thing on the left and stays visible at every width. It uses `font-display` and no gradient.
 - **AC-6**: Download PDF is the only `variant='default'` button on the page. It shows its icon plus `preview.downloadPdf` from `sm` up and the icon only below that, with the accessible name `preview.downloadPdf` at every width. It keeps `data-testid='export-pdf'` (the Lighthouse seed script waits for it).
 - **AC-7**: At 320px wide the page has no sideways scroll, in EN and PL, with the toolbar on one row.
 
