@@ -60,10 +60,19 @@ describe('raw color lint rule', () => {
         expect(errors).toHaveLength(1);
     });
 
-    it('should ignore raw colors when outside the covered folders', async () => {
+    it('should error on a palette class when in the preview folder', async () => {
         const errors = await rawColorErrors(
             "export const a = 'text-slate-500';\n",
             'src/features/preview/fixture.ts',
+        );
+
+        expect(errors).toHaveLength(1);
+    });
+
+    it('should ignore raw colors when outside the covered folders', async () => {
+        const errors = await rawColorErrors(
+            "export const a = 'text-slate-500';\n",
+            'src/features/templates/fixture.ts',
         );
 
         expect(errors).toHaveLength(0);
@@ -108,6 +117,19 @@ describe('motion import lint rule', () => {
 
         expect(errors).toHaveLength(1);
         expect(errors[0].message).toContain('Use `m` inside LazyMotion, not `motion` (spec 0008).');
+    });
+
+    // Spec 0013, AC-2: the preview page imports nothing from motion
+    it('should error when a preview file imports anything from motion/react', async () => {
+        const errors = await importErrors(
+            "import { m } from 'motion/react';\nexport const a = m;\n",
+            'src/features/preview/fixture.tsx',
+        );
+
+        expect(errors).toHaveLength(1);
+        expect(errors[0].message).toContain(
+            'This page area imports nothing from motion (spec 0013).',
+        );
     });
 
     it('should pass when a file imports m and the hooks from motion/react', async () => {

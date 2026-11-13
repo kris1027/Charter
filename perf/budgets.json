@@ -32,10 +32,6 @@
             "reason": "@react-pdf/renderer library chunk, loaded on PDF render only (spec 0008)"
         },
         {
-            "match": "src/features/templates/pdf/template-viewer.tsx",
-            "reason": "on screen PDF viewer, reached only through React.lazy (spec 0008)"
-        },
-        {
             "match": "src/features/templates/pdf/gallery-pdf-viewer.tsx",
             "reason": "gallery detail PDF viewer, reached only through React.lazy from lg up (spec 0011)"
         },

@@ -32,6 +32,11 @@ export async function exportToPDF(
         compactScale,
         lang: normalizeLang(rawLang),
     });
+    savePdf(blob, filename);
+}
+
+// Hands a finished PDF to the browser as a download
+export function savePdf(blob: Blob, filename: string): void {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -42,17 +47,19 @@ export async function exportToPDF(
     requestAnimationFrame(() => setTimeout(() => URL.revokeObjectURL(url), 1000));
 }
 
-export async function countPdfPages(blob: Blob): Promise<number> {
-    const { getDocument } = await getPdfjs();
-    const buf = await blob.arrayBuffer();
-    const loadingTask = getDocument({ data: new Uint8Array(buf) });
+// Page count of PDF bytes, or null when they cannot be read, so a broken PDF never counts as
+// one page. pdf.js takes ownership of the bytes it gets, so it only ever gets a copy
+export async function countPdfPages(pdf: ArrayBuffer): Promise<number | null> {
     try {
-        const pdfDoc = await loadingTask.promise;
-        return pdfDoc.numPages;
+        const { getDocument } = await getPdfjs();
+        const loadingTask = getDocument({ data: new Uint8Array(pdf.slice(0)) });
+        try {
+            return (await loadingTask.promise).numPages;
+        } finally {
+            await loadingTask.destroy();
+        }
     } catch {
-        return 1;
-    } finally {
-        await loadingTask.destroy();
+        return null;
     }
 }
 
