@@ -292,6 +292,25 @@ describe('PreviewPage', () => {
         expect(strip()).toHaveTextContent('1 page');
     });
 
+    it('should show the failure notice, then the pages, when the first draw fails and Try again succeeds', async () => {
+        const user = userEvent.setup();
+        saveResume();
+        vi.mocked(drawPdfPages).mockRejectedValueOnce(new Error('canvas'));
+        await renderPreview();
+
+        await answerAll(1, 0);
+
+        expect(await screen.findByText('The preview could not be drawn')).toBeInTheDocument();
+        expect(screen.queryByText('Preparing preview…')).not.toBeInTheDocument();
+        expect(screen.queryByRole('img')).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: 'Try again' }));
+        await answerAll(1, 0);
+
+        expect(await screen.findByRole('img')).toBeInTheDocument();
+        expect(screen.queryByText('The preview could not be drawn')).not.toBeInTheDocument();
+    });
+
     it('should mark Download busy while the fallback export runs', async () => {
         const user = userEvent.setup();
         let finish: () => void = () => {};

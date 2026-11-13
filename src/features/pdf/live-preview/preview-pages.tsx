@@ -14,6 +14,8 @@ type PreviewPagesProps = {
     showNotices?: boolean;
     // Fires after each canvas swap with the pages now on screen, and with 0 on unmount
     onPageCount?: (count: number) => void;
+    // Fires when a draw fails; the pages drawn before it, if any, stay on screen
+    onDrawFailed?: () => void;
 };
 
 const freeCanvases = (canvases: Iterable<HTMLCanvasElement>) => {
@@ -48,6 +50,7 @@ export const PreviewPages = ({
     renderFailed = false,
     showNotices = true,
     onPageCount,
+    onDrawFailed,
 }: PreviewPagesProps) => {
     const { t } = useTranslation();
     const pagesRef = useRef<HTMLDivElement>(null);
@@ -59,6 +62,7 @@ export const PreviewPages = ({
     const [drawFailed, setDrawFailed] = useState(false);
 
     const reportPageCount = useEffectEvent((count: number) => onPageCount?.(count));
+    const reportDrawFailed = useEffectEvent(() => onDrawFailed?.());
 
     const measureWidth = () => {
         const width = pagesRef.current?.clientWidth ?? 0;
@@ -104,6 +108,7 @@ export const PreviewPages = ({
             if (doc && doc !== docRef.current) destroyPdf(doc);
             if (generation !== generationRef.current || isCancel(error)) return;
             setDrawFailed(true);
+            reportDrawFailed();
         }
     });
 
