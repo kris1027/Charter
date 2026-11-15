@@ -1,7 +1,7 @@
 # 0013. Preview UI refresh: token chrome, a page strip, and the builder's worker drawing the pages
 
 **Date**: 2026-11-13
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
