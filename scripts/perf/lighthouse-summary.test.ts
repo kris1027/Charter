@@ -31,6 +31,23 @@ describe('summarize', () => {
         );
     });
 
+    it('should give a run its own row and floors when its URL carries a query', () => {
+        const { markdown } = summarize(
+            [entry({ url: 'http://localhost:4173/builder?theme=dark' })],
+            {
+                ...floors,
+                '/builder?theme=dark': {
+                    performance: 0.7,
+                    accessibility: 0.7,
+                    'best-practices': 0.7,
+                    seo: 0.7,
+                },
+            },
+        );
+
+        expect(markdown).toContain('| `/builder?theme=dark` | 0.90 (floor 0.70) |');
+    });
+
     it('should use only the representative run when a page has several runs', () => {
         const { warnings, markdown } = summarize(
             [

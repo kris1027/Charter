@@ -24,7 +24,9 @@ export const summarize = (entries: ReportEntry[], floors: Floors) => {
     const rows = entries
         .filter((entry) => entry.isRepresentativeRun)
         .map((entry) => {
-            const path = new URL(entry.url).pathname;
+            // With the query, so a dark theme run (`?theme=dark`) gets its own row and floors
+            const { pathname, search } = new URL(entry.url);
+            const path = pathname + search;
             const cells = CATEGORIES.map((category) => {
                 const value = entry.summary[category];
                 if (value !== undefined && value < WARN_BELOW) {
