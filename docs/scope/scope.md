@@ -333,7 +333,7 @@ Out of scope for this pass, kept so the plan stays honest.
 - **Template visual refresh**: new look for the three resume templates (web and PDF) · needs a decision
 - **More templates**: a fourth template once the shared model (feature 8) makes it cheap · needs a decision
 - **Smaller landing hero images**: use the card size images for the hero side cards · from spec 0011
-- **One PDF viewer**: decide at the preview UI refresh whether `/preview` moves to the gallery PDF viewer · from spec 0011
+- **One PDF viewer**: decided in spec 0013, `/preview` draws its pages on canvases through the preview worker and the gallery keeps its own PDF viewer · from spec 0011
 
 ## Legend
 
