@@ -2,6 +2,8 @@
 
 // Matches MAX_PAGE_CSS_WIDTH in preview-pages.tsx
 export const PAGE_MAX_WIDTH_CLASS = 'max-w-[900px]';
+// A4, the shape of a page before it is drawn (1 to the square root of 2)
+export const PAGE_ASPECT_CLASS = 'aspect-[1/1.4142]';
 // The always white sheet a page is drawn on
 export const PAGE_SHEET_CLASS = 'bg-paper shadow-surface ring-1 ring-border';
 export const WARNING_NOTICE_CLASS =

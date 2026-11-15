@@ -4,6 +4,15 @@
 const PORT = 4173;
 const ORIGIN = `http://localhost:${PORT}`;
 
+// A page path ending in this query is audited in the dark theme: the seed script reads it
+// and stores the theme, and the app itself ignores it. A query, not a hash, since LHCI groups
+// runs by the document URL, which drops the hash
+const DARK_QUERY = '?theme=dark';
+
+// /preview after spec 0013, from CI run 43750352162 on PR #106 (2026-11-15), in both themes
+const preview = { performance: 0.9, accessibility: 0.98, 'best-practices': 0.98, seo: 0.98 };
+const previewFloors = { '/preview': preview, [`/preview${DARK_QUERY}`]: preview };
+
 // Scores 0 to 1 per page, from CI run 41433413867 on main (2026-11-02)
 const floors = {
     '/': { performance: 0.98, accessibility: 0.98, 'best-practices': 0.98, seo: 0.98 },
@@ -15,7 +24,7 @@ const floors = {
         seo: 0.9,
     },
     '/builder': { performance: 0.97, accessibility: 0.9, 'best-practices': 0.94, seo: 0.9 },
-    '/preview': { performance: 0.62, accessibility: 0.93, 'best-practices': 0.98, seo: 0.9 },
+    ...previewFloors,
 };
 
 const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -36,6 +45,7 @@ const assertMatrix = Object.entries(floors).map(([path, categories]) => ({
 
 module.exports = {
     ORIGIN,
+    DARK_QUERY,
     floors,
     ci: {
         collect: {

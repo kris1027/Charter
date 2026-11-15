@@ -73,9 +73,11 @@ From the first green `lighthouse` run on `main`: CI run `41433413867` at `cb2f29
 | `/templates`           | 0.98 / 0.96 | 1.00 / 0.98 | 1.00 / 0.98    | 0.92 / 0.90 |
 | `/templates/developer` | 0.78 / 0.68 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
 | `/builder`             | 0.99 / 0.97 | 0.92 / 0.90 | 0.96 / 0.94    | 0.92 / 0.90 |
-| `/preview`             | 0.72 / 0.62 | 0.95 / 0.93 | 1.00 / 0.98    | 0.92 / 0.90 |
+| `/preview`             | 1.00 / 0.90 | 1.00 / 0.98 | 1.00 / 0.98    | 1.00 / 0.98 |
 
 The medians are the true median of the 3 runs, the value LHCI's `aggregationMethod: 'median'` asserts against. They match the job summary except `/templates` performance: its runs scored 0.89, 0.98 and 0.99, the summary shows LHCI's representative run (0.99), and the median is 0.98.
+
+The `/preview` row was measured again after spec 0013 rebuilt the page: CI run `43750352162` on PR #106 (2026-11-15), where every category scored 1.00. Before that its row read 0.72 / 0.62, 0.95 / 0.93, 1.00 / 0.98 and 0.92 / 0.90. The same floors now also apply to `/preview?theme=dark`, a second entry the seed script audits in the dark theme (three more runs); it scored 1.00 in every category on a local run.
 
 Performance on `/templates/developer` and `/preview` uses a 0.10 margin instead. Both pages render a PDF, and their score swings more than 0.02 between CI runners on the same code: `/templates/developer` scored 0.79 on `main` at `05e8d43` and 0.74 a few minutes later on PR #98, which changed only config, and `/preview` scored 0.73 and 0.71.
 

@@ -1,7 +1,7 @@
 # 0013. Preview UI refresh: token chrome, a page strip, and the builder's worker drawing the pages
 
 **Date**: 2026-11-13
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
@@ -241,8 +241,8 @@ Tracer Bullet: the first task already replaces the iframe end to end, so the pag
 
 ## Follow-up
 
-- [ ] `/sync`: update the PDF context file (remove `LazyTemplateViewer` and `template-viewer.tsx`, note `/preview` on the worker, `PreviewPages` new home) and add a "Preview page (spec 0013)" rule to root `AGENTS.md`.
-- [ ] `/scope`: tick the Deferred "One PDF viewer" item as decided here (canvas engine on `/preview`, gallery stays on `BlobProvider`).
+- [x] `/sync`: update the PDF context file (remove `LazyTemplateViewer` and `template-viewer.tsx`, note `/preview` on the worker, `PreviewPages` new home) and add a "Preview page (spec 0013)" rule to root `AGENTS.md`.
+- [x] `/scope`: tick the Deferred "One PDF viewer" item as decided here (canvas engine on `/preview`, gallery stays on `BlobProvider`).
 - [ ] If phone users ask for zoom, consider zoom buttons on the canvases as a later feature.
 
 ## Rationale

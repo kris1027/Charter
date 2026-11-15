@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { PreviewPages } from '@/features/pdf/live-preview/preview-pages';
 import {
+    PAGE_ASPECT_CLASS,
     PAGE_MAX_WIDTH_CLASS,
     PAGE_SHEET_CLASS,
     WARNING_NOTICE_CLASS,
@@ -25,7 +26,9 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
     const [isDrawn, setIsDrawn] = useState(false);
     const [drawFailed, setDrawFailed] = useState(false);
 
-    const isUnavailable = status === 'unavailable' && !pdf;
+    // Pages already on screen stay when the worker goes away, even in the window after a
+    // language change, when the kept bytes are cleared but the old pages are still drawn (AC-22)
+    const isUnavailable = status === 'unavailable' && !pdf && !isDrawn;
     const isFailed = status === 'failed' || drawFailed;
     const isLoading = !isDrawn && !isUnavailable && !isFailed;
 
@@ -68,22 +71,28 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
                         </Button>
                     </div>
                 )}
-                {isLoading && (
-                    <div
-                        data-loading-sheet
-                        className={`aspect-[1/1.4142] w-full ${PAGE_MAX_WIDTH_CLASS} ${PAGE_SHEET_CLASS}`}
-                    />
-                )}
+                {/* One grid cell holds the sheet and the pages, so the first page lands on top of
+                    the sheet and nothing moves when the sheet leaves a frame later (AC-10) */}
                 {!isUnavailable && (
-                    <PreviewPages
-                        pdf={pdf}
-                        showNotices={false}
-                        onPageCount={(count) => {
-                            setIsDrawn(count > 0);
-                            if (count > 0) setDrawFailed(false);
-                        }}
-                        onDrawFailed={() => setDrawFailed(true)}
-                    />
+                    <div className='grid grid-cols-1'>
+                        {isLoading && (
+                            <div
+                                data-loading-sheet
+                                className={`col-start-1 row-start-1 w-full self-start ${PAGE_ASPECT_CLASS} ${PAGE_MAX_WIDTH_CLASS} ${PAGE_SHEET_CLASS}`}
+                            />
+                        )}
+                        <div className='col-start-1 row-start-1'>
+                            <PreviewPages
+                                pdf={pdf}
+                                showNotices={false}
+                                onPageCount={(count) => {
+                                    setIsDrawn(count > 0);
+                                    if (count > 0) setDrawFailed(false);
+                                }}
+                                onDrawFailed={() => setDrawFailed(true)}
+                            />
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

@@ -22,6 +22,7 @@ import { PreviewPage } from '@/features/preview/preview-page';
 import { validatePreviewSearch } from '@/features/preview/preview-search';
 import { EMPTY_RESUME } from '@/features/resume/stored-resume';
 import type { TemplatePdfInput } from '@/features/templates/pdf/template-pdf';
+import i18n from '@/test/i18n-test';
 import { render, screen, userEvent, waitFor, within } from '@/test/test-utils';
 
 vi.mock('@/features/pdf/live-preview/preview-client', () => ({ createPreviewClient: vi.fn() }));
@@ -227,6 +228,19 @@ describe('PreviewPage', () => {
         expect(modeSwitch()).not.toBeInTheDocument();
     });
 
+    it('should put the pages in the same grid cell as the blank sheet when the first render has not landed', async () => {
+        saveResume();
+        const { container } = await renderPreview();
+
+        // One cell for both, so the first page lands on the sheet and nothing jumps (AC-10)
+        const cell = container.querySelector('[data-loading-sheet]')?.parentElement;
+        expect(cell).toHaveClass('grid');
+        expect(cell?.children).toHaveLength(2);
+        for (const child of Array.from(cell?.children ?? [])) {
+            expect(child).toHaveClass('col-start-1', 'row-start-1');
+        }
+    });
+
     it('should show the notice and export at full size when the worker is unavailable', async () => {
         const user = userEvent.setup();
         saveResume('default');
@@ -272,6 +286,28 @@ describe('PreviewPage', () => {
 
         expect(savePdf).toHaveBeenCalledTimes(1);
         expect(exportToPDF).not.toHaveBeenCalled();
+    });
+
+    it('should keep the drawn pages when the worker crashes after a language change', async () => {
+        saveResume();
+        await renderPreview();
+        await answerAll(1, 0);
+        await screen.findByRole('img', { name: 'Resume preview, page 1 of 1' });
+
+        try {
+            // The new run clears the kept bytes, and the old pages stay until new ones land
+            await act(async () => {
+                await i18n.changeLanguage('pl');
+            });
+            await act(async () => emitStatus('unavailable'));
+
+            expect(screen.getAllByRole('img')).toHaveLength(1);
+            expect(screen.queryByText(/can't show/)).not.toBeInTheDocument();
+        } finally {
+            await act(async () => {
+                await i18n.changeLanguage('en');
+            });
+        }
     });
 
     it('should show the failure notice, then the pages, when Try again succeeds', async () => {

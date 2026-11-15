@@ -60,8 +60,8 @@ export const Route = createRootRoute({
                 children: JSON.stringify(structuredData),
             },
         ],
+        // No canonical here: each route sets its own, and a second one from the root conflicts
         links: [
-            { rel: 'canonical', href: SITE_URL },
             { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
             { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
             { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },

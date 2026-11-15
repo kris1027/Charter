@@ -2,7 +2,7 @@
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
-const { ORIGIN } = require('../../lighthouserc.cjs');
+const { ORIGIN, DARK_QUERY } = require('../../lighthouserc.cjs');
 const resumeJson = JSON.stringify(
     JSON.parse(readFileSync(join(__dirname, '../../src/test/fixtures/perf-resume.json'), 'utf8')),
 );
@@ -28,13 +28,20 @@ module.exports = async (browser, { url }) => {
 
         // Leftovers from an earlier run
         await page.evaluate(clearWorkers, 0);
-        await page.evaluate((resume) => {
-            localStorage.clear();
-            localStorage.setItem('resumeData', resume);
-            localStorage.setItem('privacyNoticeAccepted', 'true');
-            localStorage.setItem('pwaInstallDismissed', 'true');
-            localStorage.setItem('language', 'en');
-        }, resumeJson);
+        // Always stored, so the audit never follows the runner's own color scheme
+        const theme = new URL(url).search === DARK_QUERY ? 'dark' : 'light';
+        await page.evaluate(
+            (resume, storedTheme) => {
+                localStorage.clear();
+                localStorage.setItem('resumeData', resume);
+                localStorage.setItem('privacyNoticeAccepted', 'true');
+                localStorage.setItem('pwaInstallDismissed', 'true');
+                localStorage.setItem('language', 'en');
+                localStorage.setItem('theme', storedTheme);
+            },
+            resumeJson,
+            theme,
+        );
 
         // Never audit an empty /preview: its "no data" screen has no export button
         if (new URL(url).pathname === '/preview') {
