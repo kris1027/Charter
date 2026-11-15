@@ -2,6 +2,11 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { useTranslation } from 'react-i18next';
 import { destroyPdf, drawPdfPages, loadPdf } from '@/features/pdf/live-preview/draw-pdf-pages';
+import {
+    PAGE_MAX_WIDTH_CLASS,
+    PAGE_SHEET_CLASS,
+    WARNING_NOTICE_CLASS,
+} from '@/features/pdf/live-preview/preview-styles';
 
 export const MAX_PAGE_CSS_WIDTH = 900;
 const RESIZE_DEBOUNCE_MS = 150;
@@ -9,7 +14,13 @@ const RESIZE_MIN_CHANGE_PX = 8;
 
 type PreviewPagesProps = {
     pdf: ArrayBuffer | null;
-    renderFailed: boolean;
+    renderFailed?: boolean;
+    // false when the page around it owns every notice (/preview, spec 0013)
+    showNotices?: boolean;
+    // Fires after each canvas swap with the pages now on screen, and with 0 on unmount
+    onPageCount?: (count: number) => void;
+    // Fires when a draw fails; the pages drawn before it, if any, stay on screen
+    onDrawFailed?: () => void;
 };
 
 const freeCanvases = (canvases: Iterable<HTMLCanvasElement>) => {
@@ -36,17 +47,27 @@ const isCancel = (error: unknown) =>
 
 const pixelRatio = () => Math.min(window.devicePixelRatio || 1, 2);
 
-// Draws the live preview PDF page by page. A new set of canvases replaces the old one in one
-// step only once every page is drawn, so the pages never flash blank between updates (spec 0009)
-export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
+// Draws a PDF page by page, for the builder's live preview and for /preview. A new set of
+// canvases replaces the old one in one step only once every page is drawn, so the pages never
+// flash blank between updates (spec 0009)
+export const PreviewPages = ({
+    pdf,
+    renderFailed = false,
+    showNotices = true,
+    onPageCount,
+    onDrawFailed,
+}: PreviewPagesProps) => {
     const { t } = useTranslation();
     const pagesRef = useRef<HTMLDivElement>(null);
     const docRef = useRef<PDFDocumentProxy | null>(null);
     const handledPdfRef = useRef<ArrayBuffer | null>(null);
     const generationRef = useRef(0);
     const drawnWidthRef = useRef(0);
-    const [pageCount, setPageCount] = useState(0);
+    const [hasPages, setHasPages] = useState(false);
     const [drawFailed, setDrawFailed] = useState(false);
+
+    const reportPageCount = useEffectEvent((count: number) => onPageCount?.(count));
+    const reportDrawFailed = useEffectEvent(() => onDrawFailed?.());
 
     const measureWidth = () => {
         const width = pagesRef.current?.clientWidth ?? 0;
@@ -58,9 +79,9 @@ export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
             canvas.setAttribute('role', 'img');
             canvas.setAttribute(
                 'aria-label',
-                t('builder.livePreview.pageLabel', { page: index + 1, total: canvases.length }),
+                t('pdfPreview.pageLabel', { page: index + 1, total: canvases.length }),
             );
-            canvas.className = 'block bg-paper shadow-surface ring-1 ring-border';
+            canvas.className = `block ${PAGE_SHEET_CLASS}`;
         });
     };
 
@@ -85,12 +106,14 @@ export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
             docRef.current = doc;
             if (previous && previous !== doc) destroyPdf(previous);
             drawnWidthRef.current = width;
-            setPageCount(canvases.length);
+            setHasPages(canvases.length > 0);
             setDrawFailed(false);
+            reportPageCount(canvases.length);
         } catch (error) {
             if (doc && doc !== docRef.current) destroyPdf(doc);
             if (generation !== generationRef.current || isCancel(error)) return;
             setDrawFailed(true);
+            reportDrawFailed();
         }
     });
 
@@ -129,34 +152,24 @@ export const PreviewPages = ({ pdf, renderFailed }: PreviewPagesProps) => {
             generationRef.current += 1;
             if (docRef.current) destroyPdf(docRef.current);
             docRef.current = null;
+            reportPageCount(0);
         },
         [],
     );
 
     return (
         <div className='space-y-3'>
-            {pageCount > 0 && (
-                <div className='text-muted-foreground flex flex-wrap items-center gap-2 text-xs'>
-                    <span className='bg-muted text-foreground rounded-md px-2 py-0.5 font-medium'>
-                        {t('builder.livePreview.pageCount', { count: pageCount })}
-                    </span>
-                    {pageCount > 1 && <span>{t('builder.livePreview.fullSizeHint')}</span>}
-                </div>
-            )}
-            {(renderFailed || drawFailed) && (
-                <p
-                    role='status'
-                    className='border-warning/40 bg-warning/10 text-foreground rounded-md border px-3 py-2 text-sm'
-                >
-                    {t('builder.livePreview.updateFailed')}
+            {showNotices && (renderFailed || drawFailed) && (
+                <p role='status' className={`${WARNING_NOTICE_CLASS} px-3 py-2`}>
+                    {t('pdfPreview.updateFailed')}
                 </p>
             )}
-            {pageCount === 0 && (
+            {showNotices && !hasPages && (
                 <p role='status' className='text-muted-foreground py-12 text-center text-sm'>
-                    {t('builder.livePreview.preparing')}
+                    {t('pdfPreview.preparing')}
                 </p>
             )}
-            <div ref={pagesRef} className='mx-auto flex max-w-[900px] flex-col gap-4' />
+            <div ref={pagesRef} className={`mx-auto flex flex-col gap-4 ${PAGE_MAX_WIDTH_CLASS}`} />
         </div>
     );
 };

@@ -23,6 +23,12 @@ const MOTION_BANS = ['motion/react', 'framer-motion'].map((name) => ({
     message: MOTION_MESSAGE,
 }));
 
+// The preview page stays still and imports nothing from the animation library (spec 0013, AC-2)
+const NO_MOTION = {
+    group: ['motion', 'motion/*', 'framer-motion'],
+    message: 'This page area imports nothing from motion (spec 0013).',
+};
+
 // ESLint applies the last matching block for a rule, so every block repeats noParent and MOTION_BANS.
 const restrict = (files, bans) => ({
     files,
@@ -54,6 +60,7 @@ const TOKEN_ONLY_FILES = [
     'src/features/landing/**/*.{ts,tsx}',
     'src/features/gallery/**/*.{ts,tsx}',
     'src/features/builder/**/*.{ts,tsx}',
+    'src/features/preview/**/*.{ts,tsx}',
 ];
 const tokenOnly = {
     files: TOKEN_ONLY_FILES,
@@ -141,6 +148,7 @@ export default defineConfig([
                     featureDirs(PAGE_AREAS.filter((a) => a !== area)),
                     'Page areas never import each other',
                 ),
+                ...(area === 'preview' ? [NO_MOTION] : []),
             ],
         ),
     ),

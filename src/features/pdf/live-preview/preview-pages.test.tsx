@@ -2,8 +2,8 @@ import { act } from '@testing-library/react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { destroyPdf, drawPdfPages, loadPdf } from '@/features/pdf/live-preview/draw-pdf-pages';
-import { PreviewPages } from '@/features/builder/live-preview/preview-pages';
-import { render, screen } from '@/test/test-utils';
+import { PreviewPages } from '@/features/pdf/live-preview/preview-pages';
+import { render, screen, waitFor } from '@/test/test-utils';
 
 vi.mock('@/features/pdf/live-preview/draw-pdf-pages', () => ({
     loadPdf: vi.fn(),
@@ -62,26 +62,57 @@ describe('PreviewPages', () => {
         expect(screen.getByText('Preparing preview…')).toBeInTheDocument();
     });
 
-    it('should label each page and show the count and hint when the PDF has several pages', async () => {
+    it('should label each page and hide the placeholder when the pages are drawn', async () => {
         vi.mocked(drawPdfPages).mockResolvedValue(canvases(3, 'a'));
 
-        render(<PreviewPages pdf={new ArrayBuffer(1)} renderFailed={false} />);
+        render(<PreviewPages pdf={new ArrayBuffer(1)} />);
 
         expect(
             await screen.findByRole('img', { name: 'Resume preview, page 2 of 3' }),
         ).toBeInTheDocument();
-        expect(screen.getByText('3 pages')).toBeInTheDocument();
-        expect(screen.getByText('Full size, Preview can fit it to one page')).toBeInTheDocument();
         expect(screen.queryByText('Preparing preview…')).not.toBeInTheDocument();
     });
 
-    it('should show no full size hint when the PDF has one page', async () => {
-        vi.mocked(drawPdfPages).mockResolvedValue(canvases(1, 'a'));
+    it('should report the page count after each swap and 0 when it unmounts', async () => {
+        const onPageCount = vi.fn();
+        vi.mocked(drawPdfPages)
+            .mockResolvedValueOnce(canvases(3, 'a'))
+            .mockResolvedValueOnce(canvases(1, 'b'));
+        const { rerender, unmount } = render(
+            <PreviewPages pdf={new ArrayBuffer(1)} onPageCount={onPageCount} />,
+        );
+        await screen.findAllByRole('img');
+        expect(onPageCount).toHaveBeenLastCalledWith(3);
 
-        render(<PreviewPages pdf={new ArrayBuffer(1)} renderFailed={false} />);
+        rerender(<PreviewPages pdf={new ArrayBuffer(2)} onPageCount={onPageCount} />);
+        await waitFor(() => expect(onPageCount).toHaveBeenLastCalledWith(1));
 
-        expect(await screen.findByText('1 page')).toBeInTheDocument();
-        expect(screen.queryByText(/Full size/)).not.toBeInTheDocument();
+        unmount();
+        expect(onPageCount).toHaveBeenLastCalledWith(0);
+    });
+
+    it('should show no notice of its own when the notices are turned off', async () => {
+        vi.mocked(drawPdfPages).mockRejectedValue(new Error('broken'));
+
+        render(<PreviewPages pdf={new ArrayBuffer(1)} renderFailed showNotices={false} />);
+        await act(async () => {});
+
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('should report the failure to the page around it when a draw fails', async () => {
+        const onDrawFailed = vi.fn();
+        vi.mocked(drawPdfPages).mockRejectedValue(new Error('broken'));
+
+        render(
+            <PreviewPages
+                pdf={new ArrayBuffer(1)}
+                showNotices={false}
+                onDrawFailed={onDrawFailed}
+            />,
+        );
+
+        await waitFor(() => expect(onDrawFailed).toHaveBeenCalledTimes(1));
     });
 
     it('should keep the old pages, then swap in one step, when a new set is drawn', async () => {
