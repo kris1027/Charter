@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { PreviewPages } from '@/features/pdf/live-preview/preview-pages';
 import {
+    PAGE_ASPECT_CLASS,
     PAGE_MAX_WIDTH_CLASS,
     PAGE_SHEET_CLASS,
     WARNING_NOTICE_CLASS,
@@ -25,7 +26,9 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
     const [isDrawn, setIsDrawn] = useState(false);
     const [drawFailed, setDrawFailed] = useState(false);
 
-    const isUnavailable = status === 'unavailable' && !pdf;
+    // Pages already on screen stay when the worker goes away, even in the window after a
+    // language change, when the kept bytes are cleared but the old pages are still drawn (AC-22)
+    const isUnavailable = status === 'unavailable' && !pdf && !isDrawn;
     const isFailed = status === 'failed' || drawFailed;
     const isLoading = !isDrawn && !isUnavailable && !isFailed;
 
@@ -75,7 +78,7 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
                         {isLoading && (
                             <div
                                 data-loading-sheet
-                                className={`col-start-1 row-start-1 aspect-[1/1.4142] w-full self-start ${PAGE_MAX_WIDTH_CLASS} ${PAGE_SHEET_CLASS}`}
+                                className={`col-start-1 row-start-1 w-full self-start ${PAGE_ASPECT_CLASS} ${PAGE_MAX_WIDTH_CLASS} ${PAGE_SHEET_CLASS}`}
                             />
                         )}
                         <div className='col-start-1 row-start-1'>
