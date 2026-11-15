@@ -68,22 +68,28 @@ export const PreviewArea = ({ status, pdf, onRetry }: PreviewAreaProps) => {
                         </Button>
                     </div>
                 )}
-                {isLoading && (
-                    <div
-                        data-loading-sheet
-                        className={`aspect-[1/1.4142] w-full ${PAGE_MAX_WIDTH_CLASS} ${PAGE_SHEET_CLASS}`}
-                    />
-                )}
+                {/* One grid cell holds the sheet and the pages, so the first page lands on top of
+                    the sheet and nothing moves when the sheet leaves a frame later (AC-10) */}
                 {!isUnavailable && (
-                    <PreviewPages
-                        pdf={pdf}
-                        showNotices={false}
-                        onPageCount={(count) => {
-                            setIsDrawn(count > 0);
-                            if (count > 0) setDrawFailed(false);
-                        }}
-                        onDrawFailed={() => setDrawFailed(true)}
-                    />
+                    <div className='grid grid-cols-1'>
+                        {isLoading && (
+                            <div
+                                data-loading-sheet
+                                className={`col-start-1 row-start-1 aspect-[1/1.4142] w-full self-start ${PAGE_MAX_WIDTH_CLASS} ${PAGE_SHEET_CLASS}`}
+                            />
+                        )}
+                        <div className='col-start-1 row-start-1'>
+                            <PreviewPages
+                                pdf={pdf}
+                                showNotices={false}
+                                onPageCount={(count) => {
+                                    setIsDrawn(count > 0);
+                                    if (count > 0) setDrawFailed(false);
+                                }}
+                                onDrawFailed={() => setDrawFailed(true)}
+                            />
+                        </div>
+                    </div>
                 )}
             </div>
         </div>
