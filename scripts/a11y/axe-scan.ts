@@ -165,6 +165,24 @@ const runScan = async (browser: Browser, scan: Scan): Promise<ScanResult> => {
     }
 };
 
+// One untimed visit before the scans: on a cold CI runner the first loads, each precaching the
+// service worker's files, ran past the 15 s network idle wait twice, while every later scan took
+// about 2 s. The warm up is not a scan and its context is thrown away (AC-4)
+const warmUp = async (browser: Browser) => {
+    const context = await browser.createBrowserContext();
+    try {
+        const page = await context.newPage();
+        await page.goto(`${ORIGIN}/`, { waitUntil: 'load', timeout: 60000 });
+        await page.waitForNetworkIdle({ idleTime: 500, timeout: 60000 });
+    } catch (error) {
+        console.warn(
+            `Warm up visit did not settle: ${error instanceof Error ? error.message : String(error)}`,
+        );
+    } finally {
+        await context.close();
+    }
+};
+
 const runAll = async (browser: Browser, scans: Scan[]) => {
     const results: ScanResult[] = new Array(scans.length);
     let next = 0;
@@ -217,6 +235,7 @@ const main = async () => {
             executablePath: process.env.CHROME_PATH || undefined,
             args: ['--no-sandbox'],
         });
+        await warmUp(browser);
         const results = await runAll(browser, scans);
 
         mkdirSync(OUT_DIR, { recursive: true });
