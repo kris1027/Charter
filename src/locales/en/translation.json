@@ -387,7 +387,11 @@
         "dragPickedUp": "Picked up item at position {{position}}",
         "dragOver": "Over position {{position}}",
         "dragDropped": "Dropped at position {{position}}",
-        "dragCancelled": "Move cancelled"
+        "dragCancelled": "Move cancelled",
+        "chooseDate": "Choose a date",
+        "previousYear": "Previous year",
+        "nextYear": "Next year",
+        "year": "Year"
     },
     "errorBoundary": {
         "title": "Something went wrong",
@@ -418,5 +422,12 @@
         "light": "Light",
         "dark": "Dark",
         "system": "System"
+    },
+    "pageTitle": {
+        "home": "Charter - Create Professional Resumes in Minutes",
+        "templates": "CV Templates | Charter",
+        "template": "{{name}} | Charter",
+        "builder": "Build Your CV | Charter",
+        "preview": "Preview Your CV | Charter"
     }
 }

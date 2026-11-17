@@ -1,6 +1,6 @@
 import { createRootRoute } from '@tanstack/react-router';
 import { RootLayout } from '@/app/root-layout';
-import { SITE_URL, SEO_DEFAULTS, OG_DEFAULTS } from '@/lib/seo';
+import { SITE_URL, SEO_DEFAULTS, OG_DEFAULTS, pageTitle } from '@/lib/seo';
 
 const structuredData = {
     '@context': 'https://schema.org',
@@ -31,7 +31,7 @@ export const Route = createRootRoute({
         meta: [
             { charSet: 'utf-8' },
             { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-            { title: `${SEO_DEFAULTS.siteName} - Create Professional Resumes in Minutes` },
+            { title: pageTitle('pageTitle.home') },
             { name: 'description', content: SEO_DEFAULTS.description },
             { name: 'keywords', content: SEO_DEFAULTS.keywords },
             { property: 'og:site_name', content: SEO_DEFAULTS.siteName },

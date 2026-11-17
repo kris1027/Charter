@@ -1,3 +1,4 @@
+import i18n from '@/i18n/config';
 import type { TemplateId } from '@/lib/template-ids';
 
 if (!import.meta.env.VITE_SITE_URL) {
@@ -30,3 +31,11 @@ export const TEMPLATE_NAMES: Record<TemplateId, string> = {
     default: 'Default',
     veterinary: 'Veterinary',
 } as const;
+
+/**
+ * The tab title in the visitor's language (WCAG 2.4.2, spec 0014). Routes read it in `head`, and
+ * the root layout reruns `head` on a language change; og and twitter titles stay English, like
+ * `og:locale`, since crawlers see the English page.
+ */
+export const pageTitle = (key: `pageTitle.${string}`, options?: Record<string, string>) =>
+    i18n.t(key, options);

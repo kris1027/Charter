@@ -1,11 +1,11 @@
 import IndexPage from '@/features/landing/landing-page';
 import { createFileRoute } from '@tanstack/react-router';
-import { SITE_URL, SEO_DEFAULTS } from '@/lib/seo';
+import { SITE_URL, SEO_DEFAULTS, pageTitle } from '@/lib/seo';
 
 export const Route = createFileRoute('/')({
     head: () => ({
         meta: [
-            { title: `${SEO_DEFAULTS.siteName} - Create Professional Resumes in Minutes` },
+            { title: pageTitle('pageTitle.home') },
             {
                 property: 'og:title',
                 content: `${SEO_DEFAULTS.siteName} - Create Professional Resumes in Minutes`,

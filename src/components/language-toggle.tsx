@@ -23,7 +23,9 @@ export const LanguageToggle = () => {
     const currentLanguage = languages.find((l) => l.code === i18n.language) || languages[0];
 
     return (
-        <DropdownMenu>
+        // Not modal: a modal menu hides the page with aria-hidden while focus stays inside, which
+        // axe flags as hidden focusable content (spec 0014); the builder's actions menu does the same
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
                 <Button variant='outline' size='icon'>
                     <Languages className='h-4 w-4' />
