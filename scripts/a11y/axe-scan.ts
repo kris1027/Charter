@@ -14,9 +14,17 @@ import type { Browser, Page } from 'puppeteer';
 import { writeJobSummary } from '../perf/job-summary.ts';
 import { PREVIEW_ORIGIN as ORIGIN } from '../perf/audit-targets.ts';
 import { startPreviewServer } from '../perf/preview-server.ts';
+import { runMain } from '../perf/run-main.ts';
 import { AXE_EXCEPTIONS, checkExceptions, narrowingFor } from './axe-exceptions.ts';
-import { CONCURRENCY, OVERLAY_TIMEOUT, VIEWPORTS, allScans, scanLabel } from './axe-matrix.ts';
-import type { Scan } from './axe-matrix.ts';
+import {
+    CONCURRENCY,
+    OVERLAY_TIMEOUT,
+    VIEWPORTS,
+    allScans,
+    scanLabel,
+    stateLabel,
+} from './axe-matrix.ts';
+import type { Scan, Variant } from './axe-matrix.ts';
 import { consoleLines, summaryMarkdown, verdict } from './axe-report.ts';
 import type { ScanResult } from './axe-report.ts';
 
@@ -25,7 +33,7 @@ const OUT_DIR = join(ROOT, '.a11y');
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 const WAIT_TIMEOUT = 15000;
 
-type SeedVariant = { visitor: 'returning' | 'first'; theme: 'light' | 'dark'; lang: 'en' | 'pl' };
+type SeedVariant = Pick<Variant, 'visitor' | 'theme' | 'lang'>;
 const { seedVisitor } = createRequire(import.meta.url)('../perf/seed-visitor.cjs') as {
     seedVisitor: (page: Page, variant: SeedVariant) => Promise<void>;
 };
@@ -156,7 +164,7 @@ const runAll = async (browser: Browser, scans: Scan[]) => {
 const reportJson = (results: ScanResult[]) =>
     results.map(({ scan, axe: result, error }) => ({
         path: scan.path,
-        state: scan.kind === 'load' ? 'load' : scan.name,
+        state: stateLabel(scan),
         variant: scan.variant,
         error,
         axe: result && {
@@ -199,19 +207,11 @@ const main = async () => {
         console.log(`\n${markdown}`);
         console.log(`Full results: ${join(OUT_DIR, 'axe-results.json')}`);
 
-        return verdict(results, AXE_EXCEPTIONS).passed;
+        return verdict(results, AXE_EXCEPTIONS).passed ? 0 : 1;
     } finally {
         await browser?.close();
         stopServer();
     }
 };
 
-if (import.meta.main) {
-    main().then(
-        (passed) => process.exit(passed ? 0 : 1),
-        (error: unknown) => {
-            console.error(error instanceof Error ? error.message : error);
-            process.exit(1);
-        },
-    );
-}
+if (import.meta.main) void runMain(main);

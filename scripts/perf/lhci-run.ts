@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { startPreviewServer } from './preview-server.ts';
+import { runMain } from './run-main.ts';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const PHONE_CONFIG = './lighthouserc.cjs';
@@ -55,12 +56,4 @@ const main = async () => {
     return missing.length > 0 || assertStatus !== 0 || uploadStatus !== 0 ? 1 : 0;
 };
 
-if (import.meta.main) {
-    main().then(
-        (code) => process.exit(code),
-        (error: unknown) => {
-            console.error(error instanceof Error ? error.message : error);
-            process.exit(1);
-        },
-    );
-}
+if (import.meta.main) void runMain(main);
