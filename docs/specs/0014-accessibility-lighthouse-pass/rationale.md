@@ -104,7 +104,34 @@ Local desktop preset, unseeded, `vite preview`, 2026-11-17, single runs: `/templ
 
 **Local check before CI**, `pnpm perf:lhci` on macOS, 2026-11-17, before the Zod fix: all 22 URLs ran and passed their provisional 0.95 floors. Every median was 1.00 except `/builder` best practices 0.96 (all five `/builder` URLs, the CSP issue above) and phone performance on single run variants at 0.98 to 0.99. The same run after the fix: every `/builder` URL scores 1.00 in best practices, on phone and desktop; all 22 URLs pass.
 
-_Still to fill from CI (AC-10): the first green CI run id of this PR after the fix pass, the median per URL and category for all 22 URLs, and the floors locked from them._
+**Floors locked (AC-10).** The first green CI run after the fix pass is run 44058878779 at `cad7c7a` (2026-11-17). Its medians (3 runs for EN light and desktop, 1 for the other variants) and the floors locked from them, median minus 0.02 (performance minus 0.05), clamped to [0.95, 1.00]:
+
+| URL                                       | Device  | Performance (floor) | Accessibility (floor) | Best practices (floor) | SEO (floor) |
+| ----------------------------------------- | ------- | ------------------- | --------------------- | ---------------------- | ----------- |
+| `/`                                       | phone   | 1.00 (0.95)         | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/?theme=dark`                            | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/?lang=pl`                               | phone   | 0.98 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/?theme=dark&lang=pl`                    | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates`                              | phone   | 1.00 (0.95)         | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates?theme=dark`                   | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates?lang=pl`                      | phone   | 0.98 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates?theme=dark&lang=pl`           | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates/developer`                    | phone   | 1.00 (0.95)         | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates/developer?theme=dark`         | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates/developer?lang=pl`            | phone   | 0.98 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates/developer?theme=dark&lang=pl` | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/builder`                                | phone   | 1.00 (0.95)         | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/builder?theme=dark`                     | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/builder?lang=pl`                        | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/builder?theme=dark&lang=pl`             | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/preview`                                | phone   | 1.00 (0.95)         | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/preview?theme=dark`                     | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/preview?lang=pl`                        | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/preview?theme=dark&lang=pl`             | phone   | 1.00 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/templates/developer?viewport=desktop`   | desktop | 0.99 (reported)     | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+| `/builder?viewport=desktop`               | desktop | 1.00 (0.95)         | 1.00 (0.98)           | 1.00 (0.98)            | 1.00 (0.98) |
+
+Desktop performance (three CI runs of it: 44058878779, 44061233767, 44105949212): `/builder` held 1.00 in all three and gets 0.95. `/templates/developer` mounts the PDF; its medians were 0.99, 0.99 and 0.93, with total blocking time doubling (about 110 ms to 220 ms) on the third, slower runner, where `/builder`'s speed index also rose. No floor of at least 0.95 would hold, so its performance stays reported, not asserted, against AC-10's rule; it is the first candidate for the Follow-up's flake watch. Run 44105949212 is also the one where AC-11 does not hold for that URL's reported performance; every asserted median passed in all three runs.
 
 ## Manual review
 

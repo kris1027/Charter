@@ -45,7 +45,7 @@ describe('lighthouserc', () => {
         expect(scores.every((score) => score >= 0.95 && score <= 1)).toBe(true);
     });
 
-    it('should assert performance only when the URL is English light on a phone', () => {
+    it('should assert performance only when the URL is English light and steady enough', () => {
         const withPerformance = Object.entries(config.floors)
             .filter(([, categories]) => 'performance' in categories)
             .map(([path]) => path);
@@ -56,6 +56,7 @@ describe('lighthouserc', () => {
             '/templates/developer',
             '/builder',
             '/preview',
+            '/builder?viewport=desktop',
         ]);
     });
 });

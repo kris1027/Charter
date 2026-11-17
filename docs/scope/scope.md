@@ -330,8 +330,8 @@ spec [0014](../specs/0014-accessibility-lighthouse-pass/index.md) · code in `sc
     - [x] Shared seed and a thin axe scan end to end, script, report and CI job (AC-1, AC-2, AC-4, AC-6, AC-7)
     - [x] Full axe matrix: 80 load scans and 28 open state scans (AC-3, AC-4, AC-5)
     - [x] Lighthouse on 22 URLs with PL, dark and desktop variants (AC-8, AC-9)
-    - [ ] Fix pass, CSP issue and manual WCAG 2.2 review; axe job becomes blocking (AC-7, AC-11 to AC-14)
-    - [ ] Floors locked from CI and baseline recorded (AC-10, AC-15)
+    - [x] Fix pass, CSP issue and manual WCAG 2.2 review; axe job becomes blocking (AC-7, AC-11 to AC-14)
+    - [x] Floors locked from CI and baseline recorded (AC-10, AC-15)
 
 ## Deferred
 

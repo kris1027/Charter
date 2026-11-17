@@ -17,9 +17,12 @@ const DESKTOP_PAGES = ['/templates/developer', '/builder'];
 // variants run once and assert only those; performance is noisy and gated on EN light (AC-8)
 const ALL = ['performance', 'accessibility', 'best-practices', 'seo'];
 const STEADY = ['accessibility', 'best-practices', 'seo'];
-const PROVISIONAL = 0.95;
-const at = (categories, score) =>
-    Object.fromEntries(categories.map((category) => [category, score]));
+// Locked from CI run 44058878779, the first green run after the fix pass (AC-10, rationale.md):
+// every accessibility, best practices and SEO median was 1.00, so 0.98; every performance median
+// was 0.98 to 1.00, so 0.95 after its 0.05 margin and the clamp
+const FLOOR = { performance: 0.95, accessibility: 0.98, 'best-practices': 0.98, seo: 0.98 };
+const at = (categories) =>
+    Object.fromEntries(categories.map((category) => [category, FLOOR[category]]));
 
 // LHCI calls the puppeteerScript once per url entry, not once per run, so a URL is listed as
 // often as it should run, with numberOfRuns 1: every run gets a fresh seed, asserts take the median
@@ -27,16 +30,16 @@ const RUNS = 3;
 
 /** @type {Record<string, Partial<Record<'performance' | 'accessibility' | 'best-practices' | 'seo', number>>>} */
 const floors = {
-    ...Object.fromEntries(PAGES.map((path) => [path, at(ALL, PROVISIONAL)])),
+    ...Object.fromEntries(PAGES.map((path) => [path, at(ALL)])),
     ...Object.fromEntries(
-        PAGES.flatMap((path) =>
-            VARIANT_QUERIES.map((query) => [path + query, at(STEADY, PROVISIONAL)]),
-        ),
+        PAGES.flatMap((path) => VARIANT_QUERIES.map((query) => [path + query, at(STEADY)])),
     ),
-    // Desktop performance is reported, not asserted, until three CI runs of it exist (AC-10)
-    ...Object.fromEntries(
-        DESKTOP_PAGES.map((path) => [path + DESKTOP_QUERY, at(STEADY, PROVISIONAL)]),
-    ),
+    // Desktop performance (AC-10, three CI runs of it): /builder held 1.00, so it gets 0.95.
+    // /templates/developer mounts the PDF, and its total blocking time swings with the runner
+    // (medians 0.99, 0.99 and 0.93 over runs 44058878779, 44061233767, 44105949212), so its
+    // performance stays reported, not asserted: no floor of at least 0.95 would hold
+    '/builder?viewport=desktop': at(ALL),
+    '/templates/developer?viewport=desktop': at(STEADY),
 };
 
 const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
