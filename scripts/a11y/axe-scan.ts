@@ -25,7 +25,7 @@ import {
     stateLabel,
 } from './axe-matrix.ts';
 import type { Scan, Variant } from './axe-matrix.ts';
-import { consoleLines, summaryMarkdown, verdict } from './axe-report.ts';
+import { consoleLines, outsideNarrowing, summaryMarkdown, verdict } from './axe-report.ts';
 import type { ScanResult } from './axe-report.ts';
 
 const ROOT = resolve(import.meta.dirname, '../..');
@@ -38,12 +38,20 @@ const { seedVisitor } = createRequire(import.meta.url)('../perf/seed-visitor.cjs
     seedVisitor: (page: Page, variant: SeedVariant) => Promise<void>;
 };
 
-/** Runs a wait, and once more when it times out; a second failure names what it waited for. */
-const withRetry = async (what: string, wait: () => Promise<unknown>) => {
+/**
+ * Runs a wait, and once more when it times out; a second failure names what it waited for.
+ * `reset` runs before the second try, for a step whose half done first try would get in its way.
+ */
+const withRetry = async (
+    what: string,
+    wait: () => Promise<unknown>,
+    reset?: () => Promise<unknown>,
+) => {
     try {
         await wait();
     } catch {
         try {
+            await reset?.();
             await wait();
         } catch (error) {
             throw new Error(`${what}: ${error instanceof Error ? error.message : String(error)}`, {
@@ -117,23 +125,39 @@ const runScan = async (browser: Browser, scan: Scan): Promise<ScanResult> => {
 
         await waitForReady(page, scan);
         if (scan.kind === 'open') {
-            await withRetry(`opening the ${scan.name}`, () =>
-                Promise.race([
-                    scan.open(page, scan.variant.lang),
-                    new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('timed out')), OVERLAY_TIMEOUT + 1000),
-                    ),
-                ]),
+            // A retry starts from a fresh load: clicking a toggle again on a menu the first try
+            // left open would close it (AC-5)
+            await withRetry(
+                `opening the ${scan.name}`,
+                () =>
+                    Promise.race([
+                        scan.open(page, scan.variant.lang),
+                        new Promise((_, reject) =>
+                            setTimeout(
+                                () => reject(new Error('timed out')),
+                                OVERLAY_TIMEOUT + 1000,
+                            ),
+                        ),
+                    ]),
+                () => waitForReady(page, scan),
             );
             await settleAnimations(page);
         }
 
-        const scanner = new AxePuppeteer(page, axe.source).withTags(TAGS);
+        const scanner = () => new AxePuppeteer(page, axe.source).withTags(TAGS);
+        const whole = await scanner().analyze();
         const narrowing =
             scan.kind === 'open' ? narrowingFor(AXE_EXCEPTIONS, scan.path, scan.name) : undefined;
-        if (narrowing) scanner.include(narrowing.selector);
-        const results = await scanner.analyze();
-        return { scan, axe: results };
+        if (!narrowing) return { scan, axe: whole };
+
+        // The whole page is still scanned, so what the narrowing keeps out of the failing set is
+        // reported as excepted, never silently dropped (AC-2)
+        const narrowed = await scanner().include(narrowing.selector).analyze();
+        return {
+            scan,
+            axe: narrowed,
+            narrowedAway: outsideNarrowing(whole.violations, narrowed.violations),
+        };
     } catch (error) {
         return { scan, error: error instanceof Error ? error.message : String(error) };
     } finally {
@@ -162,11 +186,12 @@ const runAll = async (browser: Browser, scans: Scan[]) => {
 // The JSON keeps every violation and undecided check; passing and inapplicable rules keep only
 // their ids, since their node lists would make the file hundreds of megabytes
 const reportJson = (results: ScanResult[]) =>
-    results.map(({ scan, axe: result, error }) => ({
+    results.map(({ scan, axe: result, narrowedAway, error }) => ({
         path: scan.path,
         state: stateLabel(scan),
         variant: scan.variant,
         error,
+        narrowedAway,
         axe: result && {
             ...(result as AxeResults),
             passes: (result as AxeResults).passes?.map((rule) => rule.id),

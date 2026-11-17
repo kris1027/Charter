@@ -1,7 +1,9 @@
 // Known axe findings that do not fail the scan (spec 0014, AC-2, AC-5). Axe always runs every
 // rule. A rule exception drops a matching violation (rule id and target) from the failing set
-// after the run, and the report still lists it as excepted. A narrowing exception scans only the
-// overlay of one open state, for violations Radix itself causes there. Every entry needs a reason.
+// after the run, and the report still lists it as excepted. A narrowing exception fails an open
+// state only on what axe finds inside its overlay, for violations Radix itself causes on the page
+// behind it; the whole page is still scanned and the rest is listed as excepted. Every entry needs
+// a reason.
 import type { PagePath } from './axe-matrix.ts';
 
 export type RuleException = {

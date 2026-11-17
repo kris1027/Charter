@@ -14,6 +14,8 @@ export type ScanResult = {
     scan: Scan;
     /** Axe's violations and its undecided checks; absent when the scan never got to run axe */
     axe?: Pick<AxeResults, 'violations' | 'incomplete'>;
+    /** Whole page violations a narrowing exception kept out of the scan; reported as excepted */
+    narrowedAway?: Result[];
     /** A failed wait, a missing trigger or a wrong `<html lang>` */
     error?: string;
 };
@@ -43,23 +45,50 @@ const isExcepted = (exceptions: AxeException[], scan: Scan, rule: string, select
             exception.paths.includes(scan.path),
     );
 
-export const findings = (results: ScanResult[], exceptions: AxeException[]): Finding[] =>
-    results.flatMap(({ scan, axe }) =>
-        (axe?.violations ?? []).flatMap((violation: Result) =>
-            violation.nodes.map((node) => {
-                const selector = nodeSelector(node);
-                return {
-                    scan,
-                    rule: violation.id,
-                    impact: impactOf(node.impact ?? violation.impact),
-                    selector,
-                    help: violation.help,
-                    helpUrl: violation.helpUrl,
-                    excepted: isExcepted(exceptions, scan, violation.id, selector),
-                };
-            }),
+/** The nodes of a whole page scan's violations that the narrowed scan did not report. */
+export const outsideNarrowing = (whole: Result[], narrowed: Result[]): Result[] => {
+    const kept = new Set(
+        narrowed.flatMap((violation) =>
+            violation.nodes.map((node) => `${violation.id}\u0000${nodeSelector(node)}`),
         ),
     );
+    return whole
+        .map((violation) => ({
+            ...violation,
+            nodes: violation.nodes.filter(
+                (node) => !kept.has(`${violation.id}\u0000${nodeSelector(node)}`),
+            ),
+        }))
+        .filter((violation) => violation.nodes.length > 0);
+};
+
+const toFindings = (
+    scan: Scan,
+    violations: Result[],
+    excepted: (rule: string, selector: string) => boolean,
+) =>
+    violations.flatMap((violation) =>
+        violation.nodes.map((node) => {
+            const selector = nodeSelector(node);
+            return {
+                scan,
+                rule: violation.id,
+                impact: impactOf(node.impact ?? violation.impact),
+                selector,
+                help: violation.help,
+                helpUrl: violation.helpUrl,
+                excepted: excepted(violation.id, selector),
+            };
+        }),
+    );
+
+export const findings = (results: ScanResult[], exceptions: AxeException[]): Finding[] =>
+    results.flatMap(({ scan, axe, narrowedAway }) => [
+        ...toFindings(scan, axe?.violations ?? [], (rule, selector) =>
+            isExcepted(exceptions, scan, rule, selector),
+        ),
+        ...toFindings(scan, narrowedAway ?? [], () => true),
+    ]);
 
 export const isFailing = (finding: Finding) => !finding.excepted && FAILING.has(finding.impact);
 

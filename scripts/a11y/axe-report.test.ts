@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { checkExceptions, narrowingFor } from './axe-exceptions.ts';
 import type { AxeException } from './axe-exceptions.ts';
 import type { LoadScan } from './axe-matrix.ts';
-import { consoleLines, summaryMarkdown, verdict } from './axe-report.ts';
+import { consoleLines, outsideNarrowing, summaryMarkdown, verdict } from './axe-report.ts';
 import type { ScanResult } from './axe-report.ts';
 
 const scan: LoadScan = {
@@ -54,6 +54,39 @@ describe('axe report', () => {
 
         expect(outcome.passed).toBe(true);
         expect(outcome.all[0].excepted).toBe(true);
+    });
+
+    it('should report what a narrowing kept out as excepted when the whole page had violations', () => {
+        const outcome = verdict(
+            [
+                {
+                    ...result([violation('button-name', 'critical', '[role="listbox"] button')]),
+                    narrowedAway: [violation('aria-hidden-focus', 'serious', '#first-name')],
+                },
+            ],
+            [],
+        );
+
+        expect(outcome.passed).toBe(false);
+        expect(outcome.all.map(({ rule, excepted }) => [rule, excepted])).toEqual([
+            ['button-name', false],
+            ['aria-hidden-focus', true],
+        ]);
+    });
+
+    it('should keep only the nodes the narrowed scan missed when comparing it with the whole page', () => {
+        const whole = violation('color-contrast', 'serious', '.inside');
+        whole.nodes.push({ ...whole.nodes[0], target: ['.outside'] });
+
+        const away = outsideNarrowing(
+            [whole, violation('region', 'moderate', 'h2')],
+            [violation('color-contrast', 'serious', '.inside')],
+        );
+
+        expect(away.map(({ id, nodes }) => [id, nodes.map(({ target }) => target[0])])).toEqual([
+            ['color-contrast', ['.outside']],
+            ['region', ['h2']],
+        ]);
     });
 
     it('should keep failing when the exception names another page', () => {
