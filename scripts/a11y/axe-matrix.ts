@@ -68,6 +68,10 @@ const clickByRole = async (page: Page, role: string, name: string) => {
         timeout: OVERLAY_TIMEOUT,
     });
     if (!element) throw new Error(`No ${role} named "${name}"`);
+    // To the top, below the sticky bars (their scroll-padding): Puppeteer's own scroll can leave
+    // the trigger under the builder toolbar, so the click lands there and the overlay opens only
+    // on the retry. From the top, an overlay also opens downward, its default side
+    await element.evaluate((node) => node.scrollIntoView({ block: 'start' }));
     await element.click();
 };
 
