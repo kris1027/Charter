@@ -1,37 +1,48 @@
-// Lighthouse CI config (spec 0003). Floors are each page's first CI median minus 0.02,
-// except performance on the two PDF pages, which is minus 0.10 (runner noise; see rationale).
-// Raise a floor only together with the baseline table in docs/specs/0003-performance-budgets/rationale.md.
+// Lighthouse CI config (spec 0003, widened by spec 0014): 20 phone URLs here, plus the 2 desktop
+// URLs in lighthouserc.desktop.cjs, all asserted from the one `floors` map below.
+// Floors (spec 0014, AC-10): each URL and category's median from the first green CI run after the
+// fix pass, minus 0.02 (performance minus 0.05), clamped to [0.95, 1.00]. Change one only together
+// with the baseline in docs/specs/0014-accessibility-lighthouse-pass/rationale.md.
 const PORT = 4173;
 const ORIGIN = `http://localhost:${PORT}`;
 
-// A page path ending in this query is audited in the dark theme: the seed script reads it
-// and stores the theme, and the app itself ignores it. A query, not a hash, since LHCI groups
-// runs by the document URL, which drops the hash
-const DARK_QUERY = '?theme=dark';
+const PAGES = ['/', '/templates', '/templates/developer', '/builder', '/preview'];
 
-// /preview after spec 0013, from CI run 43750352162 on PR #106 (2026-11-15), in both themes
-const preview = { performance: 0.9, accessibility: 0.98, 'best-practices': 0.98, seo: 0.98 };
-const previewFloors = { '/preview': preview, [`/preview${DARK_QUERY}`]: preview };
+// The variant travels in the audited URL's query: the seed script reads it and stores the theme
+// and language, and the app itself ignores it. A query, not a hash, since LHCI groups runs by the
+// document URL, which drops the hash. `viewport` only names the desktop URLs apart
+const EN_LIGHT = '';
+const VARIANT_QUERIES = ['?theme=dark', '?lang=pl', '?theme=dark&lang=pl'];
+const DESKTOP_QUERY = '?viewport=desktop';
+const DESKTOP_PAGES = ['/templates/developer', '/builder'];
 
-// Scores 0 to 1 per page, from CI run 41433413867 on main (2026-11-02)
+// Accessibility, best practices and SEO give the same score every run on one build, so the
+// variants run once and assert only those; performance is noisy and gated on EN light (AC-8)
+const ALL = ['performance', 'accessibility', 'best-practices', 'seo'];
+const STEADY = ['accessibility', 'best-practices', 'seo'];
+const PROVISIONAL = 0.95;
+const at = (categories, score) =>
+    Object.fromEntries(categories.map((category) => [category, score]));
+
+// LHCI calls the puppeteerScript once per url entry, not once per run, so a URL is listed as
+// often as it should run, with numberOfRuns 1: every run gets a fresh seed, asserts take the median
+const RUNS = 3;
+
+/** @type {Record<string, Partial<Record<'performance' | 'accessibility' | 'best-practices' | 'seo', number>>>} */
 const floors = {
-    '/': { performance: 0.98, accessibility: 0.98, 'best-practices': 0.98, seo: 0.98 },
-    '/templates': { performance: 0.96, accessibility: 0.98, 'best-practices': 0.98, seo: 0.9 },
-    '/templates/developer': {
-        performance: 0.68,
-        accessibility: 0.93,
-        'best-practices': 0.98,
-        seo: 0.9,
-    },
-    '/builder': { performance: 0.97, accessibility: 0.9, 'best-practices': 0.94, seo: 0.9 },
-    ...previewFloors,
+    ...Object.fromEntries(PAGES.map((path) => [path + EN_LIGHT, at(ALL, PROVISIONAL)])),
+    ...Object.fromEntries(
+        PAGES.flatMap((path) =>
+            VARIANT_QUERIES.map((query) => [path + query, at(STEADY, PROVISIONAL)]),
+        ),
+    ),
+    // Desktop performance is reported, not asserted, until three CI runs of it exist (AC-10)
+    ...Object.fromEntries(
+        DESKTOP_PAGES.map((path) => [path + DESKTOP_QUERY, at(STEADY, PROVISIONAL)]),
+    ),
 };
 
 const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-// LHCI calls the puppeteerScript once per url entry, not once per run, so each page is
-// listed RUNS times with numberOfRuns 1: every run gets a fresh seed, assertions still take the median
-const RUNS = 3;
 
 const assertMatrix = Object.entries(floors).map(([path, categories]) => ({
     matchingUrlPattern: `^${escapeRegex(ORIGIN + path)}$`,
@@ -43,25 +54,41 @@ const assertMatrix = Object.entries(floors).map(([path, categories]) => ({
     ),
 }));
 
+const runsOf = (paths, runs) => paths.flatMap((path) => Array(runs).fill(ORIGIN + path));
+
+// Shared by both collects; `pnpm perf:lhci` serves dist once for both (scripts/perf/lhci-run.ts)
+const collectBase = {
+    numberOfRuns: 1,
+    puppeteerScript: './scripts/perf/lhci-seed.cjs',
+    chromePath: process.env.CHROME_PATH,
+    // With a puppeteerScript, LHCI ignores settings.chromeFlags and always runs headless
+    puppeteerLaunchOptions: {
+        executablePath: process.env.CHROME_PATH,
+        args: ['--no-sandbox'],
+    },
+};
+
 module.exports = {
     ORIGIN,
-    DARK_QUERY,
     floors,
+    collectBase,
+    desktopUrls: runsOf(
+        DESKTOP_PAGES.map((path) => path + DESKTOP_QUERY),
+        RUNS,
+    ),
     ci: {
         collect: {
-            url: Object.keys(floors).flatMap((path) => Array(RUNS).fill(ORIGIN + path)),
-            numberOfRuns: 1,
-            startServerCommand: `pnpm exec vite preview --port ${PORT} --strictPort`,
-            // Not 'Local:': on CI Vite colors its output and the color reset sits before the colon
-            startServerReadyPattern: 'Local',
-            startServerReadyTimeout: 30000,
-            puppeteerScript: './scripts/perf/lhci-seed.cjs',
-            chromePath: process.env.CHROME_PATH,
-            // With a puppeteerScript, LHCI ignores settings.chromeFlags and always runs headless
-            puppeteerLaunchOptions: {
-                executablePath: process.env.CHROME_PATH,
-                args: ['--no-sandbox'],
-            },
+            ...collectBase,
+            url: [
+                ...runsOf(
+                    PAGES.map((path) => path + EN_LIGHT),
+                    RUNS,
+                ),
+                ...runsOf(
+                    PAGES.flatMap((path) => VARIANT_QUERIES.map((query) => path + query)),
+                    1,
+                ),
+            ],
             settings: {
                 // Otherwise Lighthouse wipes the storage the seed script wrote
                 disableStorageReset: true,

@@ -27,7 +27,7 @@ describe('summarize', () => {
         const { markdown } = summarize([entry()], floors);
 
         expect(markdown).toContain(
-            '| `/builder` | 0.90 (floor 0.80) | 1.00 (floor 0.90) | 0.96 (floor 0.90) | 1.00 (floor 0.90) |',
+            '| `/builder` | phone | 0.90 (floor 0.80) | 1.00 (floor 0.90) | 0.96 (floor 0.90) | 1.00 (floor 0.90) |',
         );
     });
 
@@ -45,7 +45,7 @@ describe('summarize', () => {
             },
         );
 
-        expect(markdown).toContain('| `/builder?theme=dark` | 0.90 (floor 0.70) |');
+        expect(markdown).toContain('| `/builder?theme=dark` | phone | 0.90 (floor 0.70) |');
     });
 
     it('should use only the representative run when a page has several runs', () => {
@@ -61,5 +61,34 @@ describe('summarize', () => {
 
         expect(warnings).toEqual([]);
         expect(markdown).not.toContain('0.50');
+    });
+
+    it('should give each phone, Polish, dark and desktop URL its own row with its floors', () => {
+        const all = { performance: 1, accessibility: 1, 'best-practices': 1, seo: 1 };
+        const steady = { accessibility: 0.95, 'best-practices': 0.95, seo: 0.95 };
+        const { markdown } = summarize(
+            [
+                entry({ summary: all }),
+                entry({ url: 'http://localhost:4173/builder?lang=pl', summary: all }),
+                entry({ url: 'http://localhost:4173/builder?theme=dark&lang=pl', summary: all }),
+                entry({ url: 'http://localhost:4173/builder?viewport=desktop', summary: all }),
+            ],
+            {
+                ...floors,
+                '/builder?lang=pl': steady,
+                '/builder?theme=dark&lang=pl': steady,
+                '/builder?viewport=desktop': steady,
+            },
+        );
+
+        expect(markdown).toContain(
+            '| `/builder?lang=pl` | phone | 1.00 (not asserted) | 1.00 (floor 0.95) | 1.00 (floor 0.95) | 1.00 (floor 0.95) |',
+        );
+        expect(markdown).toContain(
+            '| `/builder?theme=dark&lang=pl` | phone | 1.00 (not asserted) |',
+        );
+        expect(markdown).toContain(
+            '| `/builder?viewport=desktop` | desktop | 1.00 (not asserted) | 1.00 (floor 0.95) |',
+        );
     });
 });
