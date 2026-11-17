@@ -2,9 +2,7 @@
 // and both Lighthouse collects, which share one server since LHCI stops its own after a collect.
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
-
-export const PREVIEW_PORT = 4173;
-export const PREVIEW_ORIGIN = `http://localhost:${PREVIEW_PORT}`;
+import { PREVIEW_ORIGIN, PREVIEW_PORT } from './audit-targets.ts';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 

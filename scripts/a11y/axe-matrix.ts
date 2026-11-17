@@ -1,6 +1,8 @@
 // What the axe scan covers (spec 0014, AC-3, AC-5): every page in every variant on load, plus
 // seven overlays opened through their real triggers. Plain data, so a unit test can count it.
 import type { Page } from 'puppeteer';
+import { AUDITED_PAGES } from '../perf/audit-targets.ts';
+import type { AuditedPage } from '../perf/audit-targets.ts';
 import en from '../../src/locales/en/translation.json' with { type: 'json' };
 import pl from '../../src/locales/pl/translation.json' with { type: 'json' };
 
@@ -24,8 +26,8 @@ export type Visitor = (typeof VISITORS)[number];
 
 export type Variant = { lang: Lang; theme: Theme; viewport: Viewport; visitor: Visitor };
 
-export const PAGES = ['/', '/templates', '/templates/developer', '/builder', '/preview'] as const;
-export type PagePath = (typeof PAGES)[number];
+export const PAGES = AUDITED_PAGES;
+export type PagePath = AuditedPage;
 
 export type LoadScan = { kind: 'load'; path: PagePath; variant: Variant };
 

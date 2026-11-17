@@ -3,15 +3,12 @@
 // Floors (spec 0014, AC-10): each URL and category's median from the first green CI run after the
 // fix pass, minus 0.02 (performance minus 0.05), clamped to [0.95, 1.00]. Change one only together
 // with the baseline in docs/specs/0014-accessibility-lighthouse-pass/rationale.md.
-const PORT = 4173;
-const ORIGIN = `http://localhost:${PORT}`;
-
-const PAGES = ['/', '/templates', '/templates/developer', '/builder', '/preview'];
+const { PREVIEW_ORIGIN: ORIGIN, AUDITED_PAGES: PAGES } = require('./scripts/perf/audit-targets.ts');
 
 // The variant travels in the audited URL's query: the seed script reads it and stores the theme
 // and language, and the app itself ignores it. A query, not a hash, since LHCI groups runs by the
-// document URL, which drops the hash. `viewport` only names the desktop URLs apart
-const EN_LIGHT = '';
+// document URL, which drops the hash. EN light is the bare path; `viewport` only names the
+// desktop URLs apart
 const VARIANT_QUERIES = ['?theme=dark', '?lang=pl', '?theme=dark&lang=pl'];
 const DESKTOP_QUERY = '?viewport=desktop';
 const DESKTOP_PAGES = ['/templates/developer', '/builder'];
@@ -30,7 +27,7 @@ const RUNS = 3;
 
 /** @type {Record<string, Partial<Record<'performance' | 'accessibility' | 'best-practices' | 'seo', number>>>} */
 const floors = {
-    ...Object.fromEntries(PAGES.map((path) => [path + EN_LIGHT, at(ALL, PROVISIONAL)])),
+    ...Object.fromEntries(PAGES.map((path) => [path, at(ALL, PROVISIONAL)])),
     ...Object.fromEntries(
         PAGES.flatMap((path) =>
             VARIANT_QUERIES.map((query) => [path + query, at(STEADY, PROVISIONAL)]),
@@ -80,10 +77,7 @@ module.exports = {
         collect: {
             ...collectBase,
             url: [
-                ...runsOf(
-                    PAGES.map((path) => path + EN_LIGHT),
-                    RUNS,
-                ),
+                ...runsOf(PAGES, RUNS),
                 ...runsOf(
                     PAGES.flatMap((path) => VARIANT_QUERIES.map((query) => path + query)),
                     1,
