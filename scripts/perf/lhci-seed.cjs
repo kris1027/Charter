@@ -1,25 +1,7 @@
-// LHCI puppeteerScript (spec 0003): runs before every Lighthouse run and seeds a returning visitor.
-const { readFileSync } = require('node:fs');
-const { join } = require('node:path');
-
-const { ORIGIN, DARK_QUERY } = require('../../lighthouserc.cjs');
-const resumeJson = JSON.stringify(
-    JSON.parse(readFileSync(join(__dirname, '../../src/test/fixtures/perf-resume.json'), 'utf8')),
-);
-
-// Runs in the page: no service worker or Cache Storage may carry over into the audit.
-// The app registers its worker after load, so waitMs gives that registration time to appear.
-const clearWorkers = async (waitMs) => {
-    const deadline = Date.now() + waitMs;
-    let registrations = await navigator.serviceWorker.getRegistrations();
-    while (registrations.length === 0 && Date.now() < deadline) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        registrations = await navigator.serviceWorker.getRegistrations();
-    }
-    await Promise.all(registrations.map((registration) => registration.unregister()));
-    const keys = await caches.keys();
-    await Promise.all(keys.map((key) => caches.delete(key)));
-};
+// LHCI puppeteerScript (spec 0003, spec 0014): runs before every Lighthouse run and seeds a
+// returning visitor in the theme and language the audited URL's query names.
+const { ORIGIN } = require('../../lighthouserc.cjs');
+const { seedVisitor, clearWorkers, variantFromUrl } = require('./seed-visitor.cjs');
 
 module.exports = async (browser, { url }) => {
     const page = await browser.newPage();
@@ -28,20 +10,8 @@ module.exports = async (browser, { url }) => {
 
         // Leftovers from an earlier run
         await page.evaluate(clearWorkers, 0);
-        // Always stored, so the audit never follows the runner's own color scheme
-        const theme = new URL(url).search === DARK_QUERY ? 'dark' : 'light';
-        await page.evaluate(
-            (resume, storedTheme) => {
-                localStorage.clear();
-                localStorage.setItem('resumeData', resume);
-                localStorage.setItem('privacyNoticeAccepted', 'true');
-                localStorage.setItem('pwaInstallDismissed', 'true');
-                localStorage.setItem('language', 'en');
-                localStorage.setItem('theme', storedTheme);
-            },
-            resumeJson,
-            theme,
-        );
+        // Theme and language always stored, so the audit never follows the runner's own settings
+        await seedVisitor(page, { visitor: 'returning', ...variantFromUrl(url) });
 
         // Never audit an empty /preview: its "no data" screen has no export button
         if (new URL(url).pathname === '/preview') {

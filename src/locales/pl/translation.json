@@ -389,7 +389,11 @@
         "dragPickedUp": "Chwycono element na pozycji {{position}}",
         "dragOver": "Nad pozycją {{position}}",
         "dragDropped": "Upuszczono na pozycji {{position}}",
-        "dragCancelled": "Anulowano przenoszenie"
+        "dragCancelled": "Anulowano przenoszenie",
+        "chooseDate": "Wybierz datę",
+        "previousYear": "Poprzedni rok",
+        "nextYear": "Następny rok",
+        "year": "Rok"
     },
     "errorBoundary": {
         "title": "Coś poszło nie tak",
@@ -420,5 +424,12 @@
         "light": "Jasny",
         "dark": "Ciemny",
         "system": "Systemowy"
+    },
+    "pageTitle": {
+        "home": "Charter - Profesjonalne CV w kilka minut",
+        "templates": "Szablony CV | Charter",
+        "template": "{{name}} | Charter",
+        "builder": "Stwórz swoje CV | Charter",
+        "preview": "Podgląd CV | Charter"
     }
 }

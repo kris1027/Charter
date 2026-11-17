@@ -2,6 +2,10 @@ import { z } from 'zod';
 import { TEMPLATE_IDS } from '@/lib/template-ids';
 import { LANGUAGE_LEVELS } from '@/features/resume/language-levels';
 
+// Zod probes `new Function` once to pick a faster parser; the CSP blocks eval, so the probe logged
+// a CSP issue that cost /builder its Lighthouse best practices score (spec 0014, AC-12)
+z.config({ jitless: true });
+
 const personalInfoSchema = z.object({
     firstName: z.string().min(1, 'validation.firstNameRequired').max(100, 'validation.maxLength'),
     lastName: z.string().min(1, 'validation.lastNameRequired').max(100, 'validation.maxLength'),

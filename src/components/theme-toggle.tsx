@@ -13,7 +13,9 @@ export const ThemeToggle = () => {
     const { t } = useTranslation();
     const { theme, setTheme } = useTheme();
     return (
-        <DropdownMenu>
+        // Not modal: a modal menu hides the page with aria-hidden while focus stays inside, which
+        // axe flags as hidden focusable content (spec 0014); the builder's actions menu does the same
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
                 <Button variant='outline' size='icon'>
                     <Sun className='ease-standard h-4 w-4 scale-100 rotate-0 transition-transform duration-(--duration-base) dark:scale-0 dark:-rotate-90' />

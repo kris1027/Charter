@@ -1,5 +1,6 @@
 // pnpm perf:lhci-summary: Lighthouse medians next to their floors, plus a warning per score
-// below 0.95 (spec 0003). Always exits 0; failing on a floor is LHCI's job.
+// below 0.95 (spec 0003, spec 0014). One row per URL with its query and device. Always exits 0;
+// failing on a floor is LHCI's job.
 import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
@@ -9,7 +10,8 @@ const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'] as 
 const WARN_BELOW = 0.95;
 
 type Category = (typeof CATEGORIES)[number];
-export type Floors = Record<string, Record<Category, number>>;
+// Each URL holds only the categories it asserts; the rest are reported, not asserted
+export type Floors = Record<string, Partial<Record<Category, number>>>;
 export type ReportEntry = {
     url: string;
     isRepresentativeRun?: boolean;
@@ -17,6 +19,12 @@ export type ReportEntry = {
 };
 
 const score = (value: number | undefined) => (value === undefined ? 'n/a' : value.toFixed(2));
+const floorText = (value: number | undefined) =>
+    value === undefined ? 'not asserted' : `floor ${score(value)}`;
+
+// `?viewport=desktop` names the desktop preset runs (lighthouserc.desktop.cjs)
+const deviceOf = (query: URLSearchParams) =>
+    query.get('viewport') === 'desktop' ? 'desktop' : 'phone';
 
 /** Reads LHCI's report manifest: the representative run per URL holds the median scores. */
 export const summarize = (entries: ReportEntry[], floors: Floors) => {
@@ -24,8 +32,8 @@ export const summarize = (entries: ReportEntry[], floors: Floors) => {
     const rows = entries
         .filter((entry) => entry.isRepresentativeRun)
         .map((entry) => {
-            // With the query, so a dark theme run (`?theme=dark`) gets its own row and floors
-            const { pathname, search } = new URL(entry.url);
+            // With the query, so each variant (`?theme=dark&lang=pl`) gets its own row and floors
+            const { pathname, search, searchParams } = new URL(entry.url);
             const path = pathname + search;
             const cells = CATEGORIES.map((category) => {
                 const value = entry.summary[category];
@@ -34,9 +42,9 @@ export const summarize = (entries: ReportEntry[], floors: Floors) => {
                         `::warning::Lighthouse ${category} on ${path} is ${score(value)}, below ${WARN_BELOW}`,
                     );
                 }
-                return `${score(value)} (floor ${score(floors[path]?.[category])})`;
+                return `${score(value)} (${floorText(floors[path]?.[category])})`;
             });
-            return [`\`${path}\``, ...cells];
+            return [`\`${path}\``, deviceOf(searchParams), ...cells];
         });
 
     const markdown = [
@@ -45,6 +53,7 @@ export const summarize = (entries: ReportEntry[], floors: Floors) => {
         markdownTable(
             [
                 { label: 'Page' },
+                { label: 'Device' },
                 ...CATEGORIES.map((category) => ({ label: category, align: 'right' as const })),
             ],
             rows,

@@ -38,3 +38,6 @@ dist-ssr
 
 # Playwright MCP browser logs and downloads
 .playwright-mcp/
+
+# Axe scan reports (spec 0014)
+.a11y/

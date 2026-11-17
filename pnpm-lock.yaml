@@ -233,6 +233,9 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
     devDependencies:
+      '@axe-core/puppeteer':
+        specifier: 4.14.0
+        version: 4.14.0(puppeteer@25.14.0(yauzl@2.10.0))
       '@babel/core':
         specifier: ^7.29.7
         version: 7.29.7(supports-color@5.5.0)
@@ -278,6 +281,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^5.0.5
         version: 5.0.5(vitest@5.0.5)
+      axe-core:
+        specifier: 4.14.0
+        version: 4.14.0
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
@@ -348,6 +354,12 @@ packages:
   '@asamuzakjp/dom-selector@10.0.4':
     resolution: {integrity: sha512-A6f1nKy99I6tyoK82U6kBHvQQZmdHmTmPzJYPY/0eaOW0r8/qPmEOwjGHs+hL/vCgOwQTupu4LT1XtXNUuDruA==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
+
+  '@axe-core/puppeteer@4.14.0':
+    resolution: {integrity: sha512-EWAKemFmYfdzZx+xt2QZ/gCp2jaysfZEYbYgLqTDd2JUC4jBLYz+oSCzPT/sySLr5tcI/++CKDYUPQsf7Lr1xA==}
+    engines: {node: '>=22.12.0'}
+    peerDependencies:
+      puppeteer: '>=1.10.0'
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -5858,6 +5870,11 @@ snapshots:
       css-tree: 3.2.1
       is-potential-custom-element-name: 1.0.1
       lru-cache: 11.5.3
+
+  '@axe-core/puppeteer@4.14.0(puppeteer@25.14.0(yauzl@2.10.0))':
+    dependencies:
+      axe-core: 4.14.0
+      puppeteer: 25.14.0(yauzl@2.10.0)
 
   '@babel/code-frame@7.29.0':
     dependencies:

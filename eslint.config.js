@@ -77,7 +77,7 @@ const tokenOnly = {
 };
 
 export default defineConfig([
-    globalIgnores(['dist', '.agents', '.lighthouseci']),
+    globalIgnores(['dist', '.agents', '.lighthouseci', '.a11y']),
     {
         files: ['**/*.{ts,tsx}'],
         extends: [
@@ -118,9 +118,9 @@ export default defineConfig([
         extends: [js.configs.recommended],
         languageOptions: { sourceType: 'commonjs', globals: globals.node },
     },
-    // The seed script also passes functions into the page, which run in the browser
+    // The seed scripts also pass functions into the page, which run in the browser
     {
-        files: ['scripts/perf/lhci-seed.cjs'],
+        files: ['scripts/perf/lhci-seed.cjs', 'scripts/perf/seed-visitor.cjs'],
         languageOptions: { globals: { ...globals.node, ...globals.browser } },
     },
     { ...restrict(['src/**/*.{ts,tsx}'], []), ignores: ['src/routeTree.gen.ts'] },

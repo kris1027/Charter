@@ -35,10 +35,12 @@
         "test:coverage": "vitest run --coverage",
         "pre-commit": "prettier --write . && pnpm templates:previews --check && eslint . && vitest run && tsc -b && vite build && pnpm perf:size",
         "perf:size": "node scripts/perf/check-bundle-size.ts",
-        "perf:lhci": "lhci autorun",
+        "perf:lhci": "node scripts/perf/lhci-run.ts",
         "perf:lhci-summary": "node scripts/perf/lighthouse-summary.ts",
         "perf:lighthouse": "pnpm build && pnpm perf:lhci; pnpm perf:lhci-summary",
-        "templates:previews": "node scripts/templates/build-previews.ts"
+        "templates:previews": "node scripts/templates/build-previews.ts",
+        "a11y": "VITE_SITE_URL=http://localhost:4173 pnpm build && pnpm a11y:scan",
+        "a11y:scan": "node scripts/a11y/axe-scan.ts"
     },
     "dependencies": {
         "@dnd-kit/core": "^6.3.1",
@@ -65,6 +67,7 @@
         "zod": "^4.6.7"
     },
     "devDependencies": {
+        "@axe-core/puppeteer": "4.14.0",
         "@babel/core": "^7.29.7",
         "@eslint/js": "^10.0.1",
         "@lhci/cli": "0.15.1",
@@ -80,6 +83,7 @@
         "@types/react-dom": "^19.3.0",
         "@vitejs/plugin-react": "^6.1.2",
         "@vitest/coverage-v8": "^5.0.5",
+        "axe-core": "4.14.0",
         "babel-plugin-react-compiler": "^1.0.0",
         "eslint": "^10.13.0",
         "eslint-config-prettier": "^10.1.8",

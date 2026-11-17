@@ -80,7 +80,9 @@ export const SortableCard = ({
             <div className='mb-4 flex items-center justify-between gap-2'>
                 <div className='flex min-w-0 items-center gap-2'>
                     <DragHandle handleProps={handleProps} size='md' />
-                    <h3 className='font-display truncate text-base font-semibold'>{title}</h3>
+                    <h3 className='font-display min-w-0 text-base font-semibold wrap-break-word'>
+                        {title}
+                    </h3>
                 </div>
                 <div className='flex shrink-0 items-center gap-1'>
                     <Button

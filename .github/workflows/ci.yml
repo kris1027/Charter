@@ -99,3 +99,43 @@ jobs:
                   path: .lighthouseci
                   include-hidden-files: true
                   retention-days: 14
+
+    # Axe on every page and overlay in EN/PL, light/dark, phone/desktop (spec 0014); fails on any
+    # serious or critical violation. Runs beside Lighthouse, on the same build
+    accessibility:
+        name: Accessibility
+        needs: lint-format-test-build
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: pnpm/action-setup@v4
+
+            - uses: actions/setup-node@v6
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            # vite preview loads vite.config.ts and its plugins
+            - run: pnpm install --frozen-lockfile
+
+            - name: Download build
+              uses: actions/download-artifact@v8
+              with:
+                  name: dist
+                  path: dist
+
+            - name: Axe scan
+              run: pnpm a11y:scan
+              env:
+                  CHROME_PATH: /usr/bin/google-chrome
+
+            - name: Upload axe results
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: axe-results
+                  path: .a11y
+                  include-hidden-files: true
+                  retention-days: 14

@@ -1,4 +1,5 @@
-import { HeadContent, Outlet } from '@tanstack/react-router';
+import { HeadContent, Outlet, useRouter } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { Toaster } from '@/components/ui/toast';
@@ -10,7 +11,16 @@ import { MotionProvider } from '@/app/motion-provider';
 import { useTranslation } from 'react-i18next';
 
 export const RootLayout = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const router = useRouter();
+
+    // Route titles come from `head`, which runs on navigation; a language change reruns it so the
+    // tab title follows the language (WCAG 2.4.2, spec 0014)
+    useEffect(() => {
+        const handleLanguageChanged = () => void router.invalidate();
+        i18n.on('languageChanged', handleLanguageChanged);
+        return () => i18n.off('languageChanged', handleLanguageChanged);
+    }, [i18n, router]);
 
     return (
         <>

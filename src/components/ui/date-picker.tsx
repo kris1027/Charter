@@ -39,7 +39,7 @@ export function DatePicker({
     yearOnly = false,
 }: DatePickerProps) {
     // Re-render on language change so month names update
-    useTranslation();
+    const { t } = useTranslation();
     const months = getMonthNames('long');
     const monthsShort = getMonthNames('short');
 
@@ -146,11 +146,15 @@ export function DatePicker({
                     disabled={disabled}
                     type='button'
                 >
-                    <CalendarIcon className='mr-2 h-4 w-4' />
+                    <CalendarIcon className='mr-2 h-4 w-4' aria-hidden='true' />
                     <span>{formatDisplay()}</span>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className='w-auto p-4' align='start'>
+            <PopoverContent
+                className='w-auto p-4'
+                align='start'
+                aria-label={t('accessibility.chooseDate')}
+            >
                 <div className='space-y-4'>
                     {/* Year selector */}
                     <div className='flex items-center justify-between'>
@@ -160,14 +164,15 @@ export function DatePicker({
                             onClick={decrementYear}
                             disabled={selectedYear <= fromYear}
                             type='button'
+                            aria-label={t('accessibility.previousYear')}
                         >
-                            <ChevronLeft className='h-4 w-4' />
+                            <ChevronLeft className='h-4 w-4' aria-hidden='true' />
                         </Button>
                         <Select
                             value={selectedYear.toString()}
                             onValueChange={(value) => handleYearChange(Number(value))}
                         >
-                            <SelectTrigger className='w-32'>
+                            <SelectTrigger className='w-32' aria-label={t('accessibility.year')}>
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -187,8 +192,9 @@ export function DatePicker({
                             onClick={incrementYear}
                             disabled={selectedYear >= toYear}
                             type='button'
+                            aria-label={t('accessibility.nextYear')}
                         >
-                            <ChevronRight className='h-4 w-4' />
+                            <ChevronRight className='h-4 w-4' aria-hidden='true' />
                         </Button>
                     </div>
 

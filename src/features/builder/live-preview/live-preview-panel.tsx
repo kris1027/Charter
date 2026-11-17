@@ -21,6 +21,9 @@ export const LivePreviewPanel = ({ preview, unavailableAction }: LivePreviewPane
     return (
         <aside
             aria-label={t('builder.livePreview.title')}
+            // It scrolls on its own and may hold nothing focusable, so it takes focus itself and
+            // keyboard users can scroll it (spec 0014, axe scrollable-region-focusable)
+            tabIndex={0}
             // Strict containment keeps a page swap from laying out the long form beside it. It sticks
             // below the toolbar and the section strip (spec 0012, AC-34)
             className='bg-card shadow-surface sticky top-[7.25rem] h-[calc(100vh-8.25rem)] space-y-3 overflow-y-auto rounded-xl border p-4 [contain:strict]'

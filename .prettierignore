@@ -5,3 +5,4 @@ src/routeTree.gen.ts
 skills-lock.json
 public/pdf.worker.min.mjs
 .lighthouseci
+.a11y

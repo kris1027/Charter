@@ -154,6 +154,9 @@ const Toaster = () => {
             position='bottom-center'
             expand
             visibleToasts={4}
+            // On phones toasts span the width; 5rem keeps them above the builder's floating
+            // Preview button, which they would cover otherwise (spec 0014)
+            mobileOffset={{ bottom: '5rem' }}
             containerAriaLabel={t('toast.region')}
         />
     );
