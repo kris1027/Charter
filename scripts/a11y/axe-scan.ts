@@ -10,7 +10,7 @@ import { AxePuppeteer } from '@axe-core/puppeteer';
 import axe from 'axe-core';
 import type { AxeResults } from 'axe-core';
 import puppeteer from 'puppeteer';
-import type { Browser, Page } from 'puppeteer';
+import type { Browser, HTTPRequest, Page } from 'puppeteer';
 import { writeJobSummary } from '../perf/job-summary.ts';
 import { PREVIEW_ORIGIN as ORIGIN } from '../perf/audit-targets.ts';
 import { startPreviewServer } from '../perf/preview-server.ts';
@@ -80,12 +80,24 @@ const waitForReady = async (page: Page, scan: Scan) => {
     const visible = (selector: string) =>
         page.waitForSelector(selector, { visible: true, timeout: WAIT_TIMEOUT });
 
-    await withRetry('page load', () =>
-        page.goto(ORIGIN + path, { waitUntil: 'load', timeout: WAIT_TIMEOUT }),
-    );
-    await withRetry('network idle', () =>
-        page.waitForNetworkIdle({ idleTime: 500, timeout: WAIT_TIMEOUT }),
-    );
+    // A network idle timeout names the requests still open, so a stalled load says what it
+    // waited on
+    const open = new Set<string>();
+    const track = (request: HTTPRequest) => open.add(request.url());
+    const untrack = (request: HTTPRequest) => open.delete(request.url());
+    page.on('request', track).on('requestfinished', untrack).on('requestfailed', untrack);
+    try {
+        await withRetry('page load', () =>
+            page.goto(ORIGIN + path, { waitUntil: 'load', timeout: WAIT_TIMEOUT }),
+        );
+        await withRetry('network idle', () =>
+            page.waitForNetworkIdle({ idleTime: 500, timeout: WAIT_TIMEOUT }).catch((error) => {
+                throw new Error(`${error.message}; still open: ${[...open].join(', ') || 'none'}`);
+            }),
+        );
+    } finally {
+        page.off('request', track).off('requestfinished', untrack).off('requestfailed', untrack);
+    }
     await page.evaluate(() => document.fonts.ready.then(() => undefined));
     await withRetry('the h1', () => visible('h1'));
     if (path === '/builder') {
