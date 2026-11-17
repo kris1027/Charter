@@ -106,7 +106,6 @@ jobs:
         name: Accessibility
         needs: lint-format-test-build
         runs-on: ubuntu-latest
-        continue-on-error: true
 
         steps:
             - uses: actions/checkout@v6
