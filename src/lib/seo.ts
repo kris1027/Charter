@@ -1,5 +1,6 @@
 import i18n from '@/i18n/config';
-import type { TemplateId } from '@/lib/template-ids';
+import { isTemplateId } from '@/lib/template-ids';
+import type enTranslation from '@/locales/en/translation.json';
 
 if (!import.meta.env.VITE_SITE_URL) {
     throw new Error(
@@ -26,16 +27,37 @@ export const OG_DEFAULTS = {
     locale: 'en_US',
 } as const;
 
-export const TEMPLATE_NAMES: Record<TemplateId, string> = {
-    developer: 'Developer',
-    default: 'Default',
-    veterinary: 'Veterinary',
-} as const;
+/** A key under `pageTitle` in the locale files, so a typo fails the typecheck. */
+export type PageTitleKey = `pageTitle.${keyof (typeof enTranslation)['pageTitle']}`;
+
+/** A page title in the visitor's language, or in `lng` when given. */
+export const pageTitle = (key: PageTitleKey, options?: { name?: string; lng?: string }) =>
+    i18n.t(key, options);
 
 /**
- * The tab title in the visitor's language (WCAG 2.4.2, spec 0014). Routes read it in `head`, and
- * the root layout reruns `head` on a language change; og and twitter titles stay English, like
- * `og:locale`, since crawlers see the English page.
+ * A route's title meta (WCAG 2.4.2, spec 0014): the tab title in the visitor's language, and og
+ * and twitter titles in English, like `og:locale`, since crawlers see the English page. Routes
+ * spread it into `head`; the root layout reruns `head` on a language change.
  */
-export const pageTitle = (key: `pageTitle.${string}`, options?: Record<string, string>) =>
-    i18n.t(key, options);
+const titleMeta = (titleIn: (lng?: string) => string) => {
+    const shareTitle = titleIn('en');
+    return [
+        { title: titleIn() },
+        { property: 'og:title', content: shareTitle },
+        { name: 'twitter:title', content: shareTitle },
+    ];
+};
+
+export const routeTitleMeta = (key: PageTitleKey) =>
+    titleMeta((lng) => pageTitle(key, lng ? { lng } : undefined));
+
+/** The template detail page's title meta, naming the template in each language. */
+export const templateTitleMeta = (templateId: string) =>
+    titleMeta((lng) =>
+        pageTitle('pageTitle.template', {
+            name: isTemplateId(templateId)
+                ? i18n.t(`templates.${templateId}.name`, lng ? { lng } : undefined)
+                : templateId,
+            ...(lng && { lng }),
+        }),
+    );
