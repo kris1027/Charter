@@ -1,41 +1,48 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
+    "a11y-debugging": {
+      "source": "ChromeDevTools/chrome-devtools-mcp",
+      "commit": "045fb8c37d38a3c12d7c11475357f9ee90c60698",
+      "sourceType": "github",
+      "skillPath": "skills/a11y-debugging/SKILL.md",
+      "computedHash": "6171db1f81edc051f5759c49f4b41c3f80fc1b5cc0ed281bcaf0eb07735c4c4a"
+    },
     "ask-sonner": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
       "skillPath": "skills/ask-sonner/SKILL.md",
-      "computedHash": "8bd257b845985f4b35b603b510a126604176521094af79c4b7347ffeb8a8f7ab"
+      "computedHash": "3d53f948bd8b19993b70d66929f70fa5ddb44bca6018e2c29f9cec6c8bf2b9cf"
     },
     "react-pdf": {
       "source": "molefrog/skills",
       "sourceType": "github",
       "skillPath": "skills/react-pdf/SKILL.md",
-      "computedHash": "0d67e5cb5f4b6cff7e4f167dc519c1d2444c7580709b18b460a858606d06f652"
+      "computedHash": "27d9dfb7cc9b315492d7414d4de2f3fc573c268edbdf4dbc90e2970736918513"
     },
     "tanstack-form": {
       "source": "tanstack-skills/tanstack-skills",
       "sourceType": "github",
       "skillPath": "plugins/tanstack-form/skills/tanstack-form/SKILL.md",
-      "computedHash": "1eb9f9fc43ab2777f586f916b2234c5340ed98f296a98b22c75cbbafcbd29b86"
+      "computedHash": "430501f64ccd9122d446b9e4e411c143427bc5f0ce0f9d78a6eb8d2a056c3a6d"
     },
     "tanstack-router": {
       "source": "tanstack-skills/tanstack-skills",
       "sourceType": "github",
       "skillPath": "plugins/tanstack-router/skills/tanstack-router/SKILL.md",
-      "computedHash": "24beccc4016f91bab65547209cfd849ea5e66f3d5d92820683a9dd84669ced56"
+      "computedHash": "0dc04f63713e7f4eb62add3aa2188abc5c5e2652b246e3e839197fa27a196dbb"
     },
     "vite": {
       "source": "antfu/skills",
       "sourceType": "github",
       "skillPath": "skills/vite/SKILL.md",
-      "computedHash": "88ee465fd10f711efecc76e91e96accae2b229dda371614dcf219099c264a486"
+      "computedHash": "0817ddc0c50988b36d34c258f62e74b89d8117a02b61978a0ddc5782155b01e0"
     },
     "vitest": {
       "source": "antfu/skills",
       "sourceType": "github",
       "skillPath": "skills/vitest/SKILL.md",
-      "computedHash": "21af2b13d47d31f3094b61c0f41abc8d6a7eed0df3c9a4029ea671f6978b7209"
+      "computedHash": "fbe54c4c65d1e97c2fedc5c46381efc90d301a9d05b92690e2f577bfb907ab0c"
     }
   }
 }

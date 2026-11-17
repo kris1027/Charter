@@ -26,6 +26,7 @@ pnpm format           # Prettier; CI runs format:check, templates:previews --che
 pnpm perf:size        # Per route JS (brotli) against perf/budgets.json, fails a first load holding a `lazyEngines` chunk; needs a fresh dist
 pnpm templates:previews  # Regenerate gallery images after a template change; --check, --baseline, --diff
 pnpm perf:lighthouse  # Build, then Lighthouse CI on vite preview (local only, not in pre-commit)
+pnpm a11y             # Build, then axe scan of every page and overlay (EN/PL, light/dark, phone/desktop); a11y:scan reuses dist; blocking CI job, not in pre-commit
 pnpm pre-commit       # format, previews check, lint, test, build, perf:size (not Lighthouse); run before pushing
 ```
 
@@ -54,6 +55,8 @@ Stored in `docs/specs/`. Format: one folder per spec, `docs/specs/NNNN-title/` w
 - Resume storage keys (`resumeData`, `resumeData_backup`, `resumeData_lastSaved`) are written or removed only by `saveResume`, `writeResume` and `clearResume` in `src/features/resume/stored-resume.ts`.
 - Template choice travels as `?templateId=` on `/builder` and `/preview`; the gallery detail page uses the path `/templates/$templateId`.
 - Canonical link: each route sets its own in its `head`; `src/routes/__root.tsx` sets none, since a second one conflicts and fails the Lighthouse SEO check.
+- Page titles: each route's `head` title comes from `pageTitle('pageTitle.*')` (`src/lib/seo.ts`, keys in EN and PL); the root layout reruns `head` on a language change. og and twitter titles stay English.
+- CSP has no `'unsafe-eval'`: Zod runs with `z.config({ jitless: true })` (`resume-schema.ts`), since its `new Function` probe costs `/builder` best practices (spec 0014).
 - Route `validateSearch` ships in the bundle every page loads, so keep it zod free (plain checks such as `isTemplateId`; see `src/features/builder/builder-search.ts`).
 - Builder form: one `useAppForm` from `src/features/builder/resume-form.ts` (`createFormHook`). Sections are `withForm` components, inputs are the registered field components in `src/features/builder/fields/`, and lists use `form.Field mode='array'` helpers plus `form-sections/sortable-list.tsx` (no `@dnd-kit` imports in sections, no value casts). A card list section (experience, education, languages) also renders from `form.Subscribe` on its array's `length` (passed as `count` to `SortableList`; each card reads its own fields, so typing redraws one field, spec 0009), since array fields skip `form.reset`; chip lists (skills, interests) subscribe to the whole array, since each chip shows its name and has no input. ESLint caps non test builder files at 250 lines (`max-lines`).
 - Tests: co-located `*.test.ts(x)`, render via `@/test/test-utils` (real EN translations, so missing keys fail), `it('should ... when ...')`, query by role, label or text.
@@ -66,6 +69,8 @@ Stored in `docs/specs/`. Format: one folder per spec, `docs/specs/NNNN-title/` w
 - [vite](.agents/skills/vite/): `antfu/skills`, Vite 8 config and plugins
 - [react-pdf](.agents/skills/react-pdf/): `molefrog/skills`, `@react-pdf/renderer` templates
 - [ask-sonner](.agents/skills/ask-sonner/): `emilkowalski/skills`, Sonner toasts
+- [a11y-debugging](.agents/skills/a11y-debugging/): `chromedevtools/chrome-devtools-mcp`, accessibility debugging in a live Chrome (ARIA, focus, keyboard, contrast, tap targets); pairs with the Chrome DevTools MCP
+- MCP servers: Chrome DevTools MCP (recommended)
 
 ## Git
 
