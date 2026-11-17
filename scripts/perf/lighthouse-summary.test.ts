@@ -63,7 +63,7 @@ describe('summarize', () => {
         expect(markdown).not.toContain('0.50');
     });
 
-    it('should give each phone, Polish, dark and desktop URL its own row with its floors', () => {
+    it('should give each URL its own row with its floors when the manifest mixes phone, Polish, dark and desktop', () => {
         const all = { performance: 1, accessibility: 1, 'best-practices': 1, seo: 1 };
         const steady = { accessibility: 0.95, 'best-practices': 0.95, seo: 0.95 };
         const { markdown } = summarize(

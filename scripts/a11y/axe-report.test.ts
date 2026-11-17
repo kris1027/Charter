@@ -72,7 +72,7 @@ describe('axe report', () => {
         ).toBe(false);
     });
 
-    it('should print rule, impact, page, variant, state, target and help URL for each violation', () => {
+    it('should print rule, impact, page, variant, state, target and help URL when a scan has violations', () => {
         const [line] = consoleLines([result([violation('button-name', 'critical', '.icon')])], []);
 
         expect(line).toBe(
@@ -123,7 +123,7 @@ describe('axe exceptions', () => {
         ).toThrow('Axe exceptions need a reason: region on div');
     });
 
-    it('should find the narrowing for an open state only on its own page', () => {
+    it('should find the narrowing for an open state only when the page matches', () => {
         const exceptions: AxeException[] = [
             {
                 kind: 'narrow',

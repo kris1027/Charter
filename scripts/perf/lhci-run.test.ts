@@ -12,7 +12,7 @@ type LhciConfig = {
 const config = createRequire(import.meta.url)('../../lighthouserc.cjs') as LhciConfig;
 
 describe('unmatchedFloors', () => {
-    it('should name a floor whose URL no run audited', () => {
+    it('should name a floor when no run audited its URL', () => {
         expect(
             unmatchedFloors(['/', '/builder?lang=pl'], 'http://x', [
                 'http://x/',
@@ -37,7 +37,7 @@ describe('lighthouserc', () => {
         expect(Object.keys(config.floors)).toHaveLength(22);
     });
 
-    it('should keep every floor between 0.95 and 1.00', () => {
+    it('should keep every floor between 0.95 and 1.00 when the config loads', () => {
         const scores = Object.values(config.floors).flatMap((categories) =>
             Object.values(categories),
         );
@@ -45,7 +45,7 @@ describe('lighthouserc', () => {
         expect(scores.every((score) => score >= 0.95 && score <= 1)).toBe(true);
     });
 
-    it('should assert performance only on the English light phone URLs', () => {
+    it('should assert performance only when the URL is English light on a phone', () => {
         const withPerformance = Object.entries(config.floors)
             .filter(([, categories]) => 'performance' in categories)
             .map(([path]) => path);
