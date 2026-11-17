@@ -1,5 +1,7 @@
 // One visitor setup for Lighthouse (lhci-seed.cjs) and the axe scan (scripts/a11y), spec 0014.
-// Both checks see the same app state, and the storage keys live only here.
+// Both checks see the same app state, and the storage keys live only here. It writes localStorage
+// directly, not through the app's safeStorage or stored-resume.ts, since it runs in the page before
+// the app; src/test/fixtures/perf-resume.test.ts keeps the fixture in the shape the app saves.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 

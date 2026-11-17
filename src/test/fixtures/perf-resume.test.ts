@@ -4,7 +4,8 @@ import { sampleResumeData } from '@/features/resume/sample-resume-data';
 import { normalizeResume } from '@/features/resume/stored-resume';
 import type { StoredResume } from '@/features/resume/stored-resume';
 
-// The Lighthouse seed script (scripts/perf/lhci-seed.cjs) stores this fixture as resumeData
+// scripts/perf/seed-visitor.cjs writes this fixture straight to resumeData for Lighthouse and the
+// axe scan, outside stored-resume.ts; these tests keep it in the shape the app saves and loads
 describe('perf-resume fixture', () => {
     it('should equal the EN sample resume when the sample is unchanged', () => {
         expect(perfResume).toEqual(JSON.parse(JSON.stringify(sampleResumeData)));
